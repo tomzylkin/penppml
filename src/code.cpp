@@ -3,12 +3,10 @@
 // #include <RcppArmadillo.h>
 #include <RcppEigen.h>
 #include <Rcpp.h>
+#include "penppml_types.h"
 
 using namespace Rcpp;
 using namespace Eigen;
-
-typedef Eigen::Map<Eigen::MatrixXd>  MapMatd;
-typedef Eigen::Map<Eigen::VectorXd>  MapVecd;
 
 // This is a simple example of exporting a C++ function to R. You can
 // source this function into an R session using the Rcpp::sourceCpp

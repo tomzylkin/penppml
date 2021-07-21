@@ -1,5 +1,5 @@
-Package: penpplm
-Title: What the Package Does (One Line, Title Case)
+Package: penppml
+Title: Penalized Poisson Pseudo Maximum Likelihood
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Diego",
@@ -15,7 +15,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 LinkingTo: 
     Rcpp,
-    RcppEigen
+    RcppEigen,
+    RccpArmadillo
 Imports: 
     Rcpp,
-    RcppEigen
+    RcppEigen,
+    RccpArmadillo
