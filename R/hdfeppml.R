@@ -1,5 +1,6 @@
-hdfeppml <- function(y,x,fes,tol=1e-8,hdfetol=1e-4,colcheck=TRUE,selectobs=NULL,mu=NULL,saveX=TRUE,init_z = NULL,
-                     verbose=FALSE,maxiter=1000, cluster=NULL, vcv=TRUE) {
+hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
+                     mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
+                     cluster = NULL, vcv = TRUE) {
 
   if (is.null(selectobs)) {
     selectobs <- rep(TRUE,length(y))

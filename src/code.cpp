@@ -6,12 +6,7 @@
 
 using namespace Rcpp;
 using namespace Eigen;
-using Eigen::LLT;
-using Eigen::Lower;
-using Eigen::Map;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using Rcpp::as;
+
 typedef Eigen::Map<Eigen::MatrixXd>  MapMatd;
 typedef Eigen::Map<Eigen::VectorXd>  MapVecd;
 
@@ -29,8 +24,8 @@ typedef Eigen::Map<Eigen::VectorXd>  MapVecd;
 //   sparse matrices? https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html
 
 // [[Rcpp::export]]
-SEXP eigenMatMult(MatrixXd A, MatrixXd B){
-  MatrixXd C;
+SEXP eigenMatMult(Eigen::MatrixXd A, Eigen::MatrixXd B){
+  Eigen::MatrixXd C;
   C = A * B;
 
   return wrap(C);
@@ -45,34 +40,34 @@ SEXP eigenMapMatMult(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::Matr
   return Rcpp::wrap(C);
 }
 
-MatrixXd AtA(const MapMatd& A) {
+Eigen::MatrixXd AtA(const MapMatd& A) {
   int  n(A.cols());
-  return  MatrixXd(n,n).setZero().selfadjointView<Lower>().rankUpdate(A.adjoint());
+  return  Eigen::MatrixXd(n,n).setZero().selfadjointView<Eigen::Lower>().rankUpdate(A.adjoint());
 }
 
 // [[Rcpp::export]]
 NumericVector fastolsCpp(MapMatd X, MapVecd y){
-  MatrixXd A=AtA(X);
-  const LLT<MatrixXd> llt(A);
-  const VectorXd betahat(llt.solve(X.adjoint() * y));
+  Eigen::MatrixXd A=AtA(X);
+  const Eigen::LLT<Eigen::MatrixXd> llt(A);
+  const Eigen::VectorXd betahat(llt.solve(X.adjoint() * y));
   return wrap(betahat);
 }
 
 // [[Rcpp::export]]
 NumericVector fastridgeCpp(MapMatd X, MapVecd y, double lambda){
-  MatrixXd A=AtA(X);
+  Eigen::MatrixXd A=AtA(X);
   int k = A.cols();
-  MatrixXd Id = MatrixXd::Identity(k, k);
+  Eigen::MatrixXd Id = Eigen::MatrixXd::Identity(k, k);
   A=A+lambda*Id;
-  const LLT<MatrixXd> llt(A);
-  const VectorXd betahat(llt.solve(X.adjoint() * y));
+  const Eigen::LLT<Eigen::MatrixXd> llt(A);
+  const Eigen::VectorXd betahat(llt.solve(X.adjoint() * y));
   return wrap(betahat);
 }
 
 // [[Rcpp::export]]
-NumericVector faststddev(ArrayXXd X, ArrayXd w){
+NumericVector faststddev(Eigen::ArrayXXd X, Eigen::ArrayXd w){
   w = w/(w.sum());
-  ArrayXXd Xw      = X.colwise()*w;
+  Eigen::ArrayXXd Xw      = X.colwise()*w;
   Array<double, Dynamic, Dynamic> step1 = (((X.rowwise() - Xw.colwise().sum()).square()).colwise()*w);
   Array<double, Dynamic, 1> step2 = step1.colwise().sum();
   Array<double, Dynamic, 1> step3 = step2.sqrt();
@@ -81,13 +76,13 @@ NumericVector faststddev(ArrayXXd X, ArrayXd w){
 }
 
 // [[Rcpp::export]]
-NumericVector fastwmean(ArrayXXd X, ArrayXd w){
-  //ArrayXXd Xw = X*w;
+NumericVector fastwmean(Eigen::ArrayXXd X, Eigen::ArrayXd w){
+  //Eigen::ArrayXXd Xw = X*w;
   // convert weights to sum to 1?
   int n = X.rows();
   int k = X.cols();
   w = w/(w.sum());
-  ArrayXXd Xw = X.colwise()*w;
+  Eigen::ArrayXXd Xw = X.colwise()*w;
   Array<double, Dynamic, 1> wmean = Xw.colwise().sum();
   return wrap(wmean);
 }
@@ -117,7 +112,7 @@ SEXP xeex(const Eigen::Map<Eigen::MatrixXd> X, Eigen::Map<Eigen::MatrixXd> ee){
   int T  = ee.cols();
   int g = gT/T;
   Eigen::MatrixXd M(K,K);
-  M = MatrixXd::Zero(K, K);
+  M = Eigen::MatrixXd::Zero(K, K);
   for (int n = 0; n <= g-1; n++) {
     M = M + X.block(n*T,0,T,K).transpose()*ee.block(n*T,0,T,T)*X.block(n*T,0,T,K);
   }
