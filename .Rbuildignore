@@ -1,2 +1,5 @@
-^penpplm\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+.Rproj
+^penppml\.Rproj$
+^data-raw$
