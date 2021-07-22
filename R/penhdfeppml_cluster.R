@@ -1,3 +1,29 @@
+#' Title
+#'
+#' @param y
+#' @param x
+#' @param fes
+#' @param cluster
+#' @param tol
+#' @param hdfetol
+#' @param glmnettol
+#' @param penalty
+#' @param penweights
+#' @param selectobs
+#' @param saveX
+#' @param mu
+#' @param colcheck
+#' @param K
+#' @param init_z
+#' @param post
+#' @param verbose
+#' @param lambda
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,penalty="lasso",penweights=NULL,
                                 selectobs=NULL,saveX=TRUE,mu=NULL,colcheck=TRUE,K=15,init_z = NULL,post=FALSE,verbose=FALSE,lambda=NULL) {
 

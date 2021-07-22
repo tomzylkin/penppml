@@ -1,3 +1,31 @@
+#' Title
+#'
+#' @param y
+#' @param x
+#' @param fes
+#' @param lambda
+#' @param tol
+#' @param hdfetol
+#' @param glmnettol
+#' @param penalty
+#' @param penweights
+#' @param selectobs
+#' @param saveX
+#' @param mu
+#' @param colcheck
+#' @param init_z
+#' @param post
+#' @param verbose
+#' @param standardize
+#' @param method
+#' @param cluster
+#' @param debug
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,penalty=c("lasso","ridge"),penweights=NULL,
                         selectobs=rep(TRUE,length(y)),saveX=TRUE,mu=NULL,colcheck=TRUE,init_z = NULL,post=FALSE,verbose=FALSE,standardize=TRUE,method="placeholder",
                         cluster=NULL,debug=FALSE) {

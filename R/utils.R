@@ -1,31 +1,44 @@
 ## !!! CURRENTLY NOT USING !!!!
-setupLambda <- function(X, y, lambda.min, nlambda, penalty.factor) {
-  n <- nrow(X)
-  p <- ncol(X)
+# setupLambda <- function(X, y, lambda.min, nlambda, penalty.factor) {
+#  n <- nrow(X)
+#  p <- ncol(X)
 
-  ## Determine lambda.max
-  ind <- which(penalty.factor!=0)
-  if (length(ind)!=p) {
-    fit <- glm(y~X[, -ind], family="gaussian")
-  } else {
-    fit <- glm(y~1, family=family)
-  }
+#  ## Determine lambda.max
+#  ind <- which(penalty.factor!=0)
+#  if (length(ind)!=p) {
+#    fit <- glm(y~X[, -ind], family="gaussian")
+#  } else {
+#    fit <- glm(y~1, family=family)
+#  }
 
-  zmax <- .Call("maxprod", X, fit$residuals, ind, penalty.factor) / n
-  lambda.max <- zmax/alpha
+#  zmax <- .Call("maxprod", X, fit$residuals, ind, penalty.factor) / n
+#  lambda.max <- zmax/alpha
 
-  if (lambda.min==0) {
-    lambda <- c(exp(seq(log(lambda.max), log(.001*lambda.max), len=nlambda-1)), 0)
-  } else {
-    lambda <- exp(seq(log(lambda.max), log(lambda.min*lambda.max), len=nlambda))
-  }
+#  if (lambda.min==0) {
+#    lambda <- c(exp(seq(log(lambda.max), log(.001*lambda.max), len=nlambda-1)), 0)
+#  } else {
+#    lambda <- exp(seq(log(lambda.max), log(lambda.min*lambda.max), len=nlambda))
+#  }
+#
+#  if (length(ind)!=p) lambda[1] <- lambda[1] * 1.000001
+#  lambda
+#}
 
-  if (length(ind)!=p) lambda[1] <- lambda[1] * 1.000001
-  lambda
-}
 
-# check for collinearity
-collinearity_check= function(y,x,fes,hdfetol,selectobs=NULL) {
+#' Title
+#'
+#' @param y
+#' @param x
+#' @param fes
+#' @param hdfetol
+#' @param selectobs
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+collinearity_check <- function(y,x,fes,hdfetol,selectobs=NULL) {
   # selectobs doesn't currently do anything.
 
   mu  <- (y + mean(y))/2
@@ -41,7 +54,18 @@ collinearity_check= function(y,x,fes,hdfetol,selectobs=NULL) {
   include_x <- which(!is.na(check$coefficients))
 }
 
-# compute variance of score (XeeX) under assumed clustering
+
+#' Title
+#'
+#' @param e
+#' @param cluster
+#' @param x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 cluster_matrix <- function(e,cluster,x) {
   K <- ncol(x)
   vars      <- data.frame(e=e,cluster=factor(cluster,exclude=TRUE),x=x)
@@ -66,7 +90,19 @@ cluster_matrix <- function(e,cluster,x) {
   return(XeeX)
 }
 
-# weighted standardization; this could be made much faster.
+
+#' Title
+#'
+#' @param x
+#' @param weights
+#' @param intercept
+#' @param return.sd
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 standardize_wt <- function(x,weights=rep(1/n,n),intercept=TRUE,return.sd=FALSE){
   n     <- nrow(x)
   nvars <- ncol(x)
@@ -86,7 +122,20 @@ standardize_wt <- function(x,weights=rep(1/n,n),intercept=TRUE,return.sd=FALSE){
   }
 }
 
-# faster ridge estimation
+
+#' Title
+#'
+#' @param x
+#' @param y
+#' @param weights
+#' @param lambda
+#' @param standardize
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 fastridge <- function(x,y,weights=rep(1/n,n),lambda,standardize=TRUE){
   n <- length(y)
   if(standardize){

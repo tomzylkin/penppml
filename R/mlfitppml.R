@@ -1,3 +1,29 @@
+#' Title
+#'
+#' @param y
+#' @param x
+#' @param fes
+#' @param lambdas
+#' @param penalty
+#' @param tol
+#' @param hdfetol
+#' @param colcheck
+#' @param post
+#' @param cluster
+#' @param method
+#' @param IDs
+#' @param verbose
+#' @param xval
+#' @param standardize
+#' @param vcv
+#' @param penweights
+#' @param K
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 mlfitppml = function(y,x,fes,lambdas,penalty=c("lasso","ridge"),tol=1e-8,hdfetol=1e-4,colcheck=TRUE,post=TRUE,cluster=NULL,
                      method=c("bic","iterative"),IDs=1:n,verbose=FALSE,
                      xval=FALSE,standardize=TRUE,vcv=TRUE,penweights=NULL,K=15) {

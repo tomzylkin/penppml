@@ -1,4 +1,4 @@
-// [[Rcpp::depends(RcppArmadillo, RcppEigen)]]
+// [[Rcpp::depends(RcppEigen)]]
 
 // #include <RcppArmadillo.h>
 #include <RcppEigen.h>

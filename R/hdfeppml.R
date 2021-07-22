@@ -1,3 +1,25 @@
+#' Title
+#'
+#' @param y
+#' @param x
+#' @param fes
+#' @param tol
+#' @param hdfetol
+#' @param colcheck
+#' @param selectobs
+#' @param mu
+#' @param saveX
+#' @param init_z
+#' @param verbose
+#' @param maxiter
+#' @param cluster
+#' @param vcv
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
                      mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
                      cluster = NULL, vcv = TRUE) {
