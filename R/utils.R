@@ -38,7 +38,7 @@
 #'
 #' @examples
 
-collinearity_check <- function(y,x,fes,hdfetol,selectobs=NULL) {
+collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
   # selectobs doesn't currently do anything.
 
   mu  <- (y + mean(y))/2
@@ -46,8 +46,8 @@ collinearity_check <- function(y,x,fes,hdfetol,selectobs=NULL) {
   reg_z  <- matrix(z)
   reg_x  <- x
   mu  <- (y + mean(y))/2
-  z_resid <- demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-  x_resid <- demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+  z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
+  x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
 
   check <- lm.wfit(x_resid, z_resid, mu) #faster than lmfit
   check$coefficients

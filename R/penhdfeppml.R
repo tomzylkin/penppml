@@ -104,11 +104,11 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
       }
 
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
-      z_resid <- demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-      x_resid <- demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+      z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
+      x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
 
       if (is.null(penweights)) {
-        #penreg <- glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+        #penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
       }
       else{
         if(debug) {
@@ -134,16 +134,16 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
 
         # Lasso is the default
         if(debug) {
-          penreg <- glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+          penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
           print((penreg$beta))
           print(penweights)
         }
         if(debug) {
-          penreg <- glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+          penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
           print((penreg$beta))
           print(penweights)
         }
-        penreg <- glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,penalty.factor=penweights,standardize=standardize)
+        penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,penalty.factor=penweights,standardize=standardize)
         if(debug) {
           print((penreg$beta))
           stop()

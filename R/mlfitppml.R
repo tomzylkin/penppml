@@ -144,8 +144,8 @@ mlfitppml = function(y,x,fes,lambdas,penalty=c("lasso","ridge"),tol=1e-8,hdfetol
           } else{
             # pass mu, x, z as arguments here.
             if(length(x_select)!=0){
-              ppml_temp <- hdfeppml(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
-                                    colcheck=FALSE,cluster=cluster,vcv=vcv)
+              ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+                                    mu = penreg$mu, colcheck = FALSE, cluster = cluster, vcv = vcv)
               pen_beta_pre <- pen_beta
 
               pen_beta[which(penreg$beta!=0),v]  <- ppml_temp$coefficients

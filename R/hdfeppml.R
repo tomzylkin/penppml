@@ -25,7 +25,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
                      cluster = NULL, vcv = TRUE) {
 
   if (is.null(selectobs)) {
-    selectobs <- rep(TRUE,length(y))
+    selectobs <- rep(TRUE, length(y))
   }
   else {
     #y <- y[selectobs]
@@ -33,24 +33,24 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
   }
 
   # number of observations (needed for deviance)
-  n   <- length(selectobs)
+  n <- length(selectobs)
 
-  x<-data.matrix(x)
+  x <- data.matrix(x)
 
   # estimation algorithm
   crit <- 1
-  iter <-0
+  iter <- 0
   old_deviance <- 0
   include_x <- 1:ncol(x)
 
-  b <- matrix(NA,nrow=ncol(x),ncol=1)
+  b <- matrix(NA, nrow = ncol(x), ncol = 1)
   xnames <- colnames(x)
-  if (colcheck==TRUE){
+  if (colcheck == TRUE){
     if (verbose == TRUE) {
       print("checking collinearity")
     }
-    include_x <- collinearity_check(y,x,fes,1e-6)
-    x <- x[,include_x]
+    include_x <- collinearity_check(y, x, fes, 1e-6)
+    x <- x[, include_x]
   }
 
   if (verbose == TRUE) {
@@ -58,14 +58,14 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
   }
 
   while (crit>tol & iter<maxiter) {
-    iter<-iter+1
+    iter <- iter + 1
 
     if (verbose == TRUE) {
       print(iter)
     }
 
-    if(iter==1) {
-      ## initilize "mu"
+    if (iter == 1) {
+      ## initialize "mu"
       y   <- y[selectobs]
       if (is.null(mu)) mu  <- (y + mean(y))/2
       z   <- (y-mu)/mu + log(mu)
@@ -73,7 +73,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
       last_z <- z
       if (is.null(init_z)) {
         reg_z  <- matrix(z)
-      } else{
+      } else {
         reg_z <- init_z
       }
       #reg_x  <- x[selectobs,]  ## this won't work if x has one column. Will work otherwise.
@@ -90,8 +90,8 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     if (verbose == TRUE) {
       print("within transformation step")
     }
-    z_resid <- demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-    x_resid <- demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+    z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
+    x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
 
     if (verbose == TRUE) {
       print("obtaining coefficients")
