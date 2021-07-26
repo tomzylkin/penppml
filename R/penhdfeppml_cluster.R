@@ -24,8 +24,10 @@
 #'
 #' @examples
 
-penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,penalty="lasso",penweights=NULL,
-                                selectobs=NULL,saveX=TRUE,mu=NULL,colcheck=TRUE,K=15,init_z = NULL,post=FALSE,verbose=FALSE,lambda=NULL) {
+penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
+                                penalty = "lasso", penweights = NULL, selectobs = NULL, saveX = TRUE,
+                                mu = NULL, colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
+                                verbose = FALSE, lambda = NULL) {
 
   # allow for more penalty functions
 
@@ -36,28 +38,28 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
   if(is.null(lambda)){
     c <- 1.1
     gamma <- .1 / log(n)
-    lambda <- c * sqrt(n) * qnorm(1-gamma/(2*k))
+    lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
   }
 
   if (is.null(selectobs)) {
-    selectobs <- rep(TRUE,length(y))
+    selectobs <- rep(TRUE, length(y))
   }
   else {
     #y <- y[selectobs]
     #x <- x[selectobs]
   }
 
-  if(verbose==TRUE){
+  if(verbose == TRUE){
     print("verbose")
   }
 
-  b <- matrix(NA,nrow=ncol(x),ncol=1)  # fix this later.
+  b <- matrix(NA, nrow = ncol(x), ncol = 1)  # fix this later.
   rownames(b) <- colnames(x)
   include_x <- 1:ncol(x)
 
-  if (colcheck==TRUE){
-    include_x <- collinearity_check(y,x,fes,1e-6)
-    x <- x[,include_x]
+  if (colcheck == TRUE){
+    include_x <- collinearity_check(y, x, fes, 1e-6)
+    x <- x[, include_x]
   }
 
   # number of obs (needed for deviance)
@@ -65,17 +67,17 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
 
   # estimation algorithm
   crit <- 1
-  old_deviance <-0
-  iter <-0
-  while (crit>tol) {
-    iter<-iter+1
+  old_deviance <- 0
+  iter <- 0
+  while (crit > tol) {
+    iter <- iter + 1
 
-    if(iter==1) {
+    if (iter == 1) {
 
       # initilize "mu"
       y   <- y[selectobs]
-      if (is.null(mu)) mu  <- (y + mean(y))/2
-      z   <- (y-mu)/mu + log(mu)
+      if (is.null(mu)) mu  <- (y + mean(y)) / 2
+      z   <- (y - mu) / mu + log(mu)
       eta <- log(mu)
       last_z <- z
       if (is.null(init_z)) {
@@ -89,60 +91,61 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
       ## how to subset fes?
     } else {
       last_z <- z
-      z <- (y-mu)/mu + log(mu)
+      z <- (y - mu) / mu + log(mu)
       reg_z  <- matrix(z - last_z + z_resid)
       reg_x  <- x_resid
       ## colnames(reg_x)   <- colnames(x)
     }
     print(iter)
 
-    z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-    x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+    z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+    x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
     # the "cluster_matrix" command computes the variance of the score based on the assumed clustering
-    if (iter==1) {
-      e <- mu*z_resid
-      phi <- sqrt(diag(cluster_matrix(mu*z_resid,cluster, x_resid))/n)
+    if (iter == 1) {
+      e <- mu * z_resid
+      phi <- sqrt(diag(cluster_matrix(mu * z_resid, cluster, x_resid)) / n)
     }
-    else if (iter<=K){
-      phi <- sqrt(diag(cluster_matrix(mu*residuals,cluster, x_resid))/n) # alternatively can use y-mu
+    else if (iter<=K) {
+      phi <- sqrt(diag(cluster_matrix(mu * residuals, cluster, x_resid)) / n) # alternatively can use y-mu
     }
-    lambda_glmnet <- lambda/sum(y) * sum(phi)/k
+    lambda_glmnet <- lambda / sum(y) * sum(phi) / k
 
-    if(verbose==TRUE){
+    if (verbose == TRUE) {
       print(phi)
     }
 
-    if (penalty=="SCAD") {  ## !! currently *very* slow... could be sped up using warm starts.
+    if (penalty == "SCAD") {  ## !! currently *very* slow... could be sped up using warm starts.
       wz_resid <- sqrt(mu) * z_resid
       wx_resid <- sqrt(mu) * x_resid
-      penreg <- ncvreg(wx_resid,wz_resid,penalty="SCAD",lambda=lambda,penalty.loadings = phi)
+      penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty="SCAD", lambda = lambda, penalty.loadings = phi)
     } else {
-      #wx_resid <- cbind(sqrt(mu),wx_resid)
-      #penreg <- cdreg(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=1e-20) ## SLOW!
-      penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda_glmnet,thresh=glmnettol,penalty.factor=phi,standardize=FALSE)
+      #wx_resid <- cbind(sqrt(mu), wx_resid)
+      #penreg <- cdreg(x = x_resid, y = z_resid, weights = mu / sum(mu),lambda = lambda, thresh = 1e-20) ## SLOW!
+      penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
+                               thresh = glmnettol, penalty.factor = phi, standardize = FALSE)
     }
 
     b[include_x] <- penreg$beta #[-1,]   #does using [,include_x] make a difference?
 
-    if(verbose==TRUE){
+    if (verbose == TRUE){
       print(penreg$beta)
     }
 
     residuals <- z_resid - x_resid %*% b[include_x]  #technically this reflects (y-mu)/mu
 
-    mu <- as.numeric(exp(z[selectobs]-residuals))
+    mu <- as.numeric(exp(z[selectobs] - residuals))
 
     # calculate deviance
-    temp <-  -(y * log(y/mu) - (y-mu))
-    temp[which(y==0)] <- -mu[which(y==0)]
+    temp <-  -(y * log(y / mu) - (y - mu))
+    temp[which(y == 0)] <- -mu[which(y == 0)]
     if (!missing(selectobs)){
-      temp[which(!selectobs)] <-0
+      temp[which(!selectobs)] <- 0
     }
 
-    deviance <- -2 * sum(temp)/n
+    deviance <- -2 * sum(temp) / n
 
-    if(deviance<0) deviance = 0
+    if(deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance
 
@@ -150,7 +153,7 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
       delta_deviance = deviance
     }
 
-    denom_crit = max(c( min(c(deviance, old_deviance)) , 0.1 ))
+    denom_crit = max(c(min(c(deviance, old_deviance)), 0.1 ))
     crit = abs(delta_deviance) / denom_crit
 
     #print(deviance)
@@ -165,18 +168,18 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
 
   k   <- length(select_x)
   print(k)
-  bic <- deviance + k*log(n)/n
+  bic <- deviance + k * log(n) / n
   # k = number of elements in x here
   # BIC would be BIC = deviance + k * ln(n)
 
   # use ppml estimates instead of lasso estimates
   if (post) {
-    x_select <- x_resid[,as.numeric(penreg$beta)!=0]
-    if(length(x_select)!=0){
-      ppml_temp <- hdfeppml(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
-                            colcheck=FALSE,cluster=cluster)
+    x_select <- x_resid[, as.numeric(penreg$beta) != 0]
+    if(length(x_select) != 0){
+      ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+                            mu = penreg$mu, colcheck = FALSE, cluster = cluster)
 
-      penreg$beta[which(penreg$beta!=0),1]  <- ppml_temp$coefficients
+      penreg$beta[which(penreg$beta != 0), 1]  <- ppml_temp$coefficients
       b[include_x] <- penreg$beta
       mu    <- ppml_temp$mu
       bic   <- ppml_temp$bic
@@ -194,7 +197,7 @@ penhdfeppml_cluster <- function(y,x,fes,cluster,tol=1e-8,hdfetol=1e-4,glmnettol=
   penreg[["phi"]] <- phi
   penreg[["lambda"]] <- lambda / sum(y)
 
-  if (saveX==TRUE) {
+  if (saveX == TRUE) {
     penreg[["x_resid"]] <- x_resid
     penreg[["z_resid"]] <- z_resid
   }

@@ -49,7 +49,7 @@ collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
   z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
   x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
 
-  check <- lm.wfit(x_resid, z_resid, mu) #faster than lmfit
+  check <- stats::lm.wfit(x_resid, z_resid, mu) #faster than lmfit
   check$coefficients
   include_x <- which(!is.na(check$coefficients))
 }
@@ -71,8 +71,8 @@ cluster_matrix <- function(e,cluster,x) {
   vars      <- data.frame(e=e,cluster=factor(cluster,exclude=TRUE),x=x)
   vars      <- vars[order(vars$cluster),] #5780 is missing...
   vars$indx <- with(vars, ave(seq_along(cluster), cluster, FUN=seq_along))
-  vars      <- complete(vars, cluster, indx, fill = list(e=0,x=0))
-  vars      <- vars %>% fill(everything(),0)
+  vars      <- tidyr::complete(vars, cluster, indx, fill = list(e=0,x=0))
+  vars      <- vars %>% tidyr::fill(tidyr::everything(),0)
 
   T <- max(vars$indx)
 

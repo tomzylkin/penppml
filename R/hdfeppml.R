@@ -90,27 +90,27 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     if (verbose == TRUE) {
       print("within transformation step")
     }
-    z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-    x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+    z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+    x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
     if (verbose == TRUE) {
       print("obtaining coefficients")
     }
-    reg <- fastolsCpp(sqrt(mu)*x_resid,sqrt(mu)*z_resid)  #faster without constant
-    b[include_x] <-  reg
-    reg <- list("coefficients"=b) # this rewrites reg each time. Better to initialize upfront?
+    reg <- fastolsCpp(sqrt(mu) * x_resid, sqrt(mu) * z_resid)  #faster without constant
+    b[include_x] <- reg
+    reg <- list("coefficients" = b) # this rewrites reg each time. Better to initialize upfront?
 
     if (verbose == TRUE) {
       print(iter)
       #print(b)
     }
 
-    if (length(include_x)==1) {
+    if (length(include_x) == 1) {
       reg$residuals <- z_resid - x_resid * b[include_x]
     } else {
       reg$residuals <- z_resid - x_resid %*% b[include_x]
     }
-    mu <- as.numeric(exp(z[selectobs]-reg$residuals))
+    mu <- as.numeric(exp(z[selectobs] - reg$residuals))
     if (verbose == TRUE) {
       print("info on residuals")
       print(max(reg$residuals))
@@ -131,14 +131,14 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
 
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
-    temp[which(y==0)] <- -mu[which(y==0)]
-    if (!missing(selectobs)){
-      temp[which(!selectobs)] <-0
+    temp[which(y == 0)] <- -mu[which(y == 0)]
+    if (!missing(selectobs)) {
+      temp[which(!selectobs)] <- 0
     }
 
-    deviance <- -2 * sum(temp)/n
+    deviance <- -2 * sum(temp) / n
 
-    if(deviance<0) deviance = 0
+    if(deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance
 
@@ -148,7 +148,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     if (verbose == TRUE) {
       print("checking critical value")
     }
-    denom_crit = max(c( min(c(deviance, old_deviance)) , 0.1 ))
+    denom_crit = max(c( min(c(deviance, old_deviance)), 0.1 ))
     crit = abs(delta_deviance) / denom_crit
     if (verbose == TRUE) {
       print(deviance)
@@ -157,10 +157,10 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     old_deviance <- deviance
   }
 
-  temp <-  -(y * log(y/mu) - (y-mu))
-  temp[which(y==0)] <- 0
+  temp <-  -(y * log(y / mu) - (y - mu))
+  temp[which(y == 0)] <- 0
   if (!missing(selectobs)){
-    temp[which(y==0)] <- -mu[which(y==0)]
+    temp[which(y == 0)] <- -mu[which(y == 0)]
   }
 
   if (verbose == TRUE) {
@@ -171,8 +171,8 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
   k   <- ncol(matrix(x))
   n   <- length(selectobs)
   reg$mu  <- mu
-  reg$deviance <- -2 * sum(temp)/n
-  reg$bic <- deviance + k*log(n)/n
+  reg$deviance <- -2 * sum(temp) / n
+  reg$bic <- deviance + k * log(n) / n
 
   rownames(reg$coefficients) <- xnames
 
@@ -180,7 +180,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
   # BIC would be BIC = deviance + k * ln(n)
 
   #returnlist <- list("coefficients" = b, "mu" = mu, "bic" = bic, "deviance" = deviance)
-  if (saveX==TRUE) {
+  if (saveX == TRUE) {
     reg[["x_resid"]] <- x_resid
     reg[["z_resid"]] <- z_resid
   }

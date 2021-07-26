@@ -126,7 +126,7 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
       if (penalty=="SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
         wz_resid <- sqrt(mu) * z_resid
         wx_resid <- sqrt(mu) * x_resid
-        penreg <- ncvreg(wx_resid,wz_resid,penalty="SCAD",lambda=lambda)  # add penalty weights
+        penreg <- ncvreg::ncvreg(wx_resid,wz_resid,penalty="SCAD",lambda=lambda)  # add penalty weights
 
       }  else if (penalty=="ridge") {
         penreg <- fastridge(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=n*lambda,standardize=standardize) # ,penalty.factor=penweights

@@ -33,6 +33,13 @@ trade$iso2  <- factor(trade$iso2)
 trade$year <- ordered(trade$year)
 colnames(trade)[1:3] <- c("exp", "imp", "time")
 
+# Finally, to facilitate testing, we drop most of the provision data and keep just 50 provisions chosen
+# at random:
+
+set.seed(1)
+keep<-sample(10:314, size = 50, replace = FALSE)
+trade <- trade[, c(1:9, keep)]
+
 # Save as .Rdata file, with compression to stay below CRAN's 5Mb size limit:
 
 usethis::use_data(trade, compress = "xz", overwrite = TRUE)
