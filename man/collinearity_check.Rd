@@ -2,16 +2,34 @@
 % Please edit documentation in R/utils.R
 \name{collinearity_check}
 \alias{collinearity_check}
-\title{Title}
+\title{Checking for Perfect Multicollinearity}
 \usage{
 collinearity_check(y, x, fes, hdfetol, selectobs = NULL)
 }
 \arguments{
-\item{selectobs}{}
+\item{y}{Numeric vector with the dependent variable.}
+
+\item{x}{Matrix whose columns will be checked for multicollinearity.}
+
+\item{fes}{List of factors defining the fixed effects in the model.}
+
+\item{hdfetol}{A number, passed on to \code{lfe::demeanlist} as a tolerance for the centering.}
+
+\item{selectobs}{Currently unused.}
 }
 \value{
-
+A numeric vector containing the variables that pass the collinearity check.
 }
 \description{
-Title
+\code{collinearity_check} checks for perfect multicollinearity in a model with high-dimensional
+fixed effects.
+}
+\examples{
+y <- trade$export
+x <- data.matrix(trade[,-1:-9])
+fes <- genfes(trade,
+              f1 = c("exp",  "imp", "exp"),
+              f2 = c("time",  "time", "imp"))
+
+collinearity_check(y, x, fes, hdfetol = 1e-6)
 }

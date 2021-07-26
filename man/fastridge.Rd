@@ -2,16 +2,25 @@
 % Please edit documentation in R/utils.R
 \name{fastridge}
 \alias{fastridge}
-\title{Title}
+\title{Finding Ridge Regression Solutions}
 \usage{
 fastridge(x, y, weights = rep(1/n, n), lambda, standardize = TRUE)
 }
 \arguments{
-\item{standardize}{}
+\item{x}{Regressor matrix.}
+
+\item{y}{Dependent variable (a numeric vector).}
+
+\item{weights}{Vector of weights.}
+
+\item{lambda}{Penalty parameter.}
+
+\item{standardize}{Logical. If \code{TRUE}, x is standardized using the \code{weights}.}
 }
 \value{
 
 }
 \description{
-Title
+A wrapper around \code{fastridgeCpp}, for faster computation of the analytical solution for
+ridge regression.
 }
