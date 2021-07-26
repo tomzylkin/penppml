@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "d.ferreras-garrucho@lse.ac.uk")
 Description: What the package does (one paragraph).
-License: CC BY 4.0
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
