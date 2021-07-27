@@ -2,7 +2,7 @@
 % Please edit documentation in R/mlfitppml.R
 \name{mlfitppml}
 \alias{mlfitppml}
-\title{Title}
+\title{General Penalized PPML Estimation}
 \usage{
 mlfitppml(
   y,
@@ -26,11 +26,49 @@ mlfitppml(
 )
 }
 \arguments{
-\item{K}{}
+\item{y}{Dependent variable (a vector)}
+
+\item{x}{Regressor matrix.}
+
+\item{fes}{List of fixed effects.}
+
+\item{lambdas}{Vector of penalty parameters.}
+
+\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+
+\item{tol}{Tolerance parameter.}
+
+\item{hdfetol}{Tolerance parameter for fixed effects.}
+
+\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
+
+\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+
+\item{method}{TODO: check what this does.}
+
+\item{IDs}{TODO: check what this does (probably for cross validation).}
+
+\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+
+\item{xval}{Logical. If \code{TRUE}, carries out cross-validation.}
+
+\item{standardize}{Logical. If \code{TRUE}, x variables are standardized (TODO: check this).}
+
+\item{vcv}{TODO: check this.}
+
+\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+
+\item{K}{TODO: check what this does.}
 }
 \value{
-
+A list (TODO: complete this).
 }
 \description{
-Title
+\code{mlfitppml} is a general wrapper function for penalized PPML estimation, calling
+\code{penhdfeppml}, \code{penhdfeppml_cluster} and \code{hdfeppml} as needed.
+}
+\examples{
+# TODO: add examples here.
 }

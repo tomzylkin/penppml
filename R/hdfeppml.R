@@ -1,24 +1,27 @@
-#' Title
+#' Poisson Pseudo Maximum Likelihood Estimation
 #'
-#' @param y
-#' @param x
-#' @param fes
-#' @param tol
-#' @param hdfetol
-#' @param colcheck
-#' @param selectobs
-#' @param mu
-#' @param saveX
-#' @param init_z
-#' @param verbose
-#' @param maxiter
-#' @param cluster
-#' @param vcv
+#' \code{hdfeppml} implements (unpenalized) PPML estimation in a setting with high-dimensional
+#' fixed effects.
 #'
-#' @return
+#' @param y Dependent variable (a vector)
+#' @param x Regressor matrix.
+#' @param fes List of fixed effects.
+#' @param tol Tolerance parameter.
+#' @param hdfetol Tolerance parameter for fixed effects.
+#' @param colcheck If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
+#' @param selectobs A numeric vector with selected observations / rows (optional).
+#' @param mu TODO: check this.
+#' @param saveX TODO: check this.
+#' @param init_z TODO: check this.
+#' @param verbose If TRUE, prints information to the screen while evaluating.
+#' @param maxiter Maximum number of iterations (a number).
+#' @param cluster A vector classifying observations into clusters (TODO: check).
+#' @param vcv TODO: check this.
+#'
+#' @return A list (TODO: complete this).
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
 hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
                      mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,

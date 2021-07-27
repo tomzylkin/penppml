@@ -2,7 +2,7 @@
 % Please edit documentation in R/hdfeppml.R
 \name{hdfeppml}
 \alias{hdfeppml}
-\title{Title}
+\title{Poisson Pseudo Maximum Likelihood Estimation}
 \usage{
 hdfeppml(
   y,
@@ -22,11 +22,41 @@ hdfeppml(
 )
 }
 \arguments{
-\item{vcv}{}
+\item{y}{Dependent variable (a vector)}
+
+\item{x}{Regressor matrix.}
+
+\item{fes}{List of fixed effects.}
+
+\item{tol}{Tolerance parameter.}
+
+\item{hdfetol}{Tolerance parameter for fixed effects.}
+
+\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+
+\item{selectobs}{A numeric vector with selected observations / rows (optional).}
+
+\item{mu}{TODO: check this.}
+
+\item{saveX}{TODO: check this.}
+
+\item{init_z}{TODO: check this.}
+
+\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+
+\item{maxiter}{Maximum number of iterations (a number).}
+
+\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+
+\item{vcv}{TODO: check this.}
 }
 \value{
-
+A list (TODO: complete this).
 }
 \description{
-Title
+\code{hdfeppml} implements (unpenalized) PPML estimation in a setting with high-dimensional
+fixed effects.
+}
+\examples{
+# TODO: add examples here.
 }

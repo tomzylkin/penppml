@@ -2,16 +2,25 @@
 % Please edit documentation in R/utils.R
 \name{standardize_wt}
 \alias{standardize_wt}
-\title{Title}
+\title{Weighted Standardization}
 \usage{
 standardize_wt(x, weights = rep(1/n, n), intercept = TRUE, return.sd = FALSE)
 }
 \arguments{
-\item{return.sd}{}
+\item{x}{Regressor matrix.}
+
+\item{weights}{Weights.}
+
+\item{intercept}{Logical. If \code{TRUE}, adds an intercept.}
+
+\item{return.sd}{Logical. If \code{TRUE}, returns also standard errors.}
 }
 \value{
-
+TODO: check what this gives.
 }
 \description{
-Title
+Performs weighted standardization of x variables. Needed for penalized GLM.
+}
+\examples{
+# TODO: add examples here.
 }

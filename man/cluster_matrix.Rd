@@ -2,16 +2,23 @@
 % Please edit documentation in R/utils.R
 \name{cluster_matrix}
 \alias{cluster_matrix}
-\title{Title}
+\title{Cluster Standard Error EEstimation}
 \usage{
 cluster_matrix(e, cluster, x)
 }
 \arguments{
-\item{x}{}
+\item{e}{Vector of residuals.}
+
+\item{cluster}{Vector of clusters.}
+
+\item{x}{Regressor matrix.}
 }
 \value{
-
+Gives the XeeX matrix (TODO: check this).
 }
 \description{
-Title
+TODO: add explanation here.
+}
+\examples{
+# TODO: add examples here.
 }

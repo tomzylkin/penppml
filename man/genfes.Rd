@@ -9,12 +9,12 @@ genfes(data, f1, f2)
 \arguments{
 \item{data}{A data frame including the factors.}
 
-\item{f1}{A character vector with the names of variables to serve as first term in the interaction.}
+\item{f1}{A character vector with variables names (first term).}
 
-\item{f2}{A character vector with the names of variables (second term).}
+\item{f2}{A character vector with variable names (second term).}
 }
 \value{
-A list containing the interacted factors.
+A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
 }
 \description{
 \code{genfes} generates a list of fixed effects by creating interactions of paired factors.

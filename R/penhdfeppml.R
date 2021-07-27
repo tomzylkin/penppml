@@ -1,37 +1,31 @@
-#' Title
+#' One-Shot Penalized PPML Estimation
 #'
-#' @param y
-#' @param x
-#' @param fes
-#' @param lambda
-#' @param tol
-#' @param hdfetol
-#' @param glmnettol
-#' @param penalty
-#' @param penweights
-#' @param selectobs
-#' @param saveX
-#' @param mu
-#' @param colcheck
-#' @param init_z
-#' @param post
-#' @param verbose
-#' @param standardize
-#' @param method
-#' @param cluster
-#' @param debug
+#' \code{penhdfeppml} computes a penalized PPML model for a given type of penalty and a given
+#' value of the penalty parameter.
 #'
-#' @return
+#' @param lambda Penalty parameter (a number).
+#' @param glmnettol Tolerance parameter to be passed on to glmnet.
+#' @param penalty A string. Currently supported: "lasso", "ridge", "SCAD".
+#' @param penweights TODO: check what this does (parameter-specific penalties in plugin lasso?).
+#' @param post Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.
+#' @param standardize Logical. If \code{TRUE}, x variables are standardized (TODO: check this).
+#' @param method TODO: check what this does.
+#' @param debug TODO: check what this does.
+#' @inheritParams hdfeppml
+#'
+#' @return A list (TODO: complete this).
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
-penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,penalty=c("lasso","ridge"),penweights=NULL,
-                        selectobs=rep(TRUE,length(y)),saveX=TRUE,mu=NULL,colcheck=TRUE,init_z = NULL,post=FALSE,verbose=FALSE,standardize=TRUE,method="placeholder",
-                        cluster=NULL,debug=FALSE) {
+penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
+                        penalty = c("lasso", "ridge"), penweights = NULL,
+                        selectobs = rep(TRUE, length(y)), saveX = TRUE, mu = NULL, colcheck = TRUE,
+                        init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
+                        method = "placeholder", cluster = NULL, debug = FALSE) {
 
   if (is.null(selectobs)) {
-    selectobs <- rep(TRUE,length(y))
+    selectobs <- rep(TRUE, length(y))
   }
   else {
     #y <- y[selectobs]  # fix this later.
@@ -39,56 +33,59 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
   }
 
   # implements plugin method; calls penhdfeppml_cluster subcommand
-  if(method=="iterative") {
-    penreg <- penhdfeppml_cluster(y=y,x=x,fes=fes,cluster=cluster,tol=tol,hdfetol=hdfetol,glmnettol=glmnettol,penalty=penalty,penweights=penweights,
-                                  selectobs=selectobs,saveX=saveX,mu=mu,colcheck=colcheck,K=15,init_z = init_z,post=FALSE,verbose=verbose,lambda=NULL)
+  if (method == "iterative") {
+    penreg <- penhdfeppml_cluster(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
+                                  hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
+                                  penweights = penweights, selectobs = selectobs, saveX = saveX,
+                                  mu = mu, colcheck = colcheck, K = 15, init_z = init_z, post = FALSE,
+                                  verbose = verbose, lambda = NULL)
   }
   else {
 
     # if "iterative" option not enabled, do the following
-    b <- matrix(NA,nrow=ncol(x),ncol=1)  # fix this later.
+    b <- matrix(NA, nrow = ncol(x), ncol = 1)  # fix this later.
     rownames(b) <- colnames(x)
     include_x <- 1:ncol(x)
 
     if (is.null(penweights)) {
-      penweights <- rep(1,length(include_x))   #note this is the default used by glmnet. Using "NULL" actually gives you incorrect weights.
+      penweights <- rep(1, length(include_x))   #note this is the default used by glmnet. Using "NULL" actually gives you incorrect weights.
     }
 
-    if(length(penweights)>length(include_x)){
+    if (length(penweights) > length(include_x)){
       print("penweights needs to be same length as number of x variables")
       stop()
     }
 
     # collinearity check
-    if (colcheck==TRUE){
-      include_x <- collinearity_check(y,x,fes,1e-6)
-      x <- x[,include_x]
+    if (colcheck == TRUE) {
+      include_x <- collinearity_check(y, x, fes, 1e-6)
+      x <- x[, include_x]
       if (!is.null(penweights)) {
-        penweights=penweights[include_x]
+        penweights = penweights[include_x]
       }
     }
 
     # number of obs (needed for deviance)
-    n   <- length(selectobs)
+    n <- length(selectobs)
 
     # estimation algorithm (this implements a version of the algorithm from p. 110 of CGZ SJ 2020 but with penalized WLS in place of the WLS step)
     crit <- 1
     old_deviance <-0
     iter <-0
-    while (crit>tol) {
-      iter<-iter+1
+    while (crit > tol) {
+      iter <- iter + 1
 
-      if(iter==1) {
+      if (iter == 1) {
 
         # initilize "mu"
         y   <- y[selectobs]
         if (is.null(mu)) mu  <- (y + mean(y))/2
-        z   <- (y-mu)/mu + log(mu)
+        z   <- (y - mu)/mu + log(mu)
         eta <- log(mu)
         last_z <- z
         if (is.null(init_z)) {
           reg_z  <- matrix(z)
-        } else{
+        } else {
           reg_z <- init_z
         }
         #reg_x  <- x[selectobs,]  ## this won't work if x has one column (annoying). Will work otherwise.
@@ -97,18 +94,18 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
         ## how to subset fes using selectobs?
       } else {
         last_z <- z
-        z <- (y-mu)/mu + log(mu)
+        z <- (y - mu)/mu + log(mu)
         reg_z  <- matrix(z - last_z + z_resid)
         reg_x  <- x_resid
         ## colnames(reg_x)   <- colnames(x)
       }
 
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
-      z_resid <- lfe::demeanlist(reg_z,fes,weights=sqrt(mu),eps=hdfetol)
-      x_resid <- lfe::demeanlist(reg_x,fes,weights=sqrt(mu),eps=hdfetol)
+      z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+      x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
       if (is.null(penweights)) {
-        #penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+        #penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize)
       }
       else{
         if(debug) {
@@ -123,28 +120,32 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
         }
       }
 
-      if (penalty=="SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
+      if (penalty == "SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
         wz_resid <- sqrt(mu) * z_resid
         wx_resid <- sqrt(mu) * x_resid
-        penreg <- ncvreg::ncvreg(wx_resid,wz_resid,penalty="SCAD",lambda=lambda)  # add penalty weights
+        penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty = "SCAD", lambda = lambda)  # add penalty weights
 
-      }  else if (penalty=="ridge") {
-        penreg <- fastridge(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=n*lambda,standardize=standardize) # ,penalty.factor=penweights
+      }  else if (penalty == "ridge") {
+        penreg <- fastridge(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = n * lambda,
+                            standardize = standardize) # ,penalty.factor=penweights
       } else {
 
         # Lasso is the default
-        if(debug) {
-          penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+        if (debug) {
+          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                                   thresh = glmnettol, standardize = standardize)
           print((penreg$beta))
           print(penweights)
         }
-        if(debug) {
-          penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,standardize=standardize)
+        if (debug) {
+          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                                   thresh = glmnettol, standardize = standardize)
           print((penreg$beta))
           print(penweights)
         }
-        penreg <- glmnet::glmnet(x=x_resid,y=z_resid,weights=mu/sum(mu),lambda=lambda,thresh=glmnettol,penalty.factor=penweights,standardize=standardize)
-        if(debug) {
+        penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                                 thresh = glmnettol, penalty.factor = penweights, standardize = standardize)
+        if (debug) {
           print((penreg$beta))
           stop()
         }
@@ -154,11 +155,11 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
 
       residuals <- z_resid - x_resid %*% b[include_x]
 
-      mu <- as.numeric(exp(z[selectobs]-residuals))
+      mu <- as.numeric(exp(z[selectobs] - residuals))
 
       # calculate deviance
       temp <-  -(y * log(y/mu) - (y-mu))
-      temp[which(y==0)] <- -mu[which(y==0)]
+      temp[which(y == 0)] <- -mu[which(y == 0)]
       if (!missing(selectobs)){
         temp[which(!selectobs)] <-0
       }
@@ -177,7 +178,7 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
       crit = abs(delta_deviance) / denom_crit
 
       #print(deviance)
-      if (verbose==TRUE) {
+      if (verbose == TRUE) {
         #print(deviance)
         print(crit)
       }
@@ -188,23 +189,23 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
     ## elements to return
     k   <- ncol(matrix(x))
     n   <- length(selectobs)
-    select_x <- which(b!=0)
+    select_x <- which(b != 0)
 
     k   <- length(select_x) #ncol(matrix(x[,select_x]))
-    bic <- deviance + k*log(n)/n
+    bic <- deviance + k * log(n)/n
     # k = number of elements in x here
     # BIC would be BIC = deviance + k * ln(n)
 
 
     # if "post" enabled use post-lasso ppml estimates instead of lasso estimates
     if (post) {
-      x_select <- x_resid[,as.numeric(penreg$beta)!=0]
-      if(length(x_select)!=0){
-        ppml_temp <- hdfeppml(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
-                              colcheck=FALSE)
+      x_select <- x_resid[, as.numeric(penreg$beta) != 0]
+      if (length(x_select) != 0){
+        ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+                              mu = penreg$mu, colcheck = FALSE)
 
         penreg$pencoefs <- penreg$beta
-        penreg$beta[which(penreg$beta!=0),1]  <- ppml_temp$coefficients
+        penreg$beta[which(penreg$beta != 0), 1]  <- ppml_temp$coefficients
         b[include_x] <- penreg$beta
         mu    <- ppml_temp$mu
         bic   <- ppml_temp$bic
@@ -220,7 +221,7 @@ penhdfeppml <- function(y,x,fes,lambda,tol=1e-8,hdfetol=1e-4,glmnettol=1e-12,pen
     penreg[["mu"]]  <-  mu
     penreg[["bic"]] <-  bic
     penreg[["deviance"]] <- deviance
-    if (saveX==TRUE) {
+    if (saveX == TRUE) {
       penreg[["x_resid"]] <- x_resid
       penreg[["z_resid"]] <- z_resid
     }

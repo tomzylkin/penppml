@@ -2,7 +2,7 @@
 % Please edit documentation in R/penhdfeppml.R
 \name{penhdfeppml}
 \alias{penhdfeppml}
-\title{Title}
+\title{One-Shot Penalized PPML Estimation}
 \usage{
 penhdfeppml(
   y,
@@ -28,11 +28,53 @@ penhdfeppml(
 )
 }
 \arguments{
-\item{debug}{}
+\item{y}{Dependent variable (a vector)}
+
+\item{x}{Regressor matrix.}
+
+\item{fes}{List of fixed effects.}
+
+\item{lambda}{Penalty parameter (a number).}
+
+\item{tol}{Tolerance parameter.}
+
+\item{hdfetol}{Tolerance parameter for fixed effects.}
+
+\item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
+
+\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+
+\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+
+\item{selectobs}{A numeric vector with selected observations / rows (optional).}
+
+\item{saveX}{TODO: check this.}
+
+\item{mu}{TODO: check this.}
+
+\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+
+\item{init_z}{TODO: check this.}
+
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
+
+\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+
+\item{standardize}{Logical. If \code{TRUE}, x variables are standardized (TODO: check this).}
+
+\item{method}{TODO: check what this does.}
+
+\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+
+\item{debug}{TODO: check what this does.}
 }
 \value{
-
+A list (TODO: complete this).
 }
 \description{
-Title
+\code{penhdfeppml} computes a penalized PPML model for a given type of penalty and a given
+value of the penalty parameter.
+}
+\examples{
+# TODO: add examples here.
 }

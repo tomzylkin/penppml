@@ -1,28 +1,19 @@
-#' Title
+#' General Penalized PPML Estimation
 #'
-#' @param y
-#' @param x
-#' @param fes
-#' @param lambdas
-#' @param penalty
-#' @param tol
-#' @param hdfetol
-#' @param colcheck
-#' @param post
-#' @param cluster
-#' @param method
-#' @param IDs
-#' @param verbose
-#' @param xval
-#' @param standardize
-#' @param vcv
-#' @param penweights
-#' @param K
+#' \code{mlfitppml} is a general wrapper function for penalized PPML estimation, calling
+#' \code{penhdfeppml}, \code{penhdfeppml_cluster} and \code{hdfeppml} as needed.
 #'
-#' @return
+#' @param lambdas Vector of penalty parameters.
+#' @param IDs TODO: check what this does (probably for cross validation).
+#' @param xval Logical. If \code{TRUE}, carries out cross-validation.
+#' @param K TODO: check what this does.
+#' @param vcv TODO: check this.
+#' @inheritParams penhdfeppml
+#'
+#' @return A list (TODO: complete this).
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
 mlfitppml = function(y,x,fes,lambdas,penalty=c("lasso","ridge"),tol=1e-8,hdfetol=1e-4,colcheck=TRUE,post=TRUE,cluster=NULL,
                      method=c("bic","iterative"),IDs=1:n,verbose=FALSE,

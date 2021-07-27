@@ -1,28 +1,15 @@
-#' Title
+#' Plugin Lasso Estimation
 #'
-#' @param y
-#' @param x
-#' @param fes
-#' @param cluster
-#' @param tol
-#' @param hdfetol
-#' @param glmnettol
-#' @param penalty
-#' @param penweights
-#' @param selectobs
-#' @param saveX
-#' @param mu
-#' @param colcheck
-#' @param K
-#' @param init_z
-#' @param post
-#' @param verbose
-#' @param lambda
+#' Estimates coefficient-specific penalty weights that account for heteroskedasticity.
+#' Called by \code{mlfitppml} and \code{penhdfeppml}.
 #'
-#' @return
+#' @param K TODO: check what this does.
+#' @inheritParams penhdfeppml
+#'
+#' @return TODO: check this.
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
 penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, selectobs = NULL, saveX = TRUE,

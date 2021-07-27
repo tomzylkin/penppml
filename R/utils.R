@@ -64,16 +64,18 @@ collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
 }
 
 
-#' Title
+#' Cluster Standard Error EEstimation
 #'
-#' @param e
-#' @param cluster
-#' @param x
+#' TODO: add explanation here.
 #'
-#' @return
+#' @param e Vector of residuals.
+#' @param cluster Vector of clusters.
+#' @param x Regressor matrix.
+#'
+#' @return Gives the XeeX matrix (TODO: check this).
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
 cluster_matrix <- function(e, cluster, x) {
   K <- ncol(x)
@@ -100,29 +102,31 @@ cluster_matrix <- function(e, cluster, x) {
 }
 
 
-#' Title
+#' Weighted Standardization
 #'
-#' @param x
-#' @param weights
-#' @param intercept
-#' @param return.sd
+#' Performs weighted standardization of x variables. Needed for penalized GLM.
 #'
-#' @return
+#' @param x Regressor matrix.
+#' @param weights Weights.
+#' @param intercept Logical. If \code{TRUE}, adds an intercept.
+#' @param return.sd Logical. If \code{TRUE}, returns also standard errors.
+#'
+#' @return TODO: check what this gives.
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
-standardize_wt <- function(x,weights=rep(1/n,n),intercept=TRUE,return.sd=FALSE){
+standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd = FALSE) {
   n     <- nrow(x)
   nvars <- ncol(x)
   if (intercept) {
-    xm <- fastwmean(x,weights)
+    xm <- fastwmean(x, weights)
   } else {
     xm <- rep(0.0, times = nvars)
   }
-  xs <- faststddev(x,weights)
+  xs <- faststddev(x, weights)
 
-  if (return.sd==TRUE) {
+  if (return.sd == TRUE) {
     return(xs)
   }
   else{
@@ -143,10 +147,10 @@ standardize_wt <- function(x,weights=rep(1/n,n),intercept=TRUE,return.sd=FALSE){
 #' @param lambda Penalty parameter.
 #' @param standardize Logical. If \code{TRUE}, x is standardized using the \code{weights}.
 #'
-#' @return
+#' @return A vector of parameter (beta) estimates (TODO: check this).
 #' @export
 #'
-#' @examples
+#' @examples # TODO: add examples here.
 
 fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE){
   n <- length(y)
@@ -166,10 +170,10 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE){
 #' \code{genfes} generates a list of fixed effects by creating interactions of paired factors.
 #'
 #' @param data A data frame including the factors.
-#' @param f1 A character vector with the names of variables to serve as first term in the interaction.
-#' @param f2 A character vector with the names of variables (second term).
+#' @param f1 A character vector with variables names (first term).
+#' @param f2 A character vector with variable names (second term).
 #'
-#' @return A list containing the interacted factors.
+#' @return A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
 #' @export
 #'
 #' @examples

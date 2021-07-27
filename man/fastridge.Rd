@@ -18,9 +18,12 @@ fastridge(x, y, weights = rep(1/n, n), lambda, standardize = TRUE)
 \item{standardize}{Logical. If \code{TRUE}, x is standardized using the \code{weights}.}
 }
 \value{
-
+A vector of parameter (beta) estimates (TODO: check this).
 }
 \description{
 A wrapper around \code{fastridgeCpp}, for faster computation of the analytical solution for
 ridge regression.
+}
+\examples{
+# TODO: add examples here.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/penhdfeppml_cluster.R
 \name{penhdfeppml_cluster}
 \alias{penhdfeppml_cluster}
-\title{Title}
+\title{Plugin Lasso Estimation}
 \usage{
 penhdfeppml_cluster(
   y,
@@ -26,11 +26,49 @@ penhdfeppml_cluster(
 )
 }
 \arguments{
-\item{lambda}{}
+\item{y}{Dependent variable (a vector)}
+
+\item{x}{Regressor matrix.}
+
+\item{fes}{List of fixed effects.}
+
+\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+
+\item{tol}{Tolerance parameter.}
+
+\item{hdfetol}{Tolerance parameter for fixed effects.}
+
+\item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
+
+\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+
+\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+
+\item{selectobs}{A numeric vector with selected observations / rows (optional).}
+
+\item{saveX}{TODO: check this.}
+
+\item{mu}{TODO: check this.}
+
+\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+
+\item{K}{TODO: check what this does.}
+
+\item{init_z}{TODO: check this.}
+
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
+
+\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+
+\item{lambda}{Penalty parameter (a number).}
 }
 \value{
-
+TODO: check this.
 }
 \description{
-Title
+Estimates coefficient-specific penalty weights that account for heteroskedasticity.
+Called by \code{mlfitppml} and \code{penhdfeppml}.
+}
+\examples{
+# TODO: add examples here.
 }
