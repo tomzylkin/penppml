@@ -36,6 +36,7 @@ SEXP eigenMapMatMult(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::Matr
 //' Computes A'A using C++.
 //'
 //' @param A A matrix.
+// [[Rcpp::export]]
 Eigen::MatrixXd AtA(const MapMatd& A) {
   int  n(A.cols());
   return  Eigen::MatrixXd(n,n).setZero().selfadjointView<Eigen::Lower>().rankUpdate(A.adjoint());

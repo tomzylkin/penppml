@@ -36,6 +36,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// AtA
+Eigen::MatrixXd AtA(const MapMatd& A);
+RcppExport SEXP _penppml_AtA(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MapMatd& >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(AtA(A));
+    return rcpp_result_gen;
+END_RCPP
+}
 // fastolsCpp
 NumericVector fastolsCpp(MapMatd X, MapVecd y);
 RcppExport SEXP _penppml_fastolsCpp(SEXP XSEXP, SEXP ySEXP) {
@@ -114,6 +125,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_penppml_eigenMatMult", (DL_FUNC) &_penppml_eigenMatMult, 2},
     {"_penppml_eigenMapMatMult", (DL_FUNC) &_penppml_eigenMapMatMult, 2},
+    {"_penppml_AtA", (DL_FUNC) &_penppml_AtA, 1},
     {"_penppml_fastolsCpp", (DL_FUNC) &_penppml_fastolsCpp, 2},
     {"_penppml_fastridgeCpp", (DL_FUNC) &_penppml_fastridgeCpp, 3},
     {"_penppml_faststddev", (DL_FUNC) &_penppml_faststddev, 2},

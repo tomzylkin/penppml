@@ -28,3 +28,7 @@ Depends:
     R (>= 2.10)
 URL: https://github.com/diegoferrerasg/penppml
 BugReports: https://github.com/diegoferrerasg/penppml/issues
+Suggests: 
+    testthat (>= 3.0.0),
+    MASS
+Config/testthat/edition: 3
