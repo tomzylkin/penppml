@@ -74,6 +74,7 @@ collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
 #'
 #' @return Gives the XeeX matrix (TODO: check this).
 #' @export
+#' @importFrom rlang .data
 #'
 #' @examples # TODO: add examples here.
 
@@ -82,7 +83,7 @@ cluster_matrix <- function(e, cluster, x) {
   vars      <- data.frame(e = e, cluster = factor(cluster, exclude = TRUE), x = x)
   vars      <- vars[order(vars$cluster),]
   vars$indx <- with(vars, ave(seq_along(cluster), cluster, FUN = seq_along))
-  vars      <- tidyr::complete(vars, cluster, indx, fill = list(e = 0, x = 0))
+  vars      <- tidyr::complete(vars, .data$cluster, .data$indx, fill = list(e = 0, x = 0))
   vars      <- vars %>% tidyr::fill(tidyr::everything(), 0)
 
   T <- max(vars$indx)
