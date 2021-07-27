@@ -8,19 +8,12 @@
 using namespace Rcpp;
 using namespace Eigen;
 
-// This is a simple example of exporting a C++ function to R. You can
-// source this function into an R session using the Rcpp::sourceCpp
-// function (or via the Source button on the editor toolbar). Learn
-// more about Rcpp at:
-//
-//   http://www.rcpp.org/
-//   http://adv-r.had.co.nz/Rcpp.html
-//   http://gallery.rcpp.org/
-//
-//   more tips: https://stackoverflow.com/questions/13956292/rcpp-inline-creating-and-calling-additional-
-//
-//   sparse matrices? https://eigen.tuxfamily.org/dox/group__SparseQuickRefPage.html
 
+//' Faster Matrix Multiplication
+//'
+//' Faster matrix multiplication using C++.
+//'
+//' @param A,B Matrices.
 // [[Rcpp::export]]
 SEXP eigenMatMult(Eigen::MatrixXd A, Eigen::MatrixXd B){
   Eigen::MatrixXd C;
@@ -29,7 +22,7 @@ SEXP eigenMatMult(Eigen::MatrixXd A, Eigen::MatrixXd B){
   return wrap(C);
 }
 
-
+//' @rdname eigenMatMult
 // [[Rcpp::export]]
 SEXP eigenMapMatMult(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
   Eigen::MatrixXd C;
@@ -38,11 +31,25 @@ SEXP eigenMapMatMult(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::Matr
   return Rcpp::wrap(C);
 }
 
+//' Computing A'A
+//'
+//' Computes A'A using C++.
+//'
+//' @param A A matrix.
 Eigen::MatrixXd AtA(const MapMatd& A) {
   int  n(A.cols());
   return  Eigen::MatrixXd(n,n).setZero().selfadjointView<Eigen::Lower>().rankUpdate(A.adjoint());
 }
 
+
+//' Faster Least Squares Estimation
+//'
+//' Finds Least Squares solutions using C++.
+//'
+//' @param X Regressor matrix.
+//' @param y Dependent variable (a vector).
+//'
+//' @return The vector of parameter (beta) estimates.
 // [[Rcpp::export]]
 NumericVector fastolsCpp(MapMatd X, MapVecd y){
   Eigen::MatrixXd A=AtA(X);
@@ -51,6 +58,15 @@ NumericVector fastolsCpp(MapMatd X, MapVecd y){
   return wrap(betahat);
 }
 
+//' Faster Ridge Regression
+//'
+//' Finds Ridge solutions using C++.
+//'
+//' @param X Regressor matrix.
+//' @param y Dependent variable (a vector).
+//' @param lambda Penalty parameter (a number).
+//'
+//' @return The vector of parameter (beta) estimates.
 // [[Rcpp::export]]
 NumericVector fastridgeCpp(MapMatd X, MapVecd y, double lambda){
   Eigen::MatrixXd A=AtA(X);
@@ -62,6 +78,14 @@ NumericVector fastridgeCpp(MapMatd X, MapVecd y, double lambda){
   return wrap(betahat);
 }
 
+//' Faster Standard Deviation
+//'
+//' Computes standard deviation using C++.
+//'
+//' @param X Regressor matrix.
+//' @param w Weights.
+//'
+//' @return Vector of standard deviations of the parameter estimates.
 // [[Rcpp::export]]
 NumericVector faststddev(Eigen::ArrayXXd X, Eigen::ArrayXd w){
   w = w/(w.sum());
@@ -73,6 +97,14 @@ NumericVector faststddev(Eigen::ArrayXXd X, Eigen::ArrayXd w){
   return wrap(step3);
 }
 
+//' Faster Weighted Mean
+//'
+//' Computes weighted mean using C++.
+//'
+//' @param X Regressor matrix.
+//' @param w Weights.
+//'
+//' @return Weighted mean.
 // [[Rcpp::export]]
 NumericVector fastwmean(Eigen::ArrayXXd X, Eigen::ArrayXd w){
   //Eigen::ArrayXXd Xw = X*w;
@@ -88,7 +120,12 @@ NumericVector fastwmean(Eigen::ArrayXXd X, Eigen::ArrayXd w){
 
 // h/t: https://stackoverflow.com/questions/49206780/column-wise-initialization-and-calculation-of-standard-deviation-in-eigen-librar
 
-// many outer products
+//' Many Outer Products
+//'
+//' Compute a large number of outer products (useful for clustered SEs) using C++.
+//'
+//' @param A,B Numeric vectors.
+//' @param c Integer.
 // [[Rcpp::export]]
 SEXP manyouter(const Eigen::Map<Eigen::VectorXd> A, Eigen::Map<Eigen::VectorXd> B, int c){
   int r = A.rows();
@@ -100,9 +137,14 @@ SEXP manyouter(const Eigen::Map<Eigen::VectorXd> A, Eigen::Map<Eigen::VectorXd> 
   return Rcpp::wrap(M);
 }
 
-// Block of size (p,q), starting at (i,j): matrix.block(i,j,p,q);
-// Vector segment containing n elements, starting at position i: vector.segment(i,n);
 
+//' XeeX Matrix Computation
+//'
+//' Given matrix ee' and matrix X, compute X(k)'ee'X(k) for each regressor X.
+//'
+//' @param X,ee Matrices.
+//'
+//' @return The matrix product X(k)'ee'X(k).
 // [[Rcpp::export]]
 SEXP xeex(const Eigen::Map<Eigen::MatrixXd> X, Eigen::Map<Eigen::MatrixXd> ee){
   int K  = X.cols();  //  A is x's arranged as g (TxK) matrices vertically stacked
