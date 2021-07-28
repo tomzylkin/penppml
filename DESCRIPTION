@@ -31,5 +31,8 @@ URL: https://github.com/diegoferrerasg/penppml
 BugReports: https://github.com/diegoferrerasg/penppml/issues
 Suggests: 
     testthat (>= 3.0.0),
-    MASS
+    MASS,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
+VignetteBuilder: knitr

@@ -1,0 +1,33 @@
+---
+title: "Introduction to the penppml package"
+output: 
+  rmarkdown::html_vignette:
+    number_sections: true
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Introduction to the penppml package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(penppml)
+```
+
+# Introduction
+`penppml` is an R package that enables you to fit penalized Poisson Pseudo Maximum Likelihood models with high-dimensional fixed effects. Supported penalties in the current version are ridge and lasso. The original application that motivated the development of `penppml` was the estimation of gravity models of trade with a large number of PTA provision dummies (Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin, 2021).
+
+# Main functions
+The workhorse of our package is the `mlfitppml` function.
+
+# Applications 
+## The effects of specific trade agreement provisions on international trade
+
+# References
