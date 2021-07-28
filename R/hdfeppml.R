@@ -7,21 +7,27 @@
 #' @param x Regressor matrix.
 #' @param fes List of fixed effects.
 #' @param tol Tolerance parameter.
-#' @param hdfetol Tolerance parameter for fixed effects.
-#' @param colcheck If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
+#' @param hdfetol Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.
+#' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 #' @param selectobs A numeric vector with selected observations / rows (optional).
 #' @param mu TODO: check this.
-#' @param saveX TODO: check this.
+#' @param saveX Logical. If \code{TRUE}, it saves the residuals of the model.
 #' @param init_z TODO: check this.
 #' @param verbose If TRUE, prints information to the screen while evaluating.
 #' @param maxiter Maximum number of iterations (a number).
 #' @param cluster A vector classifying observations into clusters (TODO: check).
-#' @param vcv TODO: check this.
+#' @param vcv TODO: check this. Something to do with standard errors.
 #'
 #' @return A list (TODO: complete this).
 #' @export
 #'
-#' @examples # TODO: add examples here.
+#' @examples
+#' y <- trade$export
+#' x <- data.matrix(trade[,-1:-9])
+#' fes <- genfes(trade,
+#'               f1 = c("exp",  "imp", "exp"),
+#'               f2 = c("time",  "time", "imp"))
+#' reg <- hdfeppml(y = y, x = y, fes = fes)
 
 hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
                      mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
@@ -190,19 +196,19 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
   if (vcv) {
     if(!is.null(cluster)) {
       nclusters  <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
-      het_matrix <- (1/nclusters)*cluster_matrix((y-mu)/sum(sqrt(mu)),cluster, x_resid)
-      W          <- (1/nclusters)*(t(mu*x_resid) %*% x_resid)/sum(sqrt(mu))
+      het_matrix <- (1 / nclusters) * cluster_matrix((y - mu) / sum(sqrt(mu)), cluster, x_resid)
+      W          <- (1/nclusters) * (t(mu*x_resid) %*% x_resid) / sum(sqrt(mu))
       R <- try(chol(W), silent = FALSE)
-      V          <- (1/nclusters)*chol2inv(R)%*%het_matrix%*%chol2inv(R)
+      V          <- (1/nclusters) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
       #V          <- (1/nclusters)*solve(W)%*%het_matrix%*%solve(W)
-      V          <- nclusters / (nclusters-1) * V
+      V          <- nclusters / (nclusters - 1) * V
     } else {
-      e = y-mu
+      e = y - mu
       het_matrix = (1/n) * t(x_resid*e)  %*% (x_resid*e)
       W          = (1/n) * (t(mu*x_resid) %*% x_resid)
       R          = try(chol(W), silent = TRUE)
-      V          = (1/n) * chol2inv(R)%*%het_matrix%*%chol2inv(R)
-      V          = (n/(n-1)) * V
+      V          = (1/n) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
+      V          = (n / (n - 1)) * V
     }
   }
   reg[["se"]] <- (diag(sqrt(V)))

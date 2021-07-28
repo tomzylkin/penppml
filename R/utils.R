@@ -27,13 +27,14 @@
 
 #' Checking for Perfect Multicollinearity
 #'
-#' \code{collinearity_check} checks for perfect multicollinearity in a model with high-dimensional
-#' fixed effects.
+#' \code{collinearity_check} checks for perfect multicollinearity in a PPML model with high-dimensional
+#' fixed effects. It calls \code{lfe::demeanlist} in order to partial out the fixed effects, and then
+#' uses \code{stats::lm.wfit} to discard linearly dependent variables.
 #'
-#' @param y Numeric vector with the dependent variable.
-#' @param x Matrix whose columns will be checked for multicollinearity.
-#' @param fes List of factors defining the fixed effects in the model.
-#' @param hdfetol A number, passed on to \code{lfe::demeanlist} as a tolerance for the centering.
+#' @param y Dependent variable (a numeric vector).
+#' @param x Regressor matrix.
+#' @param fes List of fixed effects.
+#' @param hdfetol Tolerance for the centering, passed on to \code{lfe::demeanlist}.
 #' @param selectobs Currently unused.
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
@@ -41,7 +42,7 @@
 #'
 #' @examples
 #' y <- trade$export
-#' x <- data.matrix(trade[,-1:-9])
+#' x <- data.matrix(trade[, -1:-9])
 #' fes <- genfes(trade,
 #'               f1 = c("exp",  "imp", "exp"),
 #'               f2 = c("time",  "time", "imp"))
@@ -64,7 +65,7 @@ collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
 }
 
 
-#' Cluster Standard Error EEstimation
+#' Cluster Standard Error Estimation
 #'
 #' TODO: add explanation here.
 #'
@@ -88,7 +89,7 @@ cluster_matrix <- function(e, cluster, x) {
 
   T <- max(vars$indx)
 
-  if(is.null(K)){
+  if (is.null(K)) {
     X <- data.matrix(vars[, 4])
   } else{
     X <- data.matrix(vars[, 4:(3 + K)])
@@ -105,17 +106,23 @@ cluster_matrix <- function(e, cluster, x) {
 
 #' Weighted Standardization
 #'
-#' Performs weighted standardization of x variables. Needed for penalized GLM.
+#' Performs weighted standardization of x variables. Used in \code{fastridge}.
 #'
 #' @param x Regressor matrix.
 #' @param weights Weights.
 #' @param intercept Logical. If \code{TRUE}, adds an intercept.
-#' @param return.sd Logical. If \code{TRUE}, returns also standard errors.
+#' @param return.sd Logical. If \code{TRUE}, it returns standard errors for the means.
 #'
-#' @return TODO: check what this gives.
+#' @return If \code{return.sd == FALSE}, it gives the matrix of standardized regressors. If
+#' \code{return.sd == TRUE}, then it returns the vector of standard errors of the means of the
+#' variables.
+#'
 #' @export
 #'
-#' @examples # TODO: add examples here.
+#' @examples
+#' x <- data.matrix(trade[, -1:-9])
+#' x_st <- standardize_wt(x)
+#' se <- standardize_wt(x, return.sd = TRUE)
 
 standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd = FALSE) {
   n     <- nrow(x)
@@ -130,7 +137,7 @@ standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd
   if (return.sd == TRUE) {
     return(xs)
   }
-  else{
+  else {
     if (!inherits(x, "sparseMatrix")) x_std <- t((t(x) - xm) / xs)
     return(x_std)
   }
@@ -153,7 +160,7 @@ standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd
 #'
 #' @examples # TODO: add examples here.
 
-fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE){
+fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
   n <- length(y)
   if (standardize) {
     b <- fastridgeCpp(sqrt(weights) * standardize_wt(x, weights), sqrt(weights) * y, lambda)

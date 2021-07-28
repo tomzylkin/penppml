@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{cluster_matrix}
 \alias{cluster_matrix}
-\title{Cluster Standard Error EEstimation}
+\title{Cluster Standard Error Estimation}
 \usage{
 cluster_matrix(e, cluster, x)
 }

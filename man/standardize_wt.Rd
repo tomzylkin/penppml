@@ -13,14 +13,18 @@ standardize_wt(x, weights = rep(1/n, n), intercept = TRUE, return.sd = FALSE)
 
 \item{intercept}{Logical. If \code{TRUE}, adds an intercept.}
 
-\item{return.sd}{Logical. If \code{TRUE}, returns also standard errors.}
+\item{return.sd}{Logical. If \code{TRUE}, it returns standard errors for the means.}
 }
 \value{
-TODO: check what this gives.
+If \code{return.sd == FALSE}, it gives the matrix of standardized regressors. If
+\code{return.sd == TRUE}, then it returns the vector of standard errors of the means of the
+variables.
 }
 \description{
-Performs weighted standardization of x variables. Needed for penalized GLM.
+Performs weighted standardization of x variables. Used in \code{fastridge}.
 }
 \examples{
-# TODO: add examples here.
+x <- data.matrix(trade[, -1:-9])
+x_st <- standardize_wt(x)
+se <- standardize_wt(x, return.sd = TRUE)
 }

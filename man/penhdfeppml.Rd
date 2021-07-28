@@ -38,7 +38,7 @@ penhdfeppml(
 
 \item{tol}{Tolerance parameter.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects.}
+\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
 
 \item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
 
@@ -48,11 +48,11 @@ penhdfeppml(
 
 \item{selectobs}{A numeric vector with selected observations / rows (optional).}
 
-\item{saveX}{TODO: check this.}
+\item{saveX}{Logical. If \code{TRUE}, it saves the residuals of the model.}
 
 \item{mu}{TODO: check this.}
 
-\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{init_z}{TODO: check this.}
 

@@ -30,15 +30,15 @@ hdfeppml(
 
 \item{tol}{Tolerance parameter.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects.}
+\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
 
-\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{selectobs}{A numeric vector with selected observations / rows (optional).}
 
 \item{mu}{TODO: check this.}
 
-\item{saveX}{TODO: check this.}
+\item{saveX}{Logical. If \code{TRUE}, it saves the residuals of the model.}
 
 \item{init_z}{TODO: check this.}
 
@@ -48,7 +48,7 @@ hdfeppml(
 
 \item{cluster}{A vector classifying observations into clusters (TODO: check).}
 
-\item{vcv}{TODO: check this.}
+\item{vcv}{TODO: check this. Something to do with standard errors.}
 }
 \value{
 A list (TODO: complete this).
@@ -58,5 +58,10 @@ A list (TODO: complete this).
 fixed effects.
 }
 \examples{
-# TODO: add examples here.
+y <- trade$export
+x <- data.matrix(trade[,-1:-9])
+fes <- genfes(trade,
+              f1 = c("exp",  "imp", "exp"),
+              f2 = c("time",  "time", "imp"))
+reg <- hdfeppml(y = y, x = y, fes = fes)
 }

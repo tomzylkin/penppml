@@ -7,13 +7,13 @@
 collinearity_check(y, x, fes, hdfetol, selectobs = NULL)
 }
 \arguments{
-\item{y}{Numeric vector with the dependent variable.}
+\item{y}{Dependent variable (a numeric vector).}
 
-\item{x}{Matrix whose columns will be checked for multicollinearity.}
+\item{x}{Regressor matrix.}
 
-\item{fes}{List of factors defining the fixed effects in the model.}
+\item{fes}{List of fixed effects.}
 
-\item{hdfetol}{A number, passed on to \code{lfe::demeanlist} as a tolerance for the centering.}
+\item{hdfetol}{Tolerance for the centering, passed on to \code{lfe::demeanlist}.}
 
 \item{selectobs}{Currently unused.}
 }
@@ -21,12 +21,13 @@ collinearity_check(y, x, fes, hdfetol, selectobs = NULL)
 A numeric vector containing the variables that pass the collinearity check.
 }
 \description{
-\code{collinearity_check} checks for perfect multicollinearity in a model with high-dimensional
-fixed effects.
+\code{collinearity_check} checks for perfect multicollinearity in a PPML model with high-dimensional
+fixed effects. It calls \code{lfe::demeanlist} in order to partial out the fixed effects, and then
+uses \code{stats::lm.wfit} to discard linearly dependent variables.
 }
 \examples{
 y <- trade$export
-x <- data.matrix(trade[,-1:-9])
+x <- data.matrix(trade[, -1:-9])
 fes <- genfes(trade,
               f1 = c("exp",  "imp", "exp"),
               f2 = c("time",  "time", "imp"))

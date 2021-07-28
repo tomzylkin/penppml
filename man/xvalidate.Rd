@@ -39,9 +39,9 @@ xvalidate(
 
 \item{tol}{Tolerance parameter.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects.}
+\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
 
-\item{colcheck}{If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
+\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{init_mu}{TODO: check this.}
 
