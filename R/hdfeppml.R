@@ -1,7 +1,13 @@
 #' Poisson Pseudo Maximum Likelihood Estimation
 #'
-#' \code{hdfeppml} implements (unpenalized) PPML estimation in a setting with high-dimensional
+#' \code{hdfeppml} implements (unpenalized) PPML estimation in the presence of high-dimensional
 #' fixed effects.
+#'
+#' Internally, \code{hdfeppml} performs iteratively re-weighted least squares (IRLS) on a transformed
+#' model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
+#' iteration, the function calculates the transformed dependent variable, partials out the fixed effects
+#' (calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
+#' implementation).
 #'
 #' @param y Dependent variable (a vector)
 #' @param x Regressor matrix.
@@ -10,15 +16,29 @@
 #' @param hdfetol Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.
 #' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 #' @param selectobs A numeric vector with selected observations / rows (optional).
-#' @param mu TODO: check this.
-#' @param saveX Logical. If \code{TRUE}, it saves the residuals of the model.
-#' @param init_z TODO: check this.
+#' @param mu Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+#'               first iteration of the algorithm.
+#' @param saveX Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
+#'              fixed effects.
+#' @param init_z Optional: initial values of the transformed dependent variable, to be used in the
+#'               first iteration of the algorithm.
 #' @param verbose If TRUE, prints information to the screen while evaluating.
 #' @param maxiter Maximum number of iterations (a number).
-#' @param cluster A vector classifying observations into clusters (TODO: check).
+#' @param cluster A vector classifying observations into clusters.
 #' @param vcv TODO: check this. Something to do with standard errors.
 #'
-#' @return A list (TODO: complete this).
+#' @return A list with the following elements:
+#' \itemize{
+#'   \item \code{coefficients}: coefficient (beta) estimates.
+#'   \item \code{residuals}: residuals of the model.
+#'   \item \code{mu}: (TODO: check this)
+#'   \item \code{deviance}: (TODO: check this)
+#'   \item \code{bic}: (TODO: check this)
+#'   \item \code{x_resid}: matrix of demeaned regressors.
+#'   \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+#'   \item \code{se}: standard errors of the coefficients.
+#' }
+#'
 #' @export
 #'
 #' @examples
@@ -27,7 +47,7 @@
 #' fes <- genfes(trade,
 #'               f1 = c("exp",  "imp", "exp"),
 #'               f2 = c("time",  "time", "imp"))
-#' reg <- hdfeppml(y = y, x = y, fes = fes)
+#' reg <- hdfeppml(y = y, x = x, fes = fes)
 
 hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
                      mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
@@ -147,7 +167,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
 
     deviance <- -2 * sum(temp) / n
 
-    if(deviance < 0) deviance = 0
+    if (deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance
 

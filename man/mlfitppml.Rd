@@ -44,7 +44,7 @@ mlfitppml(
 
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
 
-\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+\item{cluster}{A vector classifying observations into clusters.}
 
 \item{method}{TODO: check what this does.}
 

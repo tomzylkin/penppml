@@ -53,7 +53,7 @@ xvalidate(
 
 \item{folds}{TODO: check this.}
 
-\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+\item{cluster}{A vector classifying observations into clusters.}
 
 \item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
 

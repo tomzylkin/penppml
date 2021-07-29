@@ -36,26 +36,46 @@ hdfeppml(
 
 \item{selectobs}{A numeric vector with selected observations / rows (optional).}
 
-\item{mu}{TODO: check this.}
+\item{mu}{Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+first iteration of the algorithm.}
 
-\item{saveX}{Logical. If \code{TRUE}, it saves the residuals of the model.}
+\item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
+fixed effects.}
 
-\item{init_z}{TODO: check this.}
+\item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
+first iteration of the algorithm.}
 
 \item{verbose}{If TRUE, prints information to the screen while evaluating.}
 
 \item{maxiter}{Maximum number of iterations (a number).}
 
-\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+\item{cluster}{A vector classifying observations into clusters.}
 
 \item{vcv}{TODO: check this. Something to do with standard errors.}
 }
 \value{
-A list (TODO: complete this).
+A list with the following elements:
+\itemize{
+\item \code{coefficients}: coefficient (beta) estimates.
+\item \code{residuals}: residuals of the model.
+\item \code{mu}: (TODO: check this)
+\item \code{deviance}: (TODO: check this)
+\item \code{bic}: (TODO: check this)
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+\item \code{se}: standard errors of the coefficients.
+}
 }
 \description{
-\code{hdfeppml} implements (unpenalized) PPML estimation in a setting with high-dimensional
+\code{hdfeppml} implements (unpenalized) PPML estimation in the presence of high-dimensional
 fixed effects.
+}
+\details{
+Internally, \code{hdfeppml} performs iteratively re-weighted least squares (IRLS) on a transformed
+model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
+iteration, the function calculates the transformed dependent variable, partials out the fixed effects
+(calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
+implementation).
 }
 \examples{
 y <- trade$export
@@ -63,5 +83,5 @@ x <- data.matrix(trade[,-1:-9])
 fes <- genfes(trade,
               f1 = c("exp",  "imp", "exp"),
               f2 = c("time",  "time", "imp"))
-reg <- hdfeppml(y = y, x = y, fes = fes)
+reg <- hdfeppml(y = y, x = x, fes = fes)
 }

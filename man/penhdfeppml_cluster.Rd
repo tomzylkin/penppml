@@ -32,7 +32,7 @@ penhdfeppml_cluster(
 
 \item{fes}{List of fixed effects.}
 
-\item{cluster}{A vector classifying observations into clusters (TODO: check).}
+\item{cluster}{A vector classifying observations into clusters.}
 
 \item{tol}{Tolerance parameter.}
 
@@ -46,15 +46,18 @@ penhdfeppml_cluster(
 
 \item{selectobs}{A numeric vector with selected observations / rows (optional).}
 
-\item{saveX}{Logical. If \code{TRUE}, it saves the residuals of the model.}
+\item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
+fixed effects.}
 
-\item{mu}{TODO: check this.}
+\item{mu}{Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+first iteration of the algorithm.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{K}{TODO: check what this does.}
 
-\item{init_z}{TODO: check this.}
+\item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
+first iteration of the algorithm.}
 
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
 
