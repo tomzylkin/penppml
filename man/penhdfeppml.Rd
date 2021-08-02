@@ -12,7 +12,7 @@ penhdfeppml(
   tol = 1e-08,
   hdfetol = 1e-04,
   glmnettol = 1e-12,
-  penalty = c("lasso", "ridge"),
+  penalty = "lasso",
   penweights = NULL,
   selectobs = rep(TRUE, length(y)),
   saveX = TRUE,

@@ -19,24 +19,29 @@
 #' @examples # TODO: add examples here.
 
 penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                        penalty = c("lasso", "ridge"), penweights = NULL,
+                        penalty = "lasso", penweights = NULL,
                         selectobs = rep(TRUE, length(y)), saveX = TRUE, mu = NULL, colcheck = TRUE,
                         init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                         method = "placeholder", cluster = NULL, debug = FALSE) {
 
-  if (is.null(selectobs)) {
-    selectobs <- rep(TRUE, length(y))
-  }
-  else {
-    #y <- y[selectobs]  # fix this later.
-    #x <- x[selectobs]
+  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
+  if (!is.null(selectobs)) {
+    y <- y[selectobs]
+    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.56.
+    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
+    for (i in seq_along(fes)) {
+      fes[[i]] <- fes[[i]][selectobs]
+    }
+    # Important: we need to subset clusters too (if used):
+    if (!is.null(cluster)) cluster <- cluster[selectobs]
   }
 
-  # implements plugin method; calls penhdfeppml_cluster subcommand
+  # implements plugin method; calls penhdfeppml_cluster subcommand (careful: selectobs is NULL, because
+  # we already filtered y, x, fes and cluster):
   if (method == "iterative") {
     penreg <- penhdfeppml_cluster(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
                                   hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
-                                  penweights = penweights, selectobs = selectobs, saveX = saveX,
+                                  penweights = penweights, selectobs = NULL, saveX = saveX,
                                   mu = mu, colcheck = colcheck, K = 15, init_z = init_z, post = FALSE,
                                   verbose = verbose, lambda = NULL)
   }
@@ -66,7 +71,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
     }
 
     # number of obs (needed for deviance)
-    n <- length(selectobs)
+    n <- length(y)
 
     # estimation algorithm (this implements a version of the algorithm from p. 110 of CGZ SJ 2020 but with penalized WLS in place of the WLS step)
     crit <- 1
@@ -78,7 +83,6 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
       if (iter == 1) {
 
         # initilize "mu"
-        y   <- y[selectobs]
         if (is.null(mu)) mu  <- (y + mean(y))/2
         z   <- (y - mu)/mu + log(mu)
         eta <- log(mu)
@@ -88,10 +92,8 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
         } else {
           reg_z <- init_z
         }
-        #reg_x  <- x[selectobs,]  ## this won't work if x has one column (annoying). Will work otherwise.
         reg_x  <- x
 
-        ## how to subset fes using selectobs?
       } else {
         last_z <- z
         z <- (y - mu)/mu + log(mu)
@@ -155,7 +157,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
 
       residuals <- z_resid - x_resid %*% b[include_x]
 
-      mu <- as.numeric(exp(z[selectobs] - residuals))
+      mu <- as.numeric(exp(z - residuals))
 
       # calculate deviance
       temp <-  -(y * log(y/mu) - (y-mu))
@@ -188,7 +190,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
 
     ## elements to return
     k   <- ncol(matrix(x))
-    n   <- length(selectobs)
+    n   <- length(y)
     select_x <- which(b != 0)
 
     k   <- length(select_x) #ncol(matrix(x[,select_x]))
