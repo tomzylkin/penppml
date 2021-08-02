@@ -231,6 +231,6 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
       V          = (n / (n - 1)) * V
     }
   }
-  reg[["se"]] <- (diag(sqrt(V)))
+  reg[["se"]] <- sqrt(diag(V))
   return(reg)
 }
