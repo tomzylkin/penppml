@@ -53,18 +53,20 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
                      mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
                      cluster = NULL, vcv = TRUE) {
 
-  if (is.null(selectobs)) {
-    selectobs <- rep(TRUE, length(y))
-  }
-  else {
-    #y <- y[selectobs]
-    #x <- x[selectobs]
+  x <- data.matrix(x)
+
+  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
+  if (!is.null(selectobs)) {
+    y <- y[selectobs]
+    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.56.
+    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
+    for (i in seq_along(fes)) {
+      fes[[i]] <- fes[[i]][selectobs]
+    }
   }
 
   # number of observations (needed for deviance)
-  n <- length(selectobs)
-
-  x <- data.matrix(x)
+  n <- length(y)
 
   # estimation algorithm
   crit <- 1
@@ -95,7 +97,6 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
 
     if (iter == 1) {
       ## initialize "mu"
-      y   <- y[selectobs]
       if (is.null(mu)) mu  <- (y + mean(y))/2
       z   <- (y-mu)/mu + log(mu)
       eta <- log(mu)
@@ -105,10 +106,8 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
       } else {
         reg_z <- init_z
       }
-      #reg_x  <- x[selectobs,]  ## this won't work if x has one column. Will work otherwise.
       reg_x  <- x
 
-      ## how to subset fes?
     } else {
       last_z <- z
       z <- (y-mu)/mu + log(mu)
@@ -139,7 +138,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     } else {
       reg$residuals <- z_resid - x_resid %*% b[include_x]
     }
-    mu <- as.numeric(exp(z[selectobs] - reg$residuals))
+    mu <- as.numeric(exp(z - reg$residuals))
     if (verbose == TRUE) {
       print("info on residuals")
       print(max(reg$residuals))
@@ -161,6 +160,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
+    # Don't know if this is needed now that we've subsetted all data up front:
     if (!missing(selectobs)) {
       temp[which(!selectobs)] <- 0
     }
@@ -198,7 +198,7 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
 
   ## elements to return
   k   <- ncol(matrix(x))
-  n   <- length(selectobs)
+  n   <- length(y)
   reg$mu  <- mu
   reg$deviance <- -2 * sum(temp) / n
   reg$bic <- deviance + k * log(n) / n
