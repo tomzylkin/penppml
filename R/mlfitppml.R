@@ -15,9 +15,9 @@
 #'
 #' @examples # TODO: add examples here.
 
-mlfitppml = function(y,x,fes,lambdas,penalty=c("lasso","ridge"),tol=1e-8,hdfetol=1e-4,colcheck=TRUE,post=TRUE,cluster=NULL,
-                     method=c("bic","iterative"),IDs=1:n,verbose=FALSE,
-                     xval=FALSE,standardize=TRUE,vcv=TRUE,penweights=NULL,K=15) {
+mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
+                     post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
+                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15) {
 
   set.seed(1)
   xnames <- colnames(x)
