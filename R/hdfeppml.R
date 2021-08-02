@@ -63,6 +63,8 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     for (i in seq_along(fes)) {
       fes[[i]] <- fes[[i]][selectobs]
     }
+    # Important: we need to subset clusters too (if used):
+    if (!is.null(cluster)) cluster <- cluster[selectobs]
   }
 
   # number of observations (needed for deviance)
