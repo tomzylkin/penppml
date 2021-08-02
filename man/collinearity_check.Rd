@@ -4,7 +4,7 @@
 \alias{collinearity_check}
 \title{Checking for Perfect Multicollinearity}
 \usage{
-collinearity_check(y, x, fes, hdfetol, selectobs = NULL)
+collinearity_check(y, x, fes, hdfetol)
 }
 \arguments{
 \item{y}{Dependent variable (a numeric vector).}
@@ -14,8 +14,6 @@ collinearity_check(y, x, fes, hdfetol, selectobs = NULL)
 \item{fes}{List of fixed effects.}
 
 \item{hdfetol}{Tolerance for the centering, passed on to \code{lfe::demeanlist}.}
-
-\item{selectobs}{Currently unused.}
 }
 \value{
 A numeric vector containing the variables that pass the collinearity check.

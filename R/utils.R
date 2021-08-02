@@ -35,7 +35,6 @@
 #' @param x Regressor matrix.
 #' @param fes List of fixed effects.
 #' @param hdfetol Tolerance for the centering, passed on to \code{lfe::demeanlist}.
-#' @param selectobs Currently unused.
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
 #' @export
@@ -49,7 +48,7 @@
 #'
 #' collinearity_check(y, x, fes, hdfetol = 1e-6)
 
-collinearity_check <- function(y, x, fes, hdfetol, selectobs = NULL) {
+collinearity_check <- function(y, x, fes, hdfetol) {
   mu  <- (y + mean(y)) / 2
   z   <- (y - mu) / mu + log(mu)
   reg_z  <- matrix(z)
