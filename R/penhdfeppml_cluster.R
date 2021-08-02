@@ -21,6 +21,7 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
   n <- length(y)
   k <- ncol(x) # BUG? should be defined after colcheck
   nclusters <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
+  x <- data.matrix(x)
 
   if(is.null(lambda)){
     c <- 1.1
@@ -28,12 +29,16 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
     lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
   }
 
-  if (is.null(selectobs)) {
-    selectobs <- rep(TRUE, length(y))
-  }
-  else {
-    #y <- y[selectobs]
-    #x <- x[selectobs]
+  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
+  if (!is.null(selectobs)) {
+    y <- y[selectobs]
+    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.24.
+    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
+    for (i in seq_along(fes)) {
+      fes[[i]] <- fes[[i]][selectobs]
+    }
+    # Important: we need to subset clusters too:
+    cluster <- cluster[selectobs]
   }
 
   if(verbose == TRUE){
@@ -50,7 +55,7 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
   }
 
   # number of obs (needed for deviance)
-  n   <- length(selectobs)
+  n   <- length(y)
 
   # estimation algorithm
   crit <- 1
@@ -62,7 +67,6 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
     if (iter == 1) {
 
       # initilize "mu"
-      y   <- y[selectobs]
       if (is.null(mu)) mu  <- (y + mean(y)) / 2
       z   <- (y - mu) / mu + log(mu)
       eta <- log(mu)
@@ -72,10 +76,8 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
       } else{
         reg_z <- init_z
       }
-      #reg_x  <- x[selectobs,]  ## this won't work if x has one column. Will work otherwise.
       reg_x  <- x
 
-      ## how to subset fes?
     } else {
       last_z <- z
       z <- (y - mu) / mu + log(mu)
@@ -121,7 +123,7 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
 
     residuals <- z_resid - x_resid %*% b[include_x]  #technically this reflects (y-mu)/mu
 
-    mu <- as.numeric(exp(z[selectobs] - residuals))
+    mu <- as.numeric(exp(z - residuals))
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))
@@ -150,7 +152,7 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
 
   ## elements to return
   k   <- ncol(matrix(x))
-  n   <- length(selectobs)
+  n   <- length(y)
   select_x <- which(b!=0)
 
   k   <- length(select_x)
