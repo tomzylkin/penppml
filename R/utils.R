@@ -37,7 +37,6 @@
 #' @param hdfetol Tolerance for the centering, passed on to \code{lfe::demeanlist}.
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
-#' @export
 #'
 #' @examples
 #' y <- trade$export
@@ -73,7 +72,6 @@ collinearity_check <- function(y, x, fes, hdfetol) {
 #' @param x Regressor matrix.
 #'
 #' @return Gives the XeeX matrix (TODO: check this).
-#' @export
 #' @importFrom rlang .data
 #'
 #' @examples # TODO: add examples here.
@@ -116,7 +114,6 @@ cluster_matrix <- function(e, cluster, x) {
 #' \code{return.sd == TRUE}, then it returns the vector of standard errors of the means of the
 #' variables.
 #'
-#' @export
 #'
 #' @examples
 #' x <- data.matrix(trade[, -1:-9])
@@ -155,7 +152,6 @@ standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd
 #' @param standardize Logical. If \code{TRUE}, x is standardized using the \code{weights}.
 #'
 #' @return A vector of parameter (beta) estimates (TODO: check this).
-#' @export
 #'
 #' @examples # TODO: add examples here.
 
@@ -181,7 +177,6 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #' @param f2 A character vector with variable names (second term).
 #'
 #' @return A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
-#' @export
 #'
 #' @examples
 #' data <- data.frame(exporter = c("Spain", "Spain", "Portugal", "France"),
