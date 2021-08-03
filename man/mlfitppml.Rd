@@ -34,7 +34,7 @@ mlfitppml(
 
 \item{lambdas}{Vector of penalty parameters.}
 
-\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+\item{penalty}{A string. Currently supported: "lasso" and "ridge".}
 
 \item{tol}{Tolerance parameter.}
 

@@ -5,7 +5,7 @@
 #'
 #' @param lambda Penalty parameter (a number).
 #' @param glmnettol Tolerance parameter to be passed on to glmnet.
-#' @param penalty A string. Currently supported: "lasso", "ridge", "SCAD".
+#' @param penalty A string. Currently supported: "lasso" and "ridge".
 #' @param penweights TODO: check what this does (parameter-specific penalties in plugin lasso?).
 #' @param post Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.
 #' @param standardize Logical. If \code{TRUE}, x variables are standardized (TODO: check this).
@@ -122,17 +122,22 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
         }
       }
 
-      if (penalty == "SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
-        wz_resid <- sqrt(mu) * z_resid
-        wx_resid <- sqrt(mu) * x_resid
-        penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty = "SCAD", lambda = lambda)  # add penalty weights
-
-      }  else if (penalty == "ridge") {
+# The SCAD option is DISABLED:
+#      if (penalty == "SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
+#        wz_resid <- sqrt(mu) * z_resid
+#        wx_resid <- sqrt(mu) * x_resid
+#        penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty = "SCAD", lambda = lambda)  # add penalty weights
+#
+#      }  else if (penalty == "ridge") {
+      if (penalty == "ridge") {
         penreg <- fastridge(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = n * lambda,
                             standardize = standardize) # ,penalty.factor=penweights
       } else {
 
-        # Lasso is the default
+        # Lasso is the default, so a
+        if (penalty != "lasso" & iter == 1) {
+          warning(penalty, " penalty is not supported. Lasso is used by default.")
+        }
         if (debug) {
           penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
                                    thresh = glmnettol, standardize = standardize)

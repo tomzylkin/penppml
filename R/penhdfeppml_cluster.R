@@ -104,16 +104,20 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
       print(phi)
     }
 
-    if (penalty == "SCAD") {  ## !! currently *very* slow... could be sped up using warm starts.
-      wz_resid <- sqrt(mu) * z_resid
-      wx_resid <- sqrt(mu) * x_resid
-      penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty="SCAD", lambda = lambda, penalty.loadings = phi)
-    } else {
+# The SCAD option is DISABLED. Since lasso becomes the only option, the if else structure is not needed:
+#    if (penalty == "SCAD") {  ## !! currently *very* slow... could be sped up using warm starts.
+#      wz_resid <- sqrt(mu) * z_resid
+#      wx_resid <- sqrt(mu) * x_resid
+#      penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty="SCAD", lambda = lambda, penalty.loadings = phi)
+#    } else {
       #wx_resid <- cbind(sqrt(mu), wx_resid)
       #penreg <- cdreg(x = x_resid, y = z_resid, weights = mu / sum(mu),lambda = lambda, thresh = 1e-20) ## SLOW!
+      if (penalty != "lasso" & iter == 1) {
+        warning(penalty, " penalty is not supported. Lasso is used by default.")
+      }
       penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
                                thresh = glmnettol, penalty.factor = phi, standardize = FALSE)
-    }
+#    }
 
     b[include_x] <- penreg$beta #[-1,]   #does using [,include_x] make a difference?
 

@@ -40,7 +40,7 @@ penhdfeppml_cluster(
 
 \item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
 
-\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+\item{penalty}{A string. Currently supported: "lasso" and "ridge".}
 
 \item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
 

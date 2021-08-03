@@ -55,7 +55,7 @@ xvalidate(
 
 \item{cluster}{A vector classifying observations into clusters.}
 
-\item{penalty}{A string. Currently supported: "lasso", "ridge", "SCAD".}
+\item{penalty}{A string. Currently supported: "lasso" and "ridge".}
 
 \item{method}{TODO: check what this does.}
 
