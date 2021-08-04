@@ -1,0 +1,85 @@
+#' PPML Estimation for Data Frames
+#'
+#' These functions are thin wrappers around \code{mlfitppml}, \code{hdfeppml}, \code{penhdfeppml} and
+#' \code{penhdfeppml_cluster}, providing a more convenient interface for data frames.
+#'
+#' @param data A data frame containing all relevant variables.
+#' @param dep A string with the name of the independent variable or a column number.
+#' @param indep A vector with the names or column numbers of the regressors. If left unspecified,
+#'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
+#' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects.
+#' @param interactions A list with the desired interactions between the variables in \code{fixed}.
+#'              Optional: if left unspecified, the function will just use the variables in {fixed}.
+#' @param ... Further arguments, to be passed on to the main function.
+#'
+#' @return The same as their respective parent functions.
+#'
+#' @examples
+#' test1 <- mlfitppml2(data = trade[, -(5:10)],
+#'                     dep = "export",
+#'                     fixed = c("exp", "imp", "time"),
+#'                     interactions = list(c("exp", "time"),
+#'                                         c("imp", "time"),
+#'                                         c("exp", "imp")),
+#'                     lambdas = c(0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001))
+#' test2 <- hdfeppml2(data = trade[, -(5:10)],
+#'                    dep = "export",
+#'                    fixed = c("exp", "imp", "time"),
+#'                    interactions = list(c("exp", "time"),
+#'                                        c("imp", "time"),
+#'                                        c("exp", "imp")))
+#' test3 <- penhdfeppml2(data = trade[, -(5:10)],
+#'                       dep = "export",
+#'                       fixed = c("exp", "imp", "time"),
+#'                       interactions = list(c("exp", "time"),
+#'                                           c("imp", "time"),
+#'                                           c("exp", "imp")),
+#'                       lambda = 0.05)
+#' test4 <- penhdfeppml_cluster2(data = trade[, -(5:10)],
+#'                               dep = "export",
+#'                               fixed = c("exp", "imp", "time"),
+#'                               interactions = list(c("exp", "time"),
+#'                                                   c("imp", "time"),
+#'                                                   c("exp", "imp")),
+#'                               cluster = interaction(trade$exp, trade$imp))
+#'
+#' @seealso [mlfitppml()]
+#' @name wrappers
+
+NULL
+
+#' @export
+#' @rdname wrappers
+mlfitppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...) {
+  # Initial call to genmodel:
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, interactions = interactions)
+  # Final call to mlfitppml:
+  mlfitppml(y = model$y, x = model$x, fes = model$fes, ...)
+}
+
+#' @export
+#' @rdname wrappers
+hdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...) {
+  # Initial call to genmodel:
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, interactions = interactions)
+  # Final call to mlfitppml:
+  hdfeppml(y = model$y, x = model$x, fes = model$fes, ...)
+}
+
+#' @export
+#' @rdname wrappers
+penhdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...) {
+  # Initial call to genmodel:
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, interactions = interactions)
+  # Final call to mlfitppml:
+  penhdfeppml(y = model$y, x = model$x, fes = model$fes, ...)
+}
+
+#' @export
+#' @rdname wrappers
+penhdfeppml_cluster2 <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...) {
+  # Initial call to genmodel:
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, interactions = interactions)
+  # Final call to mlfitppml:
+  penhdfeppml_cluster(y = model$y, x = model$x, fes = model$fes, ...)
+}

@@ -23,12 +23,3 @@ A numeric vector containing the variables that pass the collinearity check.
 fixed effects. It calls \code{lfe::demeanlist} in order to partial out the fixed effects, and then
 uses \code{stats::lm.wfit} to discard linearly dependent variables.
 }
-\examples{
-y <- trade$export
-x <- data.matrix(trade[, -1:-9])
-fes <- genfes(trade,
-              f1 = c("exp",  "imp", "exp"),
-              f2 = c("time",  "time", "imp"))
-
-collinearity_check(y, x, fes, hdfetol = 1e-6)
-}

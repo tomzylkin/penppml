@@ -37,15 +37,6 @@
 #' @param hdfetol Tolerance for the centering, passed on to \code{lfe::demeanlist}.
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
-#'
-#' @examples
-#' y <- trade$export
-#' x <- data.matrix(trade[, -1:-9])
-#' fes <- genfes(trade,
-#'               f1 = c("exp",  "imp", "exp"),
-#'               f2 = c("time",  "time", "imp"))
-#'
-#' collinearity_check(y, x, fes, hdfetol = 1e-6)
 
 collinearity_check <- function(y, x, fes, hdfetol) {
   mu  <- (y + mean(y)) / 2
@@ -73,8 +64,7 @@ collinearity_check <- function(y, x, fes, hdfetol) {
 #'
 #' @return Gives the XeeX matrix (TODO: check this).
 #' @importFrom rlang .data
-#'
-#' @examples # TODO: add examples here.
+
 
 cluster_matrix <- function(e, cluster, x) {
   K <- ncol(x)
@@ -113,12 +103,7 @@ cluster_matrix <- function(e, cluster, x) {
 #' @return If \code{return.sd == FALSE}, it gives the matrix of standardized regressors. If
 #' \code{return.sd == TRUE}, then it returns the vector of standard errors of the means of the
 #' variables.
-#'
-#'
-#' @examples
-#' x <- data.matrix(trade[, -1:-9])
-#' x_st <- standardize_wt(x)
-#' se <- standardize_wt(x, return.sd = TRUE)
+
 
 standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd = FALSE) {
   n     <- nrow(x)
@@ -152,8 +137,7 @@ standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd
 #' @param standardize Logical. If \code{TRUE}, x is standardized using the \code{weights}.
 #'
 #' @return A vector of parameter (beta) estimates (TODO: check this).
-#'
-#' @examples # TODO: add examples here.
+
 
 fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
   n <- length(y)
@@ -173,28 +157,86 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #' \code{genfes} generates a list of fixed effects by creating interactions of paired factors.
 #'
 #' @param data A data frame including the factors.
-#' @param f1 A character vector with variables names (first term).
-#' @param f2 A character vector with variable names (second term).
+#' @param vars A vector with variables names or column numbers.
+#' @param inter A list: each element includes the variables to be interacted.
 #'
 #' @return A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
 #'
 #' @examples
+#' # We create a very simple data frame:
 #' data <- data.frame(exporter = c("Spain", "Spain", "Portugal", "France"),
 #'                    importer = c("China", "Swaziland", "Mozambique", "Tunisia"),
 #'                    year = c("1998", "1999", "1998", "1999"))
-#' genfes(data, f1 = c("exporter",  "importer", "exporter"), f2 = c("year",  "year", "importer"))
+#' # We can specify the interactions by column number:
+#' \dontrun{fes <- genfes(data, vars = names(data), inter = list(1:2, 2:3, c(1, 3)))}
+#' # We can also specify the interactions by variable names, if desired:
+#' \dontrun{fes <- genfes(data,
+#'               vars = names(data),
+#'               inter = list(c("exporter", "importer"),
+#'                            c("importer", "year"),
+#'                            c("exporter", "year")))}
 
-genfes <- function(data, f1, f2) {
+genfes <- function(data, vars, inter) {
   fes <- list()
 
-  if (length(f1) != length(f2)) {
-    cat("ERROR: the length of f1 and f2 should be the same.")
-    stop()
-  }
-
-  for (i in 1:length(f1)) {
-    fes[[paste(f1[i], f2[i], sep = "_")]] <- interaction(data[[f1[i]]], data[[f2[i]]])
+  for (i in seq_along(inter)) {
+    fes[[paste(names(data[, inter[[i]]]), collapse = "_")]] <- interaction(data[, inter[[i]]])
   }
   return(fes)
+}
+
+#' Generating Model Structure
+#'
+#' \code{genmodel} transforms a data frame into the needed components for our main functions (a y vector,
+#' an x matrix and a fes list).
+#'
+#' @param data A data frame containing all relevant variables.
+#' @param dep A string with the name of the independent variable or a column number.
+#' @param indep A vector with the names or column numbers of the regressors. If left unspecified,
+#'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
+#' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects.
+#' @param interactions A list with the desired interactions between the variables in \code{fixed}.
+#'              Optional: if left unspecified, the function will just use the variables in {fixed}.
+#'
+#' @return A list with three elements:
+#' \itemize{
+#'   \item \code{y}: y vector.
+#'   \item \code{x}: x matrix.
+#'   \item \code{fes}: list of fixed effects.
+#' }
+
+genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL) {
+  # First we deal with y:
+  if (is.numeric(dep) | is.character(dep)) {
+    y <- data[, dep]
+  } else {
+    stop("Unsupported format for dependent variable")
+  }
+
+  # Now the fes:
+  if (is.numeric(fixed) | is.character(fixed)) {
+    if (is.null(interactions)) {
+      fes <- as.list(data[, fixed])
+    } else {
+      fes <- genfes(data, fixed, interactions)
+    }
+
+  } else if (is.null(fixed)) {
+    stop("Model must include fixed effects")
+  } else {
+    stop("Unsupported format for fixed effects")
+  }
+
+  # Finally, the x:
+  if (is.numeric(indep) | is.character(indep)) {
+    x <- data.matrix(data[, indep])
+  } else if (is.null(indep)) {
+    if (is.character(dep)) dep <- which(names(data) %in% dep)  # This line and the following ensure that the default
+    if (is.character(fixed)) fixed <- which(names(data) %in% fixed)  # selection works when dep and fes are names (not column numbers).
+    x <- data.matrix(data[, -c(dep, fixed)])
+  } else {
+    stop("Unsupported format for independent variables")
+  }
+  return(list(y = y, x = x, fes = fes))
 }
 

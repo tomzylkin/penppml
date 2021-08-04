@@ -24,6 +24,3 @@ A vector of parameter (beta) estimates (TODO: check this).
 A wrapper around \code{fastridgeCpp}, for faster computation of the analytical solution for
 ridge regression.
 }
-\examples{
-# TODO: add examples here.
-}

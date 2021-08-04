@@ -19,6 +19,3 @@ Gives the XeeX matrix (TODO: check this).
 \description{
 TODO: add explanation here.
 }
-\examples{
-# TODO: add examples here.
-}

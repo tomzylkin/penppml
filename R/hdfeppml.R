@@ -44,9 +44,10 @@
 #' @examples
 #' y <- trade$export
 #' x <- data.matrix(trade[,-1:-9])
-#' fes <- genfes(trade,
-#'               f1 = c("exp",  "imp", "exp"),
-#'               f2 = c("time",  "time", "imp"))
+#' fes <- list(exp_time = interaction(trade$exp, trade$time),
+#'             imp_time = interaction(trade$imp, trade$time),
+#'             pair     = interaction(trade$exp, trade$imp))
+
 #' reg <- hdfeppml(y = y, x = x, fes = fes)
 
 hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,

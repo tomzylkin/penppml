@@ -23,8 +23,3 @@ variables.
 \description{
 Performs weighted standardization of x variables. Used in \code{fastridge}.
 }
-\examples{
-x <- data.matrix(trade[, -1:-9])
-x_st <- standardize_wt(x)
-se <- standardize_wt(x, return.sd = TRUE)
-}

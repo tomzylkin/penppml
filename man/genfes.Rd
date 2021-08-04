@@ -4,14 +4,14 @@
 \alias{genfes}
 \title{Generating a List of Fixed Effects}
 \usage{
-genfes(data, f1, f2)
+genfes(data, vars, inter)
 }
 \arguments{
 \item{data}{A data frame including the factors.}
 
-\item{f1}{A character vector with variables names (first term).}
+\item{vars}{A vector with variables names or column numbers.}
 
-\item{f2}{A character vector with variable names (second term).}
+\item{inter}{A list: each element includes the variables to be interacted.}
 }
 \value{
 A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
@@ -20,8 +20,16 @@ A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code
 \code{genfes} generates a list of fixed effects by creating interactions of paired factors.
 }
 \examples{
+# We create a very simple data frame:
 data <- data.frame(exporter = c("Spain", "Spain", "Portugal", "France"),
                    importer = c("China", "Swaziland", "Mozambique", "Tunisia"),
                    year = c("1998", "1999", "1998", "1999"))
-genfes(data, f1 = c("exporter",  "importer", "exporter"), f2 = c("year",  "year", "importer"))
+# We can specify the interactions by column number:
+\dontrun{fes <- genfes(data, vars = names(data), inter = list(1:2, 2:3, c(1, 3)))}
+# We can also specify the interactions by variable names, if desired:
+\dontrun{fes <- genfes(data,
+              vars = names(data),
+              inter = list(c("exporter", "importer"),
+                           c("importer", "year"),
+                           c("exporter", "year")))}
 }

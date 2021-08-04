@@ -2,9 +2,13 @@
 
 export("%>%")
 export(hdfeppml)
+export(hdfeppml2)
 export(mlfitppml)
+export(mlfitppml2)
 export(penhdfeppml)
+export(penhdfeppml2)
 export(penhdfeppml_cluster)
+export(penhdfeppml_cluster2)
 export(xvalidate)
 import(RcppEigen)
 importFrom(Rcpp,sourceCpp)
