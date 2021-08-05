@@ -1,11 +1,11 @@
 ---
-title: "Introduction to the penppml package"
+title: "Penalized PPML Regression with penppml: an introduction"
 output: 
   rmarkdown::html_vignette:
     number_sections: true
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to the penppml package}
+  %\VignetteIndexEntry{Penalized PPML Regression with penppml: an introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,7 +27,36 @@ library(penppml)
 # Main functions
 The workhorse of our package is the `mlfitppml` function.
 
-# Applications 
-## The effects of specific trade agreement provisions on international trade
+# Applications: the effects of specific trade agreement provisions on international trade
+
+The `penppml` package features the `trade` data set, which integrates panel data on bilateral trade flows with information about specific provisions in trade agreements for 220 exporters and 270 importers. The provisions included in the package are a subset of 50 out of 305 "essential" provisions featured in the full data set. More information about the data set and the variables is included in the corresponding help file, accessible via `?trade`.
+
+```{r inspect data, echo = FALSE}
+knitr::kable(head(trade[, c(1:4, 10:13)], 10), format = "pipe")
+```
+
+We are going to use the `trade` data set to demonstrate the capabilities of this package. First, we will run an unpenalized PPML regression using `hdfeppml`:
+
+```{r try hdfeppml}
+reg <- hdfeppml2(data = trade[, -(5:9)],
+          dep = "export",
+          fixed = c("exp", "imp", "time"),
+          interactions = list(c("exp", "time"), 
+                              c("imp", "time"),
+                              c("exp", "imp")))
+```
+
+```{r display results, echo = FALSE}
+results <- data.frame(prov = rownames(reg$coefficients), b = reg$coefficients, se = 0)
+results$se[!is.na(reg$coefficients)] <- reg$se
+knitr::kable(list(results[1:13, ], results[14:26, ], 
+                  results[27:39, ], results[40:50, ]), 
+             format = "pipe",
+             col.names = c("Provision", "Coefficient", "SE"), 
+             caption = "Table 1: Unpenalized PPML results",
+             row.names = FALSE,
+             digits = 4)
+```
+
 
 # References
