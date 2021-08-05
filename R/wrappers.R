@@ -19,27 +19,31 @@
 #' @return The same as their respective parent functions.
 #'
 #' @examples
-#' test1 <- mlfitppml2(data = trade[, -(5:10)],
+#' # To reduce run time, we keep only countries in the Americas:
+#' americas <- countries$iso[countries$region == "Americas"]
+#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
+#' # Now we can use our main functions on the reduced trade data set:
+#' test1 <- mlfitppml2(data = trade[, -(5:6)],
 #'                     dep = "export",
 #'                     fixed = c("exp", "imp", "time"),
 #'                     interactions = list(c("exp", "time"),
 #'                                         c("imp", "time"),
 #'                                         c("exp", "imp")),
 #'                     lambdas = c(0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001))
-#' test2 <- hdfeppml2(data = trade[, -(5:10)],
+#' test2 <- hdfeppml2(data = trade[, -(5:6)],
 #'                    dep = "export",
 #'                    fixed = c("exp", "imp", "time"),
 #'                    interactions = list(c("exp", "time"),
 #'                                        c("imp", "time"),
 #'                                        c("exp", "imp")))
-#' test3 <- penhdfeppml2(data = trade[, -(5:10)],
+#' test3 <- penhdfeppml2(data = trade[, -(5:6)],
 #'                       dep = "export",
 #'                       fixed = c("exp", "imp", "time"),
 #'                       interactions = list(c("exp", "time"),
 #'                                           c("imp", "time"),
 #'                                           c("exp", "imp")),
 #'                       lambda = 0.05)
-#' test4 <- penhdfeppml_cluster2(data = trade[, -(5:10)],
+#' test4 <- penhdfeppml_cluster2(data = trade[, -(5:6)],
 #'                               dep = "export",
 #'                               fixed = c("exp", "imp", "time"),
 #'                               interactions = list(c("exp", "time"),

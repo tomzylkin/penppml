@@ -56,6 +56,8 @@ mlfitppml(
 
 \item{standardize}{Logical. If \code{TRUE}, x variables are standardized (TODO: check this).}
 
+\item{vcv}{Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.}
+
 \item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
 
 \item{K}{TODO: check what this does.}
