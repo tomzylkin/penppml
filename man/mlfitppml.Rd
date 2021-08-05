@@ -56,8 +56,6 @@ mlfitppml(
 
 \item{standardize}{Logical. If \code{TRUE}, x variables are standardized (TODO: check this).}
 
-\item{vcv}{TODO: check this.}
-
 \item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
 
 \item{K}{TODO: check what this does.}
@@ -66,10 +64,8 @@ mlfitppml(
 A list (TODO: complete this).
 }
 \description{
-\code{mlfitppml} is a general function for penalized PPML estimation, calling
+\code{mlfitppml} is a general wrapper function for penalized PPML estimation, calling
 \code{penhdfeppml}, \code{penhdfeppml_cluster} and \code{hdfeppml} as needed.
-\code{mlfitppml2} is a thin wrapper around \code{mlfitppml} that makes handling
-data frames easier.
 }
 \examples{
 # TODO: add examples here.

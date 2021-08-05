@@ -7,7 +7,7 @@
 #' @param IDs TODO: check what this does (probably for cross validation).
 #' @param xval Logical. If \code{TRUE}, carries out cross-validation.
 #' @param K TODO: check what this does.
-#' @param vcv TODO: check this.
+#' @param vcv Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.
 #' @inheritParams penhdfeppml
 #'
 #' @return A list (TODO: complete this).

@@ -14,7 +14,7 @@ genfes(data, vars, inter)
 \item{inter}{A list: each element includes the variables to be interacted.}
 }
 \value{
-A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
+A list containing the desired interactions of \code{vars}, with the same length as \code{inter}.
 }
 \description{
 \code{genfes} generates a list of fixed effects by creating interactions of paired factors.

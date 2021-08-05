@@ -19,7 +19,7 @@ collinearity_check(y, x, fes, hdfetol)
 A numeric vector containing the variables that pass the collinearity check.
 }
 \description{
-\code{collinearity_check} checks for perfect multicollinearity in a PPML model with high-dimensional
+\code{collinearity_check} checks for perfect multicollinearity in a model with high-dimensional
 fixed effects. It calls \code{lfe::demeanlist} in order to partial out the fixed effects, and then
 uses \code{stats::lm.wfit} to discard linearly dependent variables.
 }

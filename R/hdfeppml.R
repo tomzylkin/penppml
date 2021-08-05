@@ -25,7 +25,7 @@
 #' @param verbose If TRUE, prints information to the screen while evaluating.
 #' @param maxiter Maximum number of iterations (a number).
 #' @param cluster A vector classifying observations into clusters.
-#' @param vcv TODO: check this. Something to do with standard errors.
+#' @param vcv Logical. If \code{TRUE} (the default), it returns standard errors.
 #'
 #' @return A list with the following elements:
 #' \itemize{
@@ -43,7 +43,7 @@
 #'
 #' @examples
 #' y <- trade$export
-#' x <- data.matrix(trade[,-1:-9])
+#' x <- data.matrix(trade[, -1:-9])
 #' fes <- list(exp_time = interaction(trade$exp, trade$time),
 #'             imp_time = interaction(trade$imp, trade$time),
 #'             pair     = interaction(trade$exp, trade$imp))

@@ -17,7 +17,7 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects.}
 
 \item{interactions}{A list with the desired interactions between the variables in \code{fixed}.
-Optional: if left unspecified, the function will just use the variables in {fixed}.}
+Optional: if left unspecified, the function will just teturn the variables in \code{fixed}.}
 }
 \value{
 A list with three elements:
@@ -29,5 +29,5 @@ A list with three elements:
 }
 \description{
 \code{genmodel} transforms a data frame into the needed components for our main functions (a y vector,
-an x matrix and a fes list).
+a x matrix and a fes list).
 }

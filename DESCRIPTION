@@ -6,7 +6,8 @@ Authors@R:
            family = "Ferreras Garrucho",
            role = c("aut", "cre"),
            email = "d.ferreras-garrucho@lse.ac.uk")
-Description: What the package does (one paragraph).
+Description: A package that enables estimation of penalized Poisson Pseudo Maximum Likelihood regressions,
+    using lasso or ridge penalties, for models that feature high-dimensional fixed effects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -51,7 +51,7 @@ first iteration of the algorithm.}
 
 \item{cluster}{A vector classifying observations into clusters.}
 
-\item{vcv}{TODO: check this. Something to do with standard errors.}
+\item{vcv}{Logical. If \code{TRUE} (the default), it returns standard errors.}
 }
 \value{
 A list with the following elements:
@@ -79,7 +79,7 @@ implementation).
 }
 \examples{
 y <- trade$export
-x <- data.matrix(trade[,-1:-9])
+x <- data.matrix(trade[, -1:-9])
 fes <- list(exp_time = interaction(trade$exp, trade$time),
             imp_time = interaction(trade$imp, trade$time),
             pair     = interaction(trade$exp, trade$imp))

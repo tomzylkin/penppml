@@ -27,7 +27,7 @@
 
 #' Checking for Perfect Multicollinearity
 #'
-#' \code{collinearity_check} checks for perfect multicollinearity in a PPML model with high-dimensional
+#' \code{collinearity_check} checks for perfect multicollinearity in a model with high-dimensional
 #' fixed effects. It calls \code{lfe::demeanlist} in order to partial out the fixed effects, and then
 #' uses \code{stats::lm.wfit} to discard linearly dependent variables.
 #'
@@ -54,15 +54,15 @@ collinearity_check <- function(y, x, fes, hdfetol) {
 }
 
 
-#' Cluster Standard Error Estimation
+#' Cluster-robust Standard Error Estimation
 #'
-#' TODO: add explanation here.
+#' \code{cluster_matrix} is a helper for computation of cluster-robust standard errors.
 #'
 #' @param e Vector of residuals.
 #' @param cluster Vector of clusters.
 #' @param x Regressor matrix.
 #'
-#' @return Gives the XeeX matrix (TODO: check this).
+#' @return Gives the XeeX matrix.
 #' @importFrom rlang .data
 
 
@@ -136,7 +136,7 @@ standardize_wt <- function(x, weights = rep(1/n, n), intercept = TRUE, return.sd
 #' @param lambda Penalty parameter.
 #' @param standardize Logical. If \code{TRUE}, x is standardized using the \code{weights}.
 #'
-#' @return A vector of parameter (beta) estimates (TODO: check this).
+#' @return A vector of coefficient (beta) estimates.
 
 
 fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
@@ -160,7 +160,7 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #' @param vars A vector with variables names or column numbers.
 #' @param inter A list: each element includes the variables to be interacted.
 #'
-#' @return A list containing the interaction of \code{f1[i]} and \code{f2[i]} for all \code{i in 1:length(f1)}.
+#' @return A list containing the desired interactions of \code{vars}, with the same length as \code{inter}.
 #'
 #' @examples
 #' # We create a very simple data frame:
@@ -188,7 +188,7 @@ genfes <- function(data, vars, inter) {
 #' Generating Model Structure
 #'
 #' \code{genmodel} transforms a data frame into the needed components for our main functions (a y vector,
-#' an x matrix and a fes list).
+#' a x matrix and a fes list).
 #'
 #' @param data A data frame containing all relevant variables.
 #' @param dep A string with the name of the independent variable or a column number.
@@ -196,7 +196,7 @@ genfes <- function(data, vars, inter) {
 #'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects.
 #' @param interactions A list with the desired interactions between the variables in \code{fixed}.
-#'              Optional: if left unspecified, the function will just use the variables in {fixed}.
+#'              Optional: if left unspecified, the function will just teturn the variables in \code{fixed}.
 #'
 #' @return A list with three elements:
 #' \itemize{

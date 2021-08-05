@@ -1,7 +1,11 @@
 #' PPML Estimation for Data Frames
 #'
 #' These functions are thin wrappers around \code{mlfitppml}, \code{hdfeppml}, \code{penhdfeppml} and
-#' \code{penhdfeppml_cluster}, providing a more convenient interface for data frames.
+#' \code{penhdfeppml_cluster}, providing a more convenient interface for data frames. Whereas the original
+#' functions require some preliminary handling of data sets (\code{y} must be a vector, \code{x} must be a
+#' matrix and \code{fes} must be provided in a list), the wrappers take a full data frame in the \code{data}
+#' argument, and users can simply specify which variables correspond to y, x and the fixed effects, using
+#' either variable names or column numbers.
 #'
 #' @param data A data frame containing all relevant variables.
 #' @param dep A string with the name of the independent variable or a column number.
@@ -9,7 +13,7 @@
 #'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects.
 #' @param interactions A list with the desired interactions between the variables in \code{fixed}.
-#'              Optional: if left unspecified, the function will just use the variables in {fixed}.
+#'              Optional: if left unspecified, the function will just use the variables in \code{fixed}.
 #' @param ... Further arguments, to be passed on to the main function.
 #'
 #' @return The same as their respective parent functions.

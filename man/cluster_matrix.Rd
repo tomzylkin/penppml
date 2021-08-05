@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{cluster_matrix}
 \alias{cluster_matrix}
-\title{Cluster Standard Error Estimation}
+\title{Cluster-robust Standard Error Estimation}
 \usage{
 cluster_matrix(e, cluster, x)
 }
@@ -14,8 +14,8 @@ cluster_matrix(e, cluster, x)
 \item{x}{Regressor matrix.}
 }
 \value{
-Gives the XeeX matrix (TODO: check this).
+Gives the XeeX matrix.
 }
 \description{
-TODO: add explanation here.
+\code{cluster_matrix} is a helper for computation of cluster-robust standard errors.
 }
