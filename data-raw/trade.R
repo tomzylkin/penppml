@@ -10,7 +10,6 @@ WB_TRADE_DATA <- read_dta("/Users/diego/Documents/OneDrive - London School of Ec
 # Large provisions data
 WB_LARGE <- read_dta("/Users/diego/Documents/OneDrive - London School of Economics/CEP/Summer RA 2020/Files as of June 2021 (for Diego)/Data/temp_provisions_largedataset_essential_Jan302021.dta")
 
-
 # Merge:
 
 trade <- merge(WB_TRADE_DATA,WB_LARGE, c("iso1", "iso2", "year"), all.x = TRUE, all.y = FALSE)
@@ -42,3 +41,17 @@ trade <- trade[, c("exp", "imp", "time", "export", "id", "agreement", iceberg$V1
 # Save as .Rdata file, with compression to stay below CRAN's 5Mb size limit:
 
 usethis::use_data(trade, compress = "xz", overwrite = TRUE)
+
+# We may also want to include a complementary data set with information about specific countries. This one
+# provides ISO code, name, region and subregion:
+
+countries <- read.csv("~/Documents/OneDrive - London School of Economics/CEP/Summer RA 2020/ISO-3166-Countries-with-Regional-Codes-9.0/all/all.csv")
+countries <- countries[, c(3, 1, 6, 7)]
+names(countries)[1] <- c("iso")
+
+# We could also add an OECD variable (TODO).
+
+# Finally, we save it:
+
+usethis::use_data(countries, compress = "xz", overwrite = TRUE)
+
