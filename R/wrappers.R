@@ -19,9 +19,9 @@
 #' @return The same as their respective parent functions.
 #'
 #' @examples
-#' # To reduce run time, we keep only countries in the Americas:
+#' # To reduce run time, we keep only countries in America and the first 10 provision dummies:
 #' americas <- countries$iso[countries$region == "Americas"]
-#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
+#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), 1:17]
 #' # Now we can use our main functions on the reduced trade data set:
 #' test1 <- mlfitppml2(data = trade[, -(5:6)],
 #'                     dep = "export",
@@ -29,7 +29,7 @@
 #'                     interactions = list(c("exp", "time"),
 #'                                         c("imp", "time"),
 #'                                         c("exp", "imp")),
-#'                     lambdas = c(0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001))
+#'                     lambdas = c(0.01, 0.001, 0.0001))
 #' test2 <- hdfeppml2(data = trade[, -(5:6)],
 #'                    dep = "export",
 #'                    fixed = c("exp", "imp", "time"),

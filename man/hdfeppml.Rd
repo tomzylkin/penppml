@@ -78,10 +78,15 @@ iteration, the function calculates the transformed dependent variable, partials 
 implementation).
 }
 \examples{
+# To reduce run time, we keep only countries in the Americas:
+americas <- countries$iso[countries$region == "Americas"]
+trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
+# Now generate the needed x, y and fes objects:
 y <- trade$export
-x <- data.matrix(trade[, -1:-9])
+x <- data.matrix(trade[, -1:-6])
 fes <- list(exp_time = interaction(trade$exp, trade$time),
             imp_time = interaction(trade$imp, trade$time),
             pair     = interaction(trade$exp, trade$imp))
+# Finally, the call to hdfeppml:
 reg <- hdfeppml(y = y, x = x, fes = fes)
 }
