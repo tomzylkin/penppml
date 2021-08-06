@@ -49,6 +49,10 @@ countries <- read.csv("~/Documents/OneDrive - London School of Economics/CEP/Sum
 countries <- countries[, c(3, 1, 6, 7)]
 names(countries)[1] <- c("iso")
 
+# We ensure all country names use only ASCII characters (otherwise R CMD check will throw a warning):
+
+countries$name <- stringi::stri_escape_unicode(countries$name)
+
 # We could also add an OECD variable (TODO).
 
 # Finally, we save it:
