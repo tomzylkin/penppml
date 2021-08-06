@@ -19,7 +19,6 @@ LinkingTo:
     RcppEigen
 Imports: 
     Rcpp,
-    RcppEigen,
     glmnet,
     lfe,
     ncvreg,
