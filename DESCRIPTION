@@ -1,13 +1,18 @@
 Package: penppml
-Title: Penalized Poisson Pseudo Maximum Likelihood
+Title: Penalized Poisson Pseudo Maximum Likelihood Regressions
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R: c(
     person(given = "Diego",
            family = "Ferreras Garrucho",
            role = c("aut", "cre"),
-           email = "d.ferreras-garrucho@lse.ac.uk")
-Description: A package that enables estimation of penalized Poisson Pseudo Maximum Likelihood regressions,
-    using lasso or ridge penalties, for models that feature high-dimensional fixed effects.
+           email = "d.ferreras-garrucho@lse.ac.uk"),
+    person(given = "Tom",
+           family = "Zylkin",
+           role = "aut",
+           email = "tzylkin@richmond.edu")
+    )       
+Description: A set of tools that enables estimation of penalized Poisson Pseudo Maximum Likelihood 
+    regressions, using lasso or ridge penalties, for models that feature high-dimensional fixed effects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
