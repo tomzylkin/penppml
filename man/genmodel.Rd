@@ -14,10 +14,8 @@ genmodel(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL)
 \item{indep}{A vector with the names or column numbers of the regressors. If left unspecified,
 all remaining variables (excluding fixed effects) are included in the regressor matrix.}
 
-\item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects.}
-
-\item{interactions}{A list with the desired interactions between the variables in \code{fixed}.
-Optional: if left unspecified, the function will just teturn the variables in \code{fixed}.}
+\item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
+or a list with the desired interactions between variables in \code{data}.}
 }
 \value{
 A list with three elements:

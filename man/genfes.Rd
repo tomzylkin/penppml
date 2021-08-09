@@ -4,14 +4,12 @@
 \alias{genfes}
 \title{Generating a List of Fixed Effects}
 \usage{
-genfes(data, vars, inter)
+genfes(data, inter)
 }
 \arguments{
 \item{data}{A data frame including the factors.}
 
-\item{vars}{A vector with variables names or column numbers.}
-
-\item{inter}{A list: each element includes the variables to be interacted.}
+\item{inter}{A list: each element includes the variables to be interacted (both names and column}
 }
 \value{
 A list containing the desired interactions of \code{vars}, with the same length as \code{inter}.
@@ -25,10 +23,9 @@ data <- data.frame(exporter = c("Spain", "Spain", "Portugal", "France"),
                    importer = c("China", "Swaziland", "Mozambique", "Tunisia"),
                    year = c("1998", "1999", "1998", "1999"))
 # We can specify the interactions by column number:
-\dontrun{fes <- genfes(data, vars = names(data), inter = list(1:2, 2:3, c(1, 3)))}
+\dontrun{fes <- genfes(data, inter = list(1:2, 2:3, c(1, 3)))}
 # We can also specify the interactions by variable names, if desired:
 \dontrun{fes <- genfes(data,
-              vars = names(data),
               inter = list(c("exporter", "importer"),
                            c("importer", "year"),
                            c("exporter", "year")))}

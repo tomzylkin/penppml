@@ -157,8 +157,8 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #' \code{genfes} generates a list of fixed effects by creating interactions of paired factors.
 #'
 #' @param data A data frame including the factors.
-#' @param vars A vector with variables names or column numbers.
-#' @param inter A list: each element includes the variables to be interacted.
+#' @param inter A list: each element includes the variables to be interacted (both names and column
+#    and column numbers are supported).
 #'
 #' @return A list containing the desired interactions of \code{vars}, with the same length as \code{inter}.
 #'
@@ -168,15 +168,14 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #'                    importer = c("China", "Swaziland", "Mozambique", "Tunisia"),
 #'                    year = c("1998", "1999", "1998", "1999"))
 #' # We can specify the interactions by column number:
-#' \dontrun{fes <- genfes(data, vars = names(data), inter = list(1:2, 2:3, c(1, 3)))}
+#' \dontrun{fes <- genfes(data, inter = list(1:2, 2:3, c(1, 3)))}
 #' # We can also specify the interactions by variable names, if desired:
 #' \dontrun{fes <- genfes(data,
-#'               vars = names(data),
 #'               inter = list(c("exporter", "importer"),
 #'                            c("importer", "year"),
 #'                            c("exporter", "year")))}
 
-genfes <- function(data, vars, inter) {
+genfes <- function(data, inter) {
   fes <- list()
 
   for (i in seq_along(inter)) {
@@ -193,10 +192,9 @@ genfes <- function(data, vars, inter) {
 #' @param data A data frame containing all relevant variables.
 #' @param dep A string with the name of the independent variable or a column number.
 #' @param indep A vector with the names or column numbers of the regressors. If left unspecified,
-#'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
-#' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects.
-#' @param interactions A list with the desired interactions between the variables in \code{fixed}.
-#'              Optional: if left unspecified, the function will just teturn the variables in \code{fixed}.
+#'    all remaining variables (excluding fixed effects) are included in the regressor matrix.
+#' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects,
+#'    or a list with the desired interactions between variables in \code{data}.
 #'
 #' @return A list with three elements:
 #' \itemize{
@@ -210,32 +208,31 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = N
   if (is.numeric(dep) | is.character(dep)) {
     y <- data[, dep]
   } else {
-    stop("Unsupported format for dependent variable")
+    stop("Unsupported format for dependent variable: dep must be a character or numeric vector.")
   }
 
   # Now the fes:
   if (is.numeric(fixed) | is.character(fixed)) {
-    if (is.null(interactions)) {
-      fes <- as.list(data[, fixed])
-    } else {
-      fes <- genfes(data, fixed, interactions)
-    }
-
+    fes <- as.list(data[, fixed])
+  } else if (is.list(fixed)) {
+    fes <- genfes(data = data, inter = fixed)
   } else if (is.null(fixed)) {
     stop("Model must include fixed effects")
   } else {
-    stop("Unsupported format for fixed effects")
+    stop("Unsupported format for fixed effects: fixed must be a numeric or character vector or a list
+         of numeric or character vectors.")
   }
 
   # Finally, the x:
   if (is.numeric(indep) | is.character(indep)) {
     x <- data.matrix(data[, indep])
   } else if (is.null(indep)) {
+    fixed <- unique(unlist(fixed)) # We get rid of the list structure.
     if (is.character(dep)) dep <- which(names(data) %in% dep)  # This line and the following ensure that the default
     if (is.character(fixed)) fixed <- which(names(data) %in% fixed)  # selection works when dep and fes are names (not column numbers).
     x <- data.matrix(data[, -c(dep, fixed)])
   } else {
-    stop("Unsupported format for independent variables")
+    stop("Unsupported format for independent variables: x must be a character or numeric vector.")
   }
   return(list(y = y, x = x, fes = fes))
 }

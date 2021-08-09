@@ -8,27 +8,13 @@
 \alias{penhdfeppml_cluster2}
 \title{PPML Estimation for Data Frames}
 \usage{
-mlfitppml2(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...)
+mlfitppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
 
-hdfeppml2(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL, ...)
+hdfeppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
 
-penhdfeppml2(
-  data,
-  dep = 1,
-  indep = NULL,
-  fixed = NULL,
-  interactions = NULL,
-  ...
-)
+penhdfeppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
 
-penhdfeppml_cluster2(
-  data,
-  dep = 1,
-  indep = NULL,
-  fixed = NULL,
-  interactions = NULL,
-  ...
-)
+penhdfeppml_cluster2(data, dep = 1, indep = NULL, fixed = NULL, ...)
 }
 \arguments{
 \item{data}{A data frame containing all relevant variables.}
@@ -38,10 +24,8 @@ penhdfeppml_cluster2(
 \item{indep}{A vector with the names or column numbers of the regressors. If left unspecified,
 all remaining variables (excluding fixed effects) are included in the regressor matrix.}
 
-\item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects.}
-
-\item{interactions}{A list with the desired interactions between the variables in \code{fixed}.
-Optional: if left unspecified, the function will just use the variables in \code{fixed}.}
+\item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
+or a list with the desired interactions between variables in \code{data}.}
 
 \item{...}{Further arguments, to be passed on to the main function.}
 }
@@ -63,30 +47,26 @@ trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), 1:17]
 # Now we can use our main functions on the reduced trade data set:
 test1 <- mlfitppml2(data = trade[, -(5:6)],
                     dep = "export",
-                    fixed = c("exp", "imp", "time"),
-                    interactions = list(c("exp", "time"),
-                                        c("imp", "time"),
-                                        c("exp", "imp")),
+                    fixed = list(c("exp", "time"),
+                                 c("imp", "time"),
+                                 c("exp", "imp")),
                     lambdas = c(0.01, 0.001, 0.0001))
 test2 <- hdfeppml2(data = trade[, -(5:6)],
                    dep = "export",
-                   fixed = c("exp", "imp", "time"),
-                   interactions = list(c("exp", "time"),
-                                       c("imp", "time"),
-                                       c("exp", "imp")))
+                   fixed = list(c("exp", "time"),
+                                c("imp", "time"),
+                                c("exp", "imp")))
 test3 <- penhdfeppml2(data = trade[, -(5:6)],
                       dep = "export",
-                      fixed = c("exp", "imp", "time"),
-                      interactions = list(c("exp", "time"),
-                                          c("imp", "time"),
-                                          c("exp", "imp")),
+                      fixed = list(c("exp", "time"),
+                                   c("imp", "time"),
+                                   c("exp", "imp")),
                       lambda = 0.05)
 test4 <- penhdfeppml_cluster2(data = trade[, -(5:6)],
                               dep = "export",
-                              fixed = c("exp", "imp", "time"),
-                              interactions = list(c("exp", "time"),
-                                                  c("imp", "time"),
-                                                  c("exp", "imp")),
+                              fixed = list(c("exp", "time"),
+                                           c("imp", "time"),
+                                           c("exp", "imp")),
                               cluster = interaction(trade$exp, trade$imp))
 
 }
