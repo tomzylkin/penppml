@@ -195,6 +195,7 @@ genfes <- function(data, inter) {
 #'    all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects,
 #'    or a list with the desired interactions between variables in \code{data}.
+#' @param selectobs Optional. A vector indicating which observations to use.
 #'
 #' @return A list with three elements:
 #' \itemize{
@@ -203,8 +204,11 @@ genfes <- function(data, inter) {
 #'   \item \code{fes}: list of fixed effects.
 #' }
 
-genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL) {
-  # First we deal with y:
+genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL) {
+  # First, we filter using selectobs:
+  if (!is.null(selectobs)) data <- data[selectobs, ]
+
+  # Then we deal with y:
   if (is.numeric(dep) | is.character(dep)) {
     y <- data[, dep]
   } else {

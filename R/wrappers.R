@@ -13,6 +13,8 @@
 #'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects,
 #'     or a list with the desired interactions between variables in \code{data}.
+#' @param selectobs Optional. A vector indicating which observations to use (either a logical vector
+#'     or a numeric vector with row numbers, as usual when subsetting in R).
 #' @param ... Further arguments, to be passed on to the main function.
 #'
 #' @return The same as their respective parent functions.
@@ -53,36 +55,36 @@ NULL
 
 #' @export
 #' @rdname wrappers
-mlfitppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, ...) {
+mlfitppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
-  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed)
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, selectobs = selectobs)
   # Final call to mlfitppml:
   mlfitppml(y = model$y, x = model$x, fes = model$fes, ...)
 }
 
 #' @export
 #' @rdname wrappers
-hdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, ...) {
+hdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
-  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed)
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, selectobs = selectobs)
   # Final call to mlfitppml:
   hdfeppml(y = model$y, x = model$x, fes = model$fes, ...)
 }
 
 #' @export
 #' @rdname wrappers
-penhdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, ...) {
+penhdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
-  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed)
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, selectobs = selectobs)
   # Final call to mlfitppml:
   penhdfeppml(y = model$y, x = model$x, fes = model$fes, ...)
 }
 
 #' @export
 #' @rdname wrappers
-penhdfeppml_cluster2 <- function(data, dep = 1, indep = NULL, fixed = NULL, ...) {
+penhdfeppml_cluster2 <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
-  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed)
+  model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed, selectobs = selectobs)
   # Final call to mlfitppml:
   penhdfeppml_cluster(y = model$y, x = model$x, fes = model$fes, ...)
 }
