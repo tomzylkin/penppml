@@ -63,7 +63,7 @@ xvalidate(
 
 \item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
 
-\item{lambda}{Penalty parameter, to be passed on to penhdfeppml or penhdfeppml_cluster.}
+\item{lambda}{Penalty parameter, to be passed on to penhdfeppml_int or penhdfeppml_cluster_int.}
 }
 \value{
 A list (TODO: check this).

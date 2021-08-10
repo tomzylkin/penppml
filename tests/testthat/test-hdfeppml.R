@@ -1,4 +1,4 @@
-test_that("hdfeppml works", {
+test_that("hdfeppml.int works", {
   V <- matrix(runif(n = 25, min = -1, max = 1), nrow = 5, ncol = 5)
   V <- t(V) %*% V
 
@@ -11,7 +11,7 @@ test_that("hdfeppml works", {
 
   fes <- list(factor(sample(1:50, size = 1000, replace = TRUE)))
 
-  reg <- hdfeppml(y = y, x = X, fes = fes)
+  reg <- hdfeppml_int(y = y, x = X, fes = fes)
 
   expect_true(is.numeric(reg$coefficients))
 })
