@@ -8,13 +8,45 @@
 \alias{penhdfeppml_cluster2}
 \title{PPML Estimation for Data Frames}
 \usage{
-mlfitppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
+mlfitppml2(
+  data,
+  dep = 1,
+  indep = NULL,
+  fixed = NULL,
+  cluster = NULL,
+  selectobs = NULL,
+  ...
+)
 
-hdfeppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
+hdfeppml2(
+  data,
+  dep = 1,
+  indep = NULL,
+  fixed = NULL,
+  cluster = NULL,
+  selectobs = NULL,
+  ...
+)
 
-penhdfeppml2(data, dep = 1, indep = NULL, fixed = NULL, ...)
+penhdfeppml2(
+  data,
+  dep = 1,
+  indep = NULL,
+  fixed = NULL,
+  cluster = NULL,
+  selectobs = NULL,
+  ...
+)
 
-penhdfeppml_cluster2(data, dep = 1, indep = NULL, fixed = NULL, ...)
+penhdfeppml_cluster2(
+  data,
+  dep = 1,
+  indep = NULL,
+  fixed = NULL,
+  cluster = NULL,
+  selectobs = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{A data frame containing all relevant variables.}
@@ -26,6 +58,11 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
+
+\item{cluster}{Optional. A string with the name of the clustering variable or a column number.}
+
+\item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
+or a numeric vector with row numbers, as usual when subsetting in R).}
 
 \item{...}{Further arguments, to be passed on to the main function.}
 }

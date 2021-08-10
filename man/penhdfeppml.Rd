@@ -46,12 +46,10 @@ penhdfeppml(
 
 \item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
 
-\item{selectobs}{A numeric vector with selected observations / rows (optional).}
-
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 fixed effects.}
 
-\item{mu}{Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+\item{mu}{Optional: initial values of the \eqn{\mu} "weights", to be used in the
 first iteration of the algorithm.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}

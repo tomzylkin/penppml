@@ -4,7 +4,14 @@
 \alias{genmodel}
 \title{Generating Model Structure}
 \usage{
-genmodel(data, dep = 1, indep = NULL, fixed = NULL, interactions = NULL)
+genmodel(
+  data,
+  dep = 1,
+  indep = NULL,
+  fixed = NULL,
+  cluster = NULL,
+  selectobs = NULL
+)
 }
 \arguments{
 \item{data}{A data frame containing all relevant variables.}
@@ -16,13 +23,18 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
+
+\item{cluster}{Optional. A string with the name of the clustering variable or a column number.}
+
+\item{selectobs}{Optional. A vector indicating which observations to use.}
 }
 \value{
-A list with three elements:
+A list with four elements:
 \itemize{
 \item \code{y}: y vector.
 \item \code{x}: x matrix.
 \item \code{fes}: list of fixed effects.
+\item \code{cluster}: cluster vector.
 }
 }
 \description{

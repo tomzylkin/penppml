@@ -195,16 +195,18 @@ genfes <- function(data, inter) {
 #'    all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects,
 #'    or a list with the desired interactions between variables in \code{data}.
+#' @param cluster Optional. A string with the name of the clustering variable or a column number.
 #' @param selectobs Optional. A vector indicating which observations to use.
 #'
-#' @return A list with three elements:
+#' @return A list with four elements:
 #' \itemize{
 #'   \item \code{y}: y vector.
 #'   \item \code{x}: x matrix.
 #'   \item \code{fes}: list of fixed effects.
+#'   \item \code{cluster}: cluster vector.
 #' }
 
-genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL) {
+genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL) {
   # First, we filter using selectobs:
   if (!is.null(selectobs)) data <- data[selectobs, ]
 
@@ -227,6 +229,13 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL
          of numeric or character vectors.")
   }
 
+  # Next the clusters (if any):
+  if (is.numeric(cluster) | is.character(cluster)) {
+    cluster <- data[, cluster]
+  } else if (!is.null(cluster)) {
+    stop("Unsupported format for clusters: cluster must be a variable name or column number.")
+  }
+
   # Finally, the x:
   if (is.numeric(indep) | is.character(indep)) {
     x <- data.matrix(data[, indep])
@@ -238,6 +247,10 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, selectobs = NULL
   } else {
     stop("Unsupported format for independent variables: x must be a character or numeric vector.")
   }
-  return(list(y = y, x = x, fes = fes))
+  if (is.null(cluster)) {
+    return(list(y = y, x = x, fes = fes))
+  } else {
+    return(list(y = y, x = x, fes = fes, cluster = cluster))
+  }
 }
 

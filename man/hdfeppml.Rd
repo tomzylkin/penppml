@@ -11,7 +11,6 @@ hdfeppml(
   tol = 1e-08,
   hdfetol = 1e-04,
   colcheck = TRUE,
-  selectobs = NULL,
   mu = NULL,
   saveX = TRUE,
   init_z = NULL,
@@ -34,9 +33,7 @@ hdfeppml(
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{selectobs}{A numeric vector with selected observations / rows (optional).}
-
-\item{mu}{Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+\item{mu}{Optional: initial values of the \eqn{\mu} "weights", to be used in the
 first iteration of the algorithm.}
 
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the

@@ -19,29 +19,15 @@
 #' @examples # TODO: add examples here.
 
 penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                        penalty = "lasso", penweights = NULL,
-                        selectobs = rep(TRUE, length(y)), saveX = TRUE, mu = NULL, colcheck = TRUE,
+                        penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,
                         init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                         method = "placeholder", cluster = NULL, debug = FALSE) {
 
-  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
-  if (!is.null(selectobs)) {
-    y <- y[selectobs]
-    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.56.
-    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
-    for (i in seq_along(fes)) {
-      fes[[i]] <- fes[[i]][selectobs]
-    }
-    # Important: we need to subset clusters too (if used):
-    if (!is.null(cluster)) cluster <- cluster[selectobs]
-  }
-
-  # implements plugin method; calls penhdfeppml_cluster subcommand (careful: selectobs is NULL, because
-  # we already filtered y, x, fes and cluster):
+  # implements plugin method; calls penhdfeppml_cluster subcommand
   if (method == "iterative") {
     penreg <- penhdfeppml_cluster(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
                                   hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
-                                  penweights = penweights, selectobs = NULL, saveX = saveX,
+                                  penweights = penweights, saveX = saveX,
                                   mu = mu, colcheck = colcheck, K = 15, init_z = init_z, post = FALSE,
                                   verbose = verbose, lambda = NULL)
   }
@@ -167,9 +153,6 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
       # calculate deviance
       temp <-  -(y * log(y/mu) - (y-mu))
       temp[which(y == 0)] <- -mu[which(y == 0)]
-      if (!missing(selectobs)){
-        temp[which(!selectobs)] <-0
-      }
 
       deviance <- -2 * sum(temp)/n
 

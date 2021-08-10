@@ -15,8 +15,7 @@
 #' @param tol Tolerance parameter.
 #' @param hdfetol Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.
 #' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
-#' @param selectobs A numeric vector with selected observations / rows (optional).
-#' @param mu Optional: initial values of the \eqn{\mu} "weights",  to be used in the
+#' @param mu Optional: initial values of the \eqn{\mu} "weights", to be used in the
 #'               first iteration of the algorithm.
 #' @param saveX Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 #'              fixed effects.
@@ -54,23 +53,10 @@
 #' # Finally, the call to hdfeppml:
 #' reg <- hdfeppml(y = y, x = x, fes = fes)
 
-hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, selectobs = NULL,
-                     mu = NULL, saveX = TRUE, init_z = NULL, verbose = FALSE, maxiter = 1000,
-                     cluster = NULL, vcv = TRUE) {
+hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                     init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
 
   x <- data.matrix(x)
-
-  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
-  if (!is.null(selectobs)) {
-    y <- y[selectobs]
-    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.56.
-    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
-    for (i in seq_along(fes)) {
-      fes[[i]] <- fes[[i]][selectobs]
-    }
-    # Important: we need to subset clusters too (if used):
-    if (!is.null(cluster)) cluster <- cluster[selectobs]
-  }
 
   # number of observations (needed for deviance)
   n <- length(y)
@@ -167,10 +153,6 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
-    # Don't know if this is needed now that we've subsetted all data up front:
-    if (!missing(selectobs)) {
-      temp[which(!selectobs)] <- 0
-    }
 
     deviance <- -2 * sum(temp) / n
 
@@ -195,9 +177,6 @@ hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, sel
 
   temp <-  -(y * log(y / mu) - (y - mu))
   temp[which(y == 0)] <- 0
-  if (!missing(selectobs)){
-    temp[which(y == 0)] <- -mu[which(y == 0)]
-  }
 
   if (verbose == TRUE) {
     print("converged")

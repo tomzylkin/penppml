@@ -12,8 +12,8 @@
 #' @examples # TODO: add examples here.
 
 penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                                penalty = "lasso", penweights = NULL, selectobs = NULL, saveX = TRUE,
-                                mu = NULL, colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
+                                penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
+                                colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL) {
 
   # allow for more penalty functions
@@ -27,18 +27,6 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
     c <- 1.1
     gamma <- .1 / log(n)
     lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
-  }
-
-  # We'll subset using selectobs up front (no need to keep calling selectobs later on)
-  if (!is.null(selectobs)) {
-    y <- y[selectobs]
-    x <- x[selectobs, ] # Subsetting x. This works even if x is a vector: we coerced it to matrix in l.24.
-    # Subsetting fes (we're using a for loop because we're assuming they're in list form):
-    for (i in seq_along(fes)) {
-      fes[[i]] <- fes[[i]][selectobs]
-    }
-    # Important: we need to subset clusters too:
-    cluster <- cluster[selectobs]
   }
 
   if(verbose == TRUE){
@@ -132,9 +120,6 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
-    if (!missing(selectobs)){
-      temp[which(!selectobs)] <- 0
-    }
 
     deviance <- -2 * sum(temp) / n
 
