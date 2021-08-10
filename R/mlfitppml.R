@@ -42,8 +42,8 @@ mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol 
     post=FALSE
   }
 
-  # method == "iterative" => use plugin method, which iterates on regressor-specific penalty weights.
-  if (method == "iterative" & xval == FALSE) {
+  # method == "plugin" => use plugin method, which iterates on regressor-specific penalty weights.
+  if (method == "plugin" & xval == FALSE) {
 
     # for storing current estimates
     pen_beta <- matrix(0,nrow = ncol(x), ncol = 1)
@@ -85,7 +85,7 @@ mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol 
     results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "deviance" = penreg$deviance, "bic" = penreg$bic, "lambda" = penreg$lambda, "phi" =penreg$phi, "ses" =t(ses))
   } else {
 
-    # if method != "iterative", do the following:
+    # if method != "plugin", do the following:
     lambdas = sort(lambdas,decreasing=TRUE)
     pen_beta <- matrix(nrow = ncol(x), ncol = length(lambdas))
     pen_ses  <- matrix(nrow = ncol(x), ncol = length(lambdas))

@@ -24,7 +24,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
                         method = "placeholder", cluster = NULL, debug = FALSE) {
 
   # implements plugin method; calls penhdfeppml_cluster subcommand
-  if (method == "iterative") {
+  if (method == "plugin") {
     penreg <- penhdfeppml_cluster(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
                                   hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
                                   penweights = penweights, saveX = saveX,
@@ -33,7 +33,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
   }
   else {
 
-    # if "iterative" option not enabled, do the following
+    # if "plugin" option not enabled, do the following
     b <- matrix(NA, nrow = ncol(x), ncol = 1)  # fix this later.
     rownames(b) <- colnames(x)
     include_x <- 1:ncol(x)

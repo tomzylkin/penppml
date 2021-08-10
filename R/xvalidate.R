@@ -102,7 +102,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
     }
 
     # may not need colcheck? really just need mu here.
-    if (method == "iterative"){
+    if (method == "plugin"){
       cluster_reg    <- cluster[insample]
       plugin_xval <- penhdfeppml_cluster(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,cluster=cluster_reg,tol=tol,hdfetol=hdfetol,verbose=FALSE)
       if(verbose) {
