@@ -24,7 +24,9 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
 
-\item{cluster}{Optional. A string with the name of the clustering variable or a column number.}
+\item{cluster}{Optional. A string with the name of the clustering variable or a column number.
+It's also possible to input a vector with several variables, in which case the interaction of
+all of them is taken as the clustering variable.}
 
 \item{selectobs}{Optional. A vector indicating which observations to use.}
 }

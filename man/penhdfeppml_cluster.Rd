@@ -14,7 +14,6 @@ penhdfeppml_cluster(
   glmnettol = 1e-12,
   penalty = "lasso",
   penweights = NULL,
-  selectobs = NULL,
   saveX = TRUE,
   mu = NULL,
   colcheck = TRUE,

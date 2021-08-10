@@ -59,7 +59,9 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
 
-\item{cluster}{Optional. A string with the name of the clustering variable or a column number.}
+\item{cluster}{Optional. A string with the name of the clustering variable or a column number.
+It's also possible to input a vector with several variables, in which case the interaction of
+all of them is taken as the clustering variable.}
 
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
@@ -78,33 +80,36 @@ argument, and users can simply specify which variables correspond to y, x and th
 either variable names or column numbers.
 }
 \examples{
-# To reduce run time, we keep only countries in America and the first 10 provision dummies:
+# To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
-trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), 1:17]
 # Now we can use our main functions on the reduced trade data set:
 test1 <- mlfitppml2(data = trade[, -(5:6)],
                     dep = "export",
                     fixed = list(c("exp", "time"),
                                  c("imp", "time"),
                                  c("exp", "imp")),
+                    selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas),
                     lambdas = c(0.01, 0.001, 0.0001))
 test2 <- hdfeppml2(data = trade[, -(5:6)],
                    dep = "export",
                    fixed = list(c("exp", "time"),
                                 c("imp", "time"),
-                                c("exp", "imp")))
+                                c("exp", "imp")),
+                   selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas))
 test3 <- penhdfeppml2(data = trade[, -(5:6)],
                       dep = "export",
                       fixed = list(c("exp", "time"),
                                    c("imp", "time"),
                                    c("exp", "imp")),
-                      lambda = 0.05)
+                      lambda = 0.05,
+                      selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas))
 test4 <- penhdfeppml_cluster2(data = trade[, -(5:6)],
                               dep = "export",
                               fixed = list(c("exp", "time"),
                                            c("imp", "time"),
                                            c("exp", "imp")),
-                              cluster = interaction(trade$exp, trade$imp))
+                              cluster = c("exp", "imp"),
+                              selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas))
 
 }
 \seealso{

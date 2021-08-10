@@ -16,6 +16,8 @@
 #' @param selectobs Optional. A vector indicating which observations to use (either a logical vector
 #'     or a numeric vector with row numbers, as usual when subsetting in R).
 #' @param cluster Optional. A string with the name of the clustering variable or a column number.
+#'     It's also possible to input a vector with several variables, in which case the interaction of
+#'     all of them is taken as the clustering variable.
 #' @param ... Further arguments, to be passed on to the main function.
 #'
 #' @return The same as their respective parent functions.
@@ -49,7 +51,7 @@
 #'                               fixed = list(c("exp", "time"),
 #'                                            c("imp", "time"),
 #'                                            c("exp", "imp")),
-#'                               cluster = interaction(trade$exp, trade$imp),
+#'                               cluster = c("exp", "imp"),
 #'                               selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
 #'
 #' @seealso [mlfitppml()]

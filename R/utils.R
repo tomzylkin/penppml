@@ -196,6 +196,8 @@ genfes <- function(data, inter) {
 #' @param fixed A vector with the names or column numbers of factor variables identifying the fixed effects,
 #'    or a list with the desired interactions between variables in \code{data}.
 #' @param cluster Optional. A string with the name of the clustering variable or a column number.
+#'     It's also possible to input a vector with several variables, in which case the interaction of
+#'     all of them is taken as the clustering variable.
 #' @param selectobs Optional. A vector indicating which observations to use.
 #'
 #' @return A list with four elements:
@@ -231,7 +233,7 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
 
   # Next the clusters (if any):
   if (is.numeric(cluster) | is.character(cluster)) {
-    cluster <- data[, cluster]
+    cluster <- interaction(data[, cluster])
   } else if (!is.null(cluster)) {
     stop("Unsupported format for clusters: cluster must be a variable name or column number.")
   }

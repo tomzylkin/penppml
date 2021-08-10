@@ -14,7 +14,6 @@ penhdfeppml(
   glmnettol = 1e-12,
   penalty = "lasso",
   penweights = NULL,
-  selectobs = rep(TRUE, length(y)),
   saveX = TRUE,
   mu = NULL,
   colcheck = TRUE,
