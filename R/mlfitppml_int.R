@@ -1,21 +1,21 @@
 #' General Penalized PPML Estimation
 #'
-#' \code{mlfitppml} is a general wrapper function for penalized PPML estimation, calling
-#' \code{penhdfeppml}, \code{penhdfeppml_cluster} and \code{hdfeppml} as needed.
+#' \code{mlfitppml_int} is a general wrapper function for penalized PPML estimation, calling
+#' \code{penhdfeppml_int}, \code{penhdfeppml_cluster} and \code{hdfeppml_int} as needed.
 #'
 #' @param lambdas Vector of penalty parameters.
 #' @param IDs TODO: check what this does (probably for cross validation).
 #' @param xval Logical. If \code{TRUE}, carries out cross-validation.
 #' @param K TODO: check what this does.
 #' @param vcv Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.
-#' @inheritParams penhdfeppml
+#' @inheritParams penhdfeppml_int
 #'
 #' @return A list (TODO: complete this).
 #' @export
 #'
 #' @examples # TODO: add examples here.
 
-mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
+mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
                      standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15) {
 
@@ -62,7 +62,7 @@ mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol 
       pen_beta_pre <- penreg$beta
       #x_select <- x[,as.numeric(penreg$beta)!=0]
       if(length(x_select)!=0){
-        ppml_temp <- hdfeppml(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
+        ppml_temp <- hdfeppml_int(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
                               colcheck=FALSE,cluster=cluster)
 
         print(ppml_temp$coefficients)
@@ -97,11 +97,11 @@ mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol 
 
       print(lambdas[v])
       if (v==1) {
-        penreg <- penhdfeppml(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
+        penreg <- penhdfeppml_int(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
                               penalty=penalty,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       } else {
         last_penbeta <- penreg$beta
-        penreg <- penhdfeppml(y=y,x=penreg$x_resid,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
+        penreg <- penhdfeppml_int(y=y,x=penreg$x_resid,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
                               penalty=penalty,mu=penreg$mu,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       }
 
@@ -135,7 +135,7 @@ mlfitppml = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol 
           } else{
             # pass mu, x, z as arguments here.
             if(length(x_select)!=0){
-              ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+              ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
                                     mu = penreg$mu, colcheck = FALSE, cluster = cluster, vcv = vcv)
               pen_beta_pre <- pen_beta
 

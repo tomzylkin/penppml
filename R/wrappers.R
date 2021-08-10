@@ -1,7 +1,7 @@
 #' PPML Estimation for Data Frames
 #'
-#' These functions are thin wrappers around \code{mlfitppml}, \code{hdfeppml}, \code{penhdfeppml} and
-#' \code{penhdfeppml_cluster}, providing a more convenient interface for data frames. Whereas the original
+#' These functions are thin wrappers around \code{mlfitppml_int}, \code{hdfeppml_int}, \code{penhdfeppml_int} and
+#' \code{penhdfeppml_cluster_int}, providing a more convenient interface for data frames. Whereas the original
 #' functions require some preliminary handling of data sets (\code{y} must be a vector, \code{x} must be a
 #' matrix and \code{fes} must be provided in a list), the wrappers take a full data frame in the \code{data}
 #' argument, and users can simply specify which variables correspond to y, x and the fixed effects, using
@@ -26,27 +26,27 @@
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' # Now we can use our main functions on the reduced trade data set:
-#' test1 <- mlfitppml2(data = trade[, -(5:6)],
+#' test1 <- mlfitppml(data = trade[, -(5:6)],
 #'                     dep = "export",
 #'                     fixed = list(c("exp", "time"),
 #'                                  c("imp", "time"),
 #'                                  c("exp", "imp")),
 #'                     selectobs = (trade$imp %in% americas) & (trade$exp %in% americas),
 #'                     lambdas = c(0.01, 0.001, 0.0001))
-#' test2 <- hdfeppml2(data = trade[, -(5:6)],
+#' test2 <- hdfeppml(data = trade[, -(5:6)],
 #'                    dep = "export",
 #'                    fixed = list(c("exp", "time"),
 #'                                 c("imp", "time"),
 #'                                 c("exp", "imp")),
 #'                    selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
-#' test3 <- penhdfeppml2(data = trade[, -(5:6)],
+#' test3 <- penhdfeppml(data = trade[, -(5:6)],
 #'                       dep = "export",
 #'                       fixed = list(c("exp", "time"),
 #'                                    c("imp", "time"),
 #'                                    c("exp", "imp")),
 #'                       lambda = 0.05,
 #'                       selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
-#' test4 <- penhdfeppml_cluster2(data = trade[, -(5:6)],
+#' test4 <- penhdfeppml_cluster(data = trade[, -(5:6)],
 #'                               dep = "export",
 #'                               fixed = list(c("exp", "time"),
 #'                                            c("imp", "time"),
@@ -54,47 +54,47 @@
 #'                               cluster = c("exp", "imp"),
 #'                               selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
 #'
-#' @seealso [mlfitppml()]
+#' @seealso [mlfitppml_int()]
 #' @name wrappers
 
 NULL
 
 #' @export
 #' @rdname wrappers
-mlfitppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
+mlfitppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep,
                     fixed = fixed, cluster = cluster, selectobs = selectobs)
-  # Final call to mlfitppml:
-  mlfitppml(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
+  # Final call to mlfitppml_int:
+  mlfitppml_int(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
 }
 
 #' @export
 #' @rdname wrappers
-hdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
+hdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep,
                     fixed = fixed, cluster = cluster, selectobs = selectobs)
-  # Final call to mlfitppml:
-  hdfeppml(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
+  # Final call to mlfitppml_int:
+  hdfeppml_int(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
 }
 
 #' @export
 #' @rdname wrappers
-penhdfeppml2 <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
+penhdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep,
                     fixed = fixed, cluster = cluster, selectobs = selectobs)
-  # Final call to mlfitppml:
-  penhdfeppml(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
+  # Final call to mlfitppml_int:
+  penhdfeppml_int(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
 }
 
 #' @export
 #' @rdname wrappers
-penhdfeppml_cluster2 <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
+penhdfeppml_cluster <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep, fixed = fixed,
                     cluster = cluster, selectobs = selectobs)
-  # Final call to mlfitppml:
-  penhdfeppml_cluster(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
+  # Final call to mlfitppml_int:
+  penhdfeppml_cluster_int(y = model$y, x = model$x, fes = model$fes, cluster = model$cluster, ...)
 }

@@ -1,6 +1,6 @@
 #' One-Shot Penalized PPML Estimation
 #'
-#' \code{penhdfeppml} computes a penalized PPML model for a given type of penalty and a given
+#' \code{penhdfeppml_int} computes a penalized PPML model for a given type of penalty and a given
 #' value of the penalty parameter.
 #'
 #' @param lambda Penalty parameter (a number).
@@ -11,21 +11,21 @@
 #' @param standardize Logical. If \code{TRUE}, x variables are standardized (TODO: check this).
 #' @param method TODO: check what this does.
 #' @param debug TODO: check what this does.
-#' @inheritParams hdfeppml
+#' @inheritParams hdfeppml_int
 #'
 #' @return A list (TODO: complete this).
 #' @export
 #'
 #' @examples # TODO: add examples here.
 
-penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
+penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                         penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,
                         init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                         method = "placeholder", cluster = NULL, debug = FALSE) {
 
-  # implements plugin method; calls penhdfeppml_cluster subcommand
+  # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
-    penreg <- penhdfeppml_cluster(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
+    penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
                                   hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
                                   penweights = penweights, saveX = saveX,
                                   mu = mu, colcheck = colcheck, K = 15, init_z = init_z, post = FALSE,
@@ -191,7 +191,7 @@ penhdfeppml <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol
     if (post) {
       x_select <- x_resid[, as.numeric(penreg$beta) != 0]
       if (length(x_select) != 0){
-        ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+        ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
                               mu = penreg$mu, colcheck = FALSE)
 
         penreg$pencoefs <- penreg$beta

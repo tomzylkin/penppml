@@ -7,8 +7,8 @@
 #' @param init_x TODO: check this.
 #' @param init_z TODO: check this.
 #' @param folds TODO: check this.
-#' @param lambda Penalty parameter, to be passed on to penhdfeppml or penhdfeppml_cluster.
-#' @inheritParams mlfitppml
+#' @param lambda Penalty parameter, to be passed on to penhdfeppml_int or penhdfeppml_cluster_int.
+#' @inheritParams mlfitppml_int
 #'
 #' @return A list (TODO: check this).
 #' @export
@@ -104,7 +104,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
     # may not need colcheck? really just need mu here.
     if (method == "plugin"){
       cluster_reg    <- cluster[insample]
-      plugin_xval <- penhdfeppml_cluster(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,cluster=cluster_reg,tol=tol,hdfetol=hdfetol,verbose=FALSE)
+      plugin_xval <- penhdfeppml_cluster_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,cluster=cluster_reg,tol=tol,hdfetol=hdfetol,verbose=FALSE)
       if(verbose) {
         print("hdfeppml finished")
       }
@@ -112,7 +112,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
       b  <-plugin_xval$beta
     }
     else if(penalty=="ridge"){
-      ridge_xval <-  penhdfeppml(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="ridge",standardize=standardize,verbose=verbose)
+      ridge_xval <-  penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="ridge",standardize=standardize,verbose=verbose)
       if(verbose) {
         print("hdfeppml finished")
       }
@@ -120,7 +120,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
       b  <-ridge_xval$beta
 
     } else {
-      lasso_xval <- penhdfeppml(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="lasso",
+      lasso_xval <- penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="lasso",
                                 standardize=standardize,verbose=verbose,penweights=penweights)
 
       if(verbose) {

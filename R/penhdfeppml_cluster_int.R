@@ -1,17 +1,17 @@
 #' Plugin Lasso Estimation
 #'
 #' Estimates coefficient-specific penalty weights that account for heteroskedasticity.
-#' Called by \code{mlfitppml} and \code{penhdfeppml}.
+#' Called by \code{mlfitppml_int} and \code{penhdfeppml_int}.
 #'
 #' @param K TODO: check what this does.
-#' @inheritParams penhdfeppml
+#' @inheritParams penhdfeppml_int
 #'
 #' @return TODO: check this.
 #' @export
 #'
 #' @examples # TODO: add examples here.
 
-penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
+penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
                                 colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL) {
@@ -154,7 +154,7 @@ penhdfeppml_cluster <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, 
   if (post) {
     x_select <- x_resid[, as.numeric(penreg$beta) != 0]
     if(length(x_select) != 0){
-      ppml_temp <- hdfeppml(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+      ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
                             mu = penreg$mu, colcheck = FALSE, cluster = cluster)
 
       penreg$beta[which(penreg$beta != 0), 1]  <- ppml_temp$coefficients

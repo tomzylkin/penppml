@@ -1,9 +1,9 @@
 #' Poisson Pseudo Maximum Likelihood Estimation
 #'
-#' \code{hdfeppml} implements (unpenalized) PPML estimation in the presence of high-dimensional
+#' \code{hdfeppml_int} implements (unpenalized) PPML estimation in the presence of high-dimensional
 #' fixed effects.
 #'
-#' Internally, \code{hdfeppml} performs iteratively re-weighted least squares (IRLS) on a transformed
+#' Internally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a transformed
 #' model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
 #' iteration, the function calculates the transformed dependent variable, partials out the fixed effects
 #' (calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
@@ -50,10 +50,10 @@
 #' fes <- list(exp_time = interaction(trade$exp, trade$time),
 #'             imp_time = interaction(trade$imp, trade$time),
 #'             pair     = interaction(trade$exp, trade$imp))
-#' # Finally, the call to hdfeppml:
-#' reg <- hdfeppml(y = y, x = x, fes = fes)
+#' # Finally, the call to hdfeppml_int:
+#' reg <- hdfeppml_int(y = y, x = x, fes = fes)
 
-hdfeppml <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
                      init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
 
   x <- data.matrix(x)
