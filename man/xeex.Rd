@@ -4,10 +4,14 @@
 \alias{xeex}
 \title{XeeX Matrix Computation}
 \usage{
-xeex(X, ee)
+xeex(X, e, S)
 }
 \arguments{
-\item{X, ee}{Matrices.}
+\item{X}{Regressor matrix.}
+
+\item{e}{Residuals.}
+
+\item{S}{Cluster sizes.}
 }
 \value{
 The matrix product X(k)'ee'X(k).

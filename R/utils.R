@@ -65,29 +65,34 @@ collinearity_check <- function(y, x, fes, hdfetol) {
 #' @return Gives the XeeX matrix.
 #' @importFrom rlang .data
 
-
 cluster_matrix <- function(e, cluster, x) {
   K <- ncol(x)
   vars      <- data.frame(e = e, cluster = factor(cluster, exclude = TRUE), x = x)
-  vars      <- vars[order(vars$cluster),]
+  vars      <- vars[order(vars$cluster), ] #5780 is missing...
   vars$indx <- with(vars, ave(seq_along(cluster), cluster, FUN = seq_along))
-  vars      <- tidyr::complete(vars, .data$cluster, .data$indx, fill = list(e = 0, x = 0))
-  vars      <- vars %>% tidyr::fill(tidyr::everything(), 0)
 
-  T <- max(vars$indx)
+  sizes <- collapse(vars$indx, by = list(vars$cluster), FUN = max)
 
-  if (is.null(K)) {
-    X <- data.matrix(vars[, 4])
+  if(is.null(K)){
+    X <- data.matrix(vars[, 3])
   } else{
-    X <- data.matrix(vars[, 4:(3 + K)])
+    X <- data.matrix(vars[, 3:(2 + K)])
   }
 
-  e <- as.matrix(vars[, 3])
+  e <- as.matrix(vars[, 1])
   rm(vars)
-
-  ee   <- manyouter(e, e, T)  #many outer products for vectors of length T
-  XeeX <- xeex(X, ee)        #XeeX matrix for cluster-robust SEs
+  XeeX <- xeex(X, e, sizes)        #XeeX matrix for cluster-robust SEs
   return(XeeX)
+}
+
+
+collapse = function(x, by, FUN, keep.by = FALSE) {
+  if (keep.by == TRUE) {
+    data.matrix(stats::aggregate(x = x, by = by, FUN = FUN))
+  }
+  else {
+    data.matrix(stats::aggregate(x = x, by = by, FUN = FUN)[, -1:-length(by)])
+  }
 }
 
 

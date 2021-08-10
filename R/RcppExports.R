@@ -87,10 +87,12 @@ manyouter <- function(A, B, c) {
 #'
 #' Given matrix ee' and matrix X, compute X(k)'ee'X(k) for each regressor X.
 #'
-#' @param X,ee Matrices.
+#' @param X Regressor matrix.
+#' @param e Residuals.
+#' @param S Cluster sizes.
 #'
 #' @return The matrix product X(k)'ee'X(k).
-xeex <- function(X, ee) {
-    .Call(`_penppml_xeex`, X, ee)
+xeex <- function(X, e, S) {
+    .Call(`_penppml_xeex`, X, e, S)
 }
 

@@ -110,14 +110,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // xeex
-SEXP xeex(const Eigen::Map<Eigen::MatrixXd> X, Eigen::Map<Eigen::MatrixXd> ee);
-RcppExport SEXP _penppml_xeex(SEXP XSEXP, SEXP eeSEXP) {
+SEXP xeex(const Eigen::MatrixXd X, const Eigen::VectorXd e, const Eigen::VectorXd S);
+RcppExport SEXP _penppml_xeex(SEXP XSEXP, SEXP eSEXP, SEXP SSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type ee(eeSEXP);
-    rcpp_result_gen = Rcpp::wrap(xeex(X, ee));
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd >::type e(eSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd >::type S(SSEXP);
+    rcpp_result_gen = Rcpp::wrap(xeex(X, e, S));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -131,7 +132,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_penppml_faststddev", (DL_FUNC) &_penppml_faststddev, 2},
     {"_penppml_fastwmean", (DL_FUNC) &_penppml_fastwmean, 2},
     {"_penppml_manyouter", (DL_FUNC) &_penppml_manyouter, 3},
-    {"_penppml_xeex", (DL_FUNC) &_penppml_xeex, 2},
+    {"_penppml_xeex", (DL_FUNC) &_penppml_xeex, 3},
     {NULL, NULL, 0}
 };
 

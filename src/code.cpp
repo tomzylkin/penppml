@@ -138,24 +138,33 @@ SEXP manyouter(const Eigen::Map<Eigen::VectorXd> A, Eigen::Map<Eigen::VectorXd> 
   return Rcpp::wrap(M);
 }
 
+MatrixXd selfouter(Eigen::VectorXd A){
+  int r = A.rows();
+  MatrixXd M = A*A.transpose();
+  return M;
+}
 
 //' XeeX Matrix Computation
 //'
 //' Given matrix ee' and matrix X, compute X(k)'ee'X(k) for each regressor X.
 //'
-//' @param X,ee Matrices.
+//' @param X Regressor matrix.
+//' @param e Residuals.
+//' @param S Cluster sizes.
 //'
 //' @return The matrix product X(k)'ee'X(k).
 // [[Rcpp::export]]
-SEXP xeex(const Eigen::Map<Eigen::MatrixXd> X, Eigen::Map<Eigen::MatrixXd> ee){
-  int K  = X.cols();  //  A is x's arranged as g (TxK) matrices vertically stacked
-  int gT = ee.rows();  //  B is g TxT blocks arranged vertically
-  int T  = ee.cols();
-  int g = gT/T;
-  Eigen::MatrixXd M(K,K);
+SEXP xeex(const Eigen::MatrixXd X,  const Eigen::VectorXd e, const Eigen::VectorXd S){
+  int K  = X.cols();   //  A is x's arranged as g (TxK) matrices vertically stacked
+  int g = S.size();    // number of clusters
+  int s = 0;           // size of current cluster
+  int p = 0;           // placekeeper for where to start
+  MatrixXd M(K,K);
   M = Eigen::MatrixXd::Zero(K, K);
   for (int n = 0; n <= g-1; n++) {
-    M = M + X.block(n*T,0,T,K).transpose()*ee.block(n*T,0,T,T)*X.block(n*T,0,T,K);
+    s = S(n);
+    M = M + selfouter(X.block(p,0,s,K).transpose()*e.segment(p,s)); // https://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html
+    p = p + s;
   }
   return Rcpp::wrap(M);
 }
