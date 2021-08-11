@@ -230,7 +230,7 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
   } else if (is.list(fixed)) {
     fes <- genfes(data = data, inter = fixed)
   } else if (is.null(fixed)) {
-    stop("Model must include fixed effects")
+    fes <- NULL
   } else {
     stop("Unsupported format for fixed effects: fixed must be a numeric or character vector or a list
          of numeric or character vectors.")
