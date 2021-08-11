@@ -11,19 +11,29 @@
 #' @param ... Further arguments, to be passed on to the main function.
 #'
 #'
-#' @return A list with (TODO).
+#' @return A matrix with coefficient estimates for all dependent variables.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' iceberg_results <- iceberg(data = trade[, -(1:6)],
+#'         dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07", "tbt_prov_33", "tf_prov_41", "tf_prov_45"))
 
-plugin_lasso <- function(data, dep = 1, indep = NULL, selectobs = NULL, ...) {
-  # Initial call to genmodel:
+iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
+  # First we do the data handling with genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep, selectobs = selectobs)
-  # Final call to plugin_lasso_int:
-  penhdfeppml_cluster_int(y = model$y, x = model$x, ...)
+
+  # Now we create the result matrix:
+  iceberg_results <- matrix(NA, nrow = ncol(model$x), ncol = ncol(model$y))
+  rownames(iceberg_results) <- colnames(model$x)
+  colnames(iceberg_results) <- colnames(model$y)
+
+  # Finally, we call plugin_lasso_int
+  for (v in 1:ncol(model$y)) {
+    temp <- plugin_lasso_int(y = model$y[, v], x = model$x, K = 15)
+    iceberg_results[, v] <- temp$beta
+  }
+  return(iceberg_results)
 }
-
-
 
 #' Iceberg Lasso Implementation (in development)
 #'
@@ -41,9 +51,7 @@ plugin_lasso <- function(data, dep = 1, indep = NULL, selectobs = NULL, ...) {
 #' @param phipost TODO: check this (something with glmnet).
 #'
 #' @return A list with (TODO).
-#' @export
-#'
-#' @examples # TODO.
+
 
 plugin_lasso_int <- function(y, x, tol = 1e-8,
                          glmnettol = 1e-12, penweights = NULL,
