@@ -2,7 +2,7 @@
 % Please edit documentation in R/hdfeppml_int.R
 \name{hdfeppml_int}
 \alias{hdfeppml_int}
-\title{Poisson Pseudo Maximum Likelihood Estimation}
+\title{Poisson Pseudo Maximum Likelihood Estimation with HDFE}
 \usage{
 hdfeppml_int(
   y,
@@ -27,9 +27,10 @@ hdfeppml_int(
 
 \item{fes}{List of fixed effects.}
 
-\item{tol}{Tolerance parameter.}
+\item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
+\item{hdfetol}{Tolerance parameter for the within-transformation step,
+passed on to \code{lfe::demeanlist}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
@@ -42,37 +43,39 @@ fixed effects.}
 \item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
 first iteration of the algorithm.}
 
-\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+\item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
 \item{maxiter}{Maximum number of iterations (a number).}
 
-\item{cluster}{A vector classifying observations into clusters.}
+\item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
 \item{vcv}{Logical. If \code{TRUE} (the default), it returns standard errors.}
 }
 \value{
 A list with the following elements:
 \itemize{
-\item \code{coefficients}: coefficient (beta) estimates.
-\item \code{residuals}: residuals of the model.
-\item \code{mu}: (TODO: check this)
-\item \code{deviance}: (TODO: check this)
-\item \code{bic}: (TODO: check this)
+\item \code{coefficients}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
+\item \code{residuals}: a 1 x \code{length(y)} matrix with the residuals of the model.
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
+\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
+\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
 \item \code{x_resid}: matrix of demeaned regressors.
 \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 \item \code{se}: standard errors of the coefficients.
 }
 }
 \description{
-\code{hdfeppml_int} implements (unpenalized) PPML estimation in the presence of high-dimensional
-fixed effects.
+\code{hdfeppml_int} is the internal algorithm called by \code{hdfeppml} to fit an (unpenalized)
+PPML model with high-dimensional fixed effects (HDFE). It takes a vector with the dependent variable,
+a regressor matrix and a set of fixed effects (in list form: each element in the list should be a
+separate HDFE).
 }
 \details{
-Internally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a transformed
-model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
-iteration, the function calculates the transformed dependent variable, partials out the fixed effects
-(calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
-implementation).
+More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
+\code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
+variable, partials out the fixed effects (calling \code{lfe::demeanlist}) and then solves a weighted
+least squares problem (using fast C++ implementation).
 }
 \examples{
 # To reduce run time, we keep only countries in the Americas:

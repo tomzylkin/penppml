@@ -2,7 +2,7 @@
 % Please edit documentation in R/penhdfeppml_int.R
 \name{penhdfeppml_int}
 \alias{penhdfeppml_int}
-\title{One-Shot Penalized PPML Estimation}
+\title{One-Shot Penalized PPML Estimation with HDFE}
 \usage{
 penhdfeppml_int(
   y,
@@ -35,15 +35,17 @@ penhdfeppml_int(
 
 \item{lambda}{Penalty parameter (a number).}
 
-\item{tol}{Tolerance parameter.}
+\item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
+\item{hdfetol}{Tolerance parameter for the within-transformation step,
+passed on to \code{lfe::demeanlist}.}
 
-\item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
+\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 
-\item{penalty}{A string. Currently supported: "lasso" and "ridge".}
+\item{penalty}{A string indicating the penalty type. Currently supported: "lasso" and "ridge".}
 
-\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+\item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
+\code{method == "plugin"}.}
 
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 fixed effects.}
@@ -58,22 +60,46 @@ first iteration of the algorithm.}
 
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
 
-\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+\item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
-\item{standardize}{Logical. If \code{TRUE}, x variables are standardized (TODO: check this).}
+\item{standardize}{Logical. If \code{TRUE}, x variables are standardized before estimation.}
 
-\item{method}{TODO: check what this does.}
+\item{method}{The user can set this equal to "plugin" to perform the plugin algorithm with
+coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.}
 
-\item{cluster}{A vector classifying observations into clusters.}
+\item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
-\item{debug}{TODO: check what this does.}
+\item{debug}{TODO: check what this does (ask Tom).}
 }
 \value{
-A list (TODO: complete this).
+If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
+described in \link[glmnet]{glmnet}. If \code{method == "ridge"}, a list with the following
+elements:
+\itemize{
+\item \code{beta}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
+\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
+\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+}
 }
 \description{
-\code{penhdfeppml_int} computes a penalized PPML model for a given type of penalty and a given
-value of the penalty parameter.
+\code{penhdfeppml_int} is the internal algorithm called by \code{penhdfeppml} to fit a penalized PPML
+model for a given type of penalty and a given value of the penalty parameter. It takes a vector with
+the dependent variable, a regressor matrix and a set of fixed effects (in list form: each element in
+the list should be a separate HDFE). The penalty can be either lasso or ridge, and the plugin method
+can be enabled via the \code{method} argument.
+}
+\details{
+More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
+In each iteration, the function calculates the transformed dependent variable, partials out the fixed
+effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
+penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
+computed directly using fast C++ implementation.
+
+For information on how the plugin lasso method works, see \link{penhdfeppml_cluster_int}.
 }
 \examples{
 # TODO: add examples here.

@@ -1,38 +1,41 @@
-#' Poisson Pseudo Maximum Likelihood Estimation
+#' Poisson Pseudo Maximum Likelihood Estimation with HDFE
 #'
-#' \code{hdfeppml_int} implements (unpenalized) PPML estimation in the presence of high-dimensional
-#' fixed effects.
+#' \code{hdfeppml_int} is the internal algorithm called by \code{hdfeppml} to fit an (unpenalized)
+#' PPML model with high-dimensional fixed effects (HDFE). It takes a vector with the dependent variable,
+#' a regressor matrix and a set of fixed effects (in list form: each element in the list should be a
+#' separate HDFE).
 #'
-#' Internally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a transformed
-#' model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
-#' iteration, the function calculates the transformed dependent variable, partials out the fixed effects
-#' (calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
-#' implementation).
+#' More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+#' transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
+#' \code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
+#' variable, partials out the fixed effects (calling \code{lfe::demeanlist}) and then solves a weighted
+#' least squares problem (using fast C++ implementation).
 #'
 #' @param y Dependent variable (a vector)
 #' @param x Regressor matrix.
 #' @param fes List of fixed effects.
-#' @param tol Tolerance parameter.
-#' @param hdfetol Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.
+#' @param tol Tolerance parameter for convergence of the IRLS algorithm.
+#' @param hdfetol Tolerance parameter for the within-transformation step,
+#'     passed on to \code{lfe::demeanlist}.
 #' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 #' @param mu Optional: initial values of the \eqn{\mu} "weights", to be used in the
-#'               first iteration of the algorithm.
+#'     first iteration of the algorithm.
 #' @param saveX Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
-#'              fixed effects.
+#'     fixed effects.
 #' @param init_z Optional: initial values of the transformed dependent variable, to be used in the
-#'               first iteration of the algorithm.
-#' @param verbose If TRUE, prints information to the screen while evaluating.
+#'     first iteration of the algorithm.
+#' @param verbose Logical. If \code{TRUE}, it prints information to the screen while evaluating.
 #' @param maxiter Maximum number of iterations (a number).
-#' @param cluster A vector classifying observations into clusters.
+#' @param cluster Optional: a vector classifying observations into clusters (to use when calculating SEs).
 #' @param vcv Logical. If \code{TRUE} (the default), it returns standard errors.
 #'
 #' @return A list with the following elements:
 #' \itemize{
-#'   \item \code{coefficients}: coefficient (beta) estimates.
-#'   \item \code{residuals}: residuals of the model.
-#'   \item \code{mu}: (TODO: check this)
-#'   \item \code{deviance}: (TODO: check this)
-#'   \item \code{bic}: (TODO: check this)
+#'   \item \code{coefficients}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
+#'   \item \code{residuals}: a 1 x \code{length(y)} matrix with the residuals of the model.
+#'   \item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
+#'   \item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
+#'   \item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
 #'   \item \code{x_resid}: matrix of demeaned regressors.
 #'   \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 #'   \item \code{se}: standard errors of the coefficients.
@@ -161,12 +164,12 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     delta_deviance <- old_deviance - deviance
 
     if (!is.na(delta_deviance) & (deviance < 0.1 * delta_deviance)) {
-      delta_deviance = deviance
+      delta_deviance <- deviance
     }
     if (verbose == TRUE) {
       print("checking critical value")
     }
-    denom_crit = max(c( min(c(deviance, old_deviance)), 0.1 ))
+    denom_crit = max(c(min(c(deviance, old_deviance)), 0.1))
     crit = abs(delta_deviance) / denom_crit
     if (verbose == TRUE) {
       print(deviance)

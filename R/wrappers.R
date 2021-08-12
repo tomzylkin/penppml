@@ -34,8 +34,8 @@
 #'                                  c("imp", "time"),
 #'                                  c("exp", "imp")),
 #'                     selectobs = (trade$imp %in% americas) & (trade$exp %in% americas),
-#'                     lambdas = c(0.01, 0.001, 0.0001),
-#'                     tol = 1e-5, hdfetol = 1e-1)
+#'                     lambdas = c(0.01, 0.001),
+#'                     tol = 1e-6, hdfetol = 1e-2)
 
 mlfitppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL, ...) {
   # Initial call to genmodel:
@@ -46,36 +46,26 @@ mlfitppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL,
 }
 
 
-#' Poisson Pseudo Maximum Likelihood Estimation
+#' Poisson Pseudo Maximum Likelihood Estimation with HDFE
 #'
-#' \code{hdfeppml} implements (unpenalized) PPML estimation in the presence of high-dimensional
-#' fixed effects.
+#' \code{hdfeppml} fits an (unpenalized) PPML model with high-dimensional fixed effects (HDFE).
 #'
-#' This function is a thin wrapper around \code{hdfeppml_int}, providing a more convenient interface for
+#' This function is a thin wrapper around \link{hdfeppml_int}, providing a more convenient interface for
 #' data frames. Whereas the internal function requires some preliminary handling of data sets (\code{y}
-#' must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
-#' takes a full data frame in the \code{data} argument, and users can simply specify which variables
-#' correspond to y, x and the fixed effects, using either variable names or column numbers.
+#' must be a vector, \code{x} must be a matrix and fixed effects \code{fes} must be provided in a list),
+#' the wrapper takes a full data frame in the \code{data} argument, and users can simply specify which
+#' variables correspond to y, x and the fixed effects, using either variable names or column numbers.
 #'
-#' Internally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a transformed
-#' model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
-#' iteration, the function calculates the transformed dependent variable, partials out the fixed effects
-#' (calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
-#' implementation).
+#' More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+#' transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
+#' \code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
+#' variable, partials out the fixed effects (calling \code{lfe::demeanlist}) and then solves a weighted
+#' least squares problem (using fast C++ implementation).
 #'
 #' @inheritParams mlfitppml
+#' @param ... Further options. For a full list, see \link{hdfeppml_int}.
 #'
-#' @return A list with the following elements:
-#' \itemize{
-#'   \item \code{coefficients}: coefficient (beta) estimates.
-#'   \item \code{residuals}: residuals of the model.
-#'   \item \code{mu}: (TODO: check this)
-#'   \item \code{deviance}: (TODO: check this)
-#'   \item \code{bic}: (TODO: check this)
-#'   \item \code{x_resid}: matrix of demeaned regressors.
-#'   \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
-#'   \item \code{se}: standard errors of the coefficients.
-#' }
+#' @inherit hdfeppml_int return
 #' @export
 #'
 #' @examples
@@ -97,20 +87,37 @@ hdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
 }
 
 
-#' One-Shot Penalized PPML Estimation
+#' One-Shot Penalized PPML Estimation with HDFE
 #'
-#' \code{penhdfeppml} computes a penalized PPML model for a given type of penalty and a given
-#' value of the penalty parameter.
+#' \code{penhdfeppml} fits a penalized PPML model for a given type of penalty and a given
+#' value of the penalty parameter.  The penalty can be either lasso or ridge, and the plugin method
+#' can be enabled via the \code{method} argument.
 #'
-#' This function is a thin wrapper around \code{penppml_int}, providing a more convenient interface
+#' This function is a thin wrapper around \link{penppml_int}, providing a more convenient interface
 #' for data frames. Whereas the internal function requires some preliminary handling of data sets (\code{y}
 #' must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
 #' takes a full data frame in the \code{data} argument, and users can simply specify which variables
 #' correspond to y, x and the fixed effects, using either variable names or column numbers.
 #'
-#' @inheritParams mlfitppml
+#' More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+#' transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021).
+#' In each iteration, the function calculates the transformed dependent variable, partials out the fixed
+#' effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
+#' penalty is lasso (the default). If the user has selected ridge, the analytical solution is instead
+#' computed directly using fast C++ implementation.
 #'
-#' @return TODO: add this.
+#' For information on how the plugin lasso method works, see \link{penhdfeppml_cluster}.
+#'
+#' @inheritParams mlfitppml
+#' @param ... Further options, including:
+#' \itemize{
+#'     \item \code{penalty}: A string indicating the penalty type. Currently supported: "lasso" and "ridge".
+#'     \item \code{method}: The user can set this equal to "plugin" to perform the plugin algorithm with
+#'         coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.
+#' }
+#' For a full list of options, see \link{penhdfeppml_int}.
+#'
+#' @inherit penhdfeppml_int return
 #' @export
 #'
 #' @examples

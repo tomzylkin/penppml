@@ -15,8 +15,10 @@
 #' @export
 #'
 #' @examples
-#' iceberg_results <- iceberg(data = trade[, -(1:6)],
-#'         dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07", "tbt_prov_33", "tf_prov_41", "tf_prov_45"))
+#' \dontrun{iceberg_results <- iceberg(data = trade[, -(1:6)],
+#'         dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
+#'                 "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
+#'         selectobs = (trade$time == "2016"))}
 
 iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
   # First we do the data handling with genmodel:

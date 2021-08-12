@@ -31,17 +31,19 @@ penhdfeppml_cluster_int(
 
 \item{fes}{List of fixed effects.}
 
-\item{cluster}{A vector classifying observations into clusters.}
+\item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
-\item{tol}{Tolerance parameter.}
+\item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
-\item{hdfetol}{Tolerance parameter for fixed effects, passed on to \code{lfe::demeanlist}.}
+\item{hdfetol}{Tolerance parameter for the within-transformation step,
+passed on to \code{lfe::demeanlist}.}
 
-\item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
+\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 
-\item{penalty}{A string. Currently supported: "lasso" and "ridge".}
+\item{penalty}{A string indicating the penalty type. Currently supported: "lasso" and "ridge".}
 
-\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+\item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
+\code{method == "plugin"}.}
 
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 fixed effects.}
@@ -58,7 +60,7 @@ first iteration of the algorithm.}
 
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
 
-\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+\item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
 \item{lambda}{Penalty parameter (a number).}
 }

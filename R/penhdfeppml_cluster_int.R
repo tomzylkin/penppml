@@ -29,7 +29,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
   }
 
-  if(verbose == TRUE){
+  if (verbose == TRUE) {
     print("verbose")
   }
 
@@ -37,13 +37,13 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   rownames(b) <- colnames(x)
   include_x <- 1:ncol(x)
 
-  if (colcheck == TRUE){
+  if (colcheck == TRUE) {
     include_x <- collinearity_check(y, x, fes, 1e-6)
     x <- x[, include_x]
   }
 
   # number of obs (needed for deviance)
-  n   <- length(y)
+  n <- length(y)
 
   # estimation algorithm
   crit <- 1
@@ -123,7 +123,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
     deviance <- -2 * sum(temp) / n
 
-    if(deviance < 0) deviance = 0
+    if (deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance
 
@@ -131,8 +131,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       delta_deviance = deviance
     }
 
-    denom_crit = max(c(min(c(deviance, old_deviance)), 0.1 ))
-    crit = abs(delta_deviance) / denom_crit
+    denom_crit <-  max(c(min(c(deviance, old_deviance)), 0.1))
+    crit <-  abs(delta_deviance) / denom_crit
 
     #print(deviance)
 
@@ -153,7 +153,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   # use ppml estimates instead of lasso estimates
   if (post) {
     x_select <- x_resid[, as.numeric(penreg$beta) != 0]
-    if(length(x_select) != 0){
+    if (length(x_select) != 0) {
       ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
                             mu = penreg$mu, colcheck = FALSE, cluster = cluster)
 

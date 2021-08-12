@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrappers.R
 \name{hdfeppml}
 \alias{hdfeppml}
-\title{Poisson Pseudo Maximum Likelihood Estimation}
+\title{Poisson Pseudo Maximum Likelihood Estimation with HDFE}
 \usage{
 hdfeppml(
   data,
@@ -32,37 +32,36 @@ all of them is taken as the clustering variable.}
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
-\item{...}{Further arguments, to be passed on to the main function.}
+\item{...}{Further options. For a full list, see \link{hdfeppml_int}.}
 }
 \value{
 A list with the following elements:
 \itemize{
-\item \code{coefficients}: coefficient (beta) estimates.
-\item \code{residuals}: residuals of the model.
-\item \code{mu}: (TODO: check this)
-\item \code{deviance}: (TODO: check this)
-\item \code{bic}: (TODO: check this)
+\item \code{coefficients}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
+\item \code{residuals}: a 1 x \code{length(y)} matrix with the residuals of the model.
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
+\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
+\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
 \item \code{x_resid}: matrix of demeaned regressors.
 \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 \item \code{se}: standard errors of the coefficients.
 }
 }
 \description{
-\code{hdfeppml} implements (unpenalized) PPML estimation in the presence of high-dimensional
-fixed effects.
+\code{hdfeppml} fits an (unpenalized) PPML model with high-dimensional fixed effects (HDFE).
 }
 \details{
-This function is a thin wrapper around \code{hdfeppml_int}, providing a more convenient interface for
+This function is a thin wrapper around \link{hdfeppml_int}, providing a more convenient interface for
 data frames. Whereas the internal function requires some preliminary handling of data sets (\code{y}
-must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
-takes a full data frame in the \code{data} argument, and users can simply specify which variables
-correspond to y, x and the fixed effects, using either variable names or column numbers.
+must be a vector, \code{x} must be a matrix and fixed effects \code{fes} must be provided in a list),
+the wrapper takes a full data frame in the \code{data} argument, and users can simply specify which
+variables correspond to y, x and the fixed effects, using either variable names or column numbers.
 
-Internally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a transformed
-model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021). In each
-iteration, the function calculates the transformed dependent variable, partials out the fixed effects
-(calling \code{lfe::demeanlist}) and then solves a weighted least squares problem (using fast C++
-implementation).
+More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
+\code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
+variable, partials out the fixed effects (calling \code{lfe::demeanlist}) and then solves a weighted
+least squares problem (using fast C++ implementation).
 }
 \examples{
 # To reduce run time, we keep only countries in the Americas:

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrappers.R
 \name{penhdfeppml}
 \alias{penhdfeppml}
-\title{One-Shot Penalized PPML Estimation}
+\title{One-Shot Penalized PPML Estimation with HDFE}
 \usage{
 penhdfeppml(
   data,
@@ -32,21 +32,47 @@ all of them is taken as the clustering variable.}
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
-\item{...}{Further arguments, to be passed on to the main function.}
+\item{...}{Further options, including:
+\itemize{
+\item \code{penalty}: A string indicating the penalty type. Currently supported: "lasso" and "ridge".
+\item \code{method}: The user can set this equal to "plugin" to perform the plugin algorithm with
+coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.
+}
+For a full list of options, see \link{penhdfeppml_int}.}
 }
 \value{
-TODO: add this.
+If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
+described in \link[glmnet]{glmnet}. If \code{method == "ridge"}, a list with the following
+elements:
+\itemize{
+\item \code{beta}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
+\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
+\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+}
 }
 \description{
-\code{penhdfeppml} computes a penalized PPML model for a given type of penalty and a given
-value of the penalty parameter.
+\code{penhdfeppml} fits a penalized PPML model for a given type of penalty and a given
+value of the penalty parameter.  The penalty can be either lasso or ridge, and the plugin method
+can be enabled via the \code{method} argument.
 }
 \details{
-This function is a thin wrapper around \code{penppml_int}, providing a more convenient interface
+This function is a thin wrapper around \link{penppml_int}, providing a more convenient interface
 for data frames. Whereas the internal function requires some preliminary handling of data sets (\code{y}
 must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
 takes a full data frame in the \code{data} argument, and users can simply specify which variables
 correspond to y, x and the fixed effects, using either variable names or column numbers.
+
+More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
+transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021).
+In each iteration, the function calculates the transformed dependent variable, partials out the fixed
+effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
+penalty is lasso (the default). If the user has selected ridge, the analytical solution is instead
+computed directly using fast C++ implementation.
+
+For information on how the plugin lasso method works, see \link{penhdfeppml_cluster}.
 }
 \examples{
 # To reduce run time, we keep only countries in the Americas:

@@ -57,6 +57,6 @@ test <- mlfitppml(data = trade[, -(5:6)],
                                  c("imp", "time"),
                                  c("exp", "imp")),
                     selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas),
-                    lambdas = c(0.01, 0.001, 0.0001),
-                    tol = 1e-5, hdfetol = 1e-1)
+                    lambdas = c(0.01, 0.001),
+                    tol = 1e-6, hdfetol = 1e-2)
 }
