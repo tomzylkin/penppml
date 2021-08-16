@@ -33,10 +33,15 @@ trade$iso2  <- factor(trade$iso2)
 trade$year <- ordered(trade$year)
 colnames(trade)[1:3] <- c("exp", "imp", "time")
 
-# Finally, to facilitate testing, we drop most of the provision data and keep just the iceberg provisions:
+# Finally, to make the data set lighter, we drop most of the provision data and keep just the
+# six selected provisions plus 10 others chosen at random:
 
-iceberg <- read.csv("/Users/diego/Documents/OneDrive - London School of Economics/CEP/Summer RA 2020/Files as of June 2021 (for Diego)/Data/icberg_provisions.csv", header = FALSE)
-trade <- trade[, c("exp", "imp", "time", "export", "id", "agreement", iceberg$V1[iceberg$V2 == 1])]
+provisions <- names(trade[, -(1:9)])
+selected <- c("ad_prov_14", "cp_prov_23", "tbt_prov_07", "tbt_prov_33", "tf_prov_41", "tf_prov_45")
+provisions <- provisions[!(provisions %in% selected)]
+selected <- c(selected, sample(provisions, size = 10))
+
+trade <- trade[, c("exp", "imp", "time", "export", "id", "agreement", selected)]
 
 # Save as .Rdata file, with compression to stay below CRAN's 5Mb size limit:
 

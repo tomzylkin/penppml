@@ -14,7 +14,8 @@ A data frame with 249 rows and 4 variables.
 }
 }
 \source{
-https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes.
+The source of the data set is Luke Duncalfe's ISO-3166-Countries-with-Regional-Codes repository
+on GitHub (\url{https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes#readme}).
 }
 \usage{
 countries

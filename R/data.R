@@ -32,5 +32,6 @@
 #'   \item subregion: sub-continental region.
 
 #' }
-#' @source https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes.
+#' @source The source of the data set is Luke Duncalfe's ISO-3166-Countries-with-Regional-Codes repository
+#' on GitHub (\url{https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes#readme}).
 "countries"
