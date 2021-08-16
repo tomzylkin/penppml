@@ -224,6 +224,8 @@ genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
     if (is.character(dep)) dep <- which(names(data) %in% dep)  # This line and the following ensure that the default
     if (is.character(fixed)) fixed <- which(names(data) %in% fixed)  # selection works when dep and fes are names (not column numbers).
     x <- data.matrix(data[, -c(dep, fixed)])
+    cat("User did not specify independent variables. By default, the function takes all variables
+        not included in 'dep' or 'fixed' as regressors.")
   } else {
     stop("Unsupported format for independent variables: x must be a character or numeric vector.")
   }
