@@ -38,6 +38,9 @@ Suggests:
     testthat (>= 3.0.0),
     MASS,
     knitr,
-    rmarkdown
+    rmarkdown,
+    directlabels,
+    ggplot2,
+    reshape2
 Config/testthat/edition: 3
 VignetteBuilder: knitr
