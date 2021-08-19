@@ -55,7 +55,6 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
                      cluster = NULL, penalty = "lasso", method = "placeholder",
                      standardize = TRUE, penweights = rep(1, ncol(x_reg)), lambda = 0) {
 
-  set.seed(1)
 
   ## incorporate folds option (removed from arguments for initial release, since it wasn't doing
   # anything. Create seed option.

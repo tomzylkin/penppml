@@ -68,7 +68,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
                      standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15) {
 
-  set.seed(1)
   xnames <- colnames(x)
   n      <- length(y)
 
