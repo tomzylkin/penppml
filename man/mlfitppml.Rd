@@ -85,6 +85,25 @@ For technical details on the algorithms used, see \link{hdfeppml} (post-lasso re
 \link{penhdfeppml} (standard penalized regression), \link{penhdfeppml_cluster} (plugin lasso),
 and \link{xvalidate} (cross-validation).
 }
+\section{References}{
+
+Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin,
+T. (2021). "Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements",
+Policy Research Working Paper; No. 9629. World Bank, Washington, DC.
+
+Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional
+fixed effects", \emph{STATA Journal}, 20, 90-115.
+
+Gaure, S (2013). "OLS with multiple high dimensional category variables",
+\emph{Computational Statistics & Data Analysis}, 66, 8-18.
+
+Friedman, J., T. Hastie, and R. Tibshirani (2010). "Regularization paths for generalized linear
+models via coordinate descent", \emph{Journal of Statistical Software}, 33, 1-22.
+
+Belloni, A., V. Chernozhukov, C. Hansen and D. Kozbur (2016). "Inference in high dimensional panel
+models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
+}
+
 \examples{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
@@ -97,4 +116,5 @@ test <- mlfitppml(data = trade[, -(5:6)],
                     selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas),
                     lambdas = c(0.01, 0.001),
                     tol = 1e-6, hdfetol = 1e-2)
+
 }

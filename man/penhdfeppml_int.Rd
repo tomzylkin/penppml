@@ -110,6 +110,25 @@ computed directly using fast C++ implementation.
 
 For information on the plugin lasso method, see \link{penhdfeppml_cluster_int}.
 }
+\section{References}{
+
+Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin,
+T. (2021). "Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements",
+Policy Research Working Paper; No. 9629. World Bank, Washington, DC.
+
+Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional
+fixed effects", \emph{STATA Journal}, 20, 90-115.
+
+Gaure, S (2013). "OLS with multiple high dimensional category variables",
+\emph{Computational Statistics & Data Analysis}, 66, 8-18.
+
+Friedman, J., T. Hastie, and R. Tibshirani (2010). "Regularization paths for generalized linear
+models via coordinate descent", \emph{Journal of Statistical Software}, 33, 1-22.
+
+Belloni, A., V. Chernozhukov, C. Hansen and D. Kozbur (2016). "Inference in high dimensional panel
+models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
+}
+
 \examples{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
@@ -125,4 +144,5 @@ reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1)
 
 # We can also try ridge:
 \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
+
 }

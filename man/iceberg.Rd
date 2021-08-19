@@ -45,9 +45,29 @@ method in \code{mlfitppml}, just select all the variables with non-zero coeffici
 \code{dep} and the remaining regressors in \code{indep}. The function will then perform separate
 lasso estimation on each of the selected dependent variables and report the coefficients.
 }
+\section{References}{
+
+Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin,
+T. (2021). "Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements",
+Policy Research Working Paper; No. 9629. World Bank, Washington, DC.
+
+Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional
+fixed effects", \emph{STATA Journal}, 20, 90-115.
+
+Gaure, S (2013). "OLS with multiple high dimensional category variables",
+\emph{Computational Statistics & Data Analysis}, 66, 8-18.
+
+Friedman, J., T. Hastie, and R. Tibshirani (2010). "Regularization paths for generalized linear
+models via coordinate descent", \emph{Journal of Statistical Software}, 33, 1-22.
+
+Belloni, A., V. Chernozhukov, C. Hansen and D. Kozbur (2016). "Inference in high dimensional panel
+models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
+}
+
 \examples{
 \donttest{iceberg_results <- iceberg(data = trade[, -(1:6)],
                                     dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
                                             "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
                                     selectobs = (trade$time == "2016"))}
+
 }

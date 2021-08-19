@@ -47,6 +47,8 @@
 #' # Finally, we try xvalidate with a lasso penalty (the default) and two lambda values:
 #' \donttest{reg <- xvalidate(y = y, x = x, fes = fes, lambda = 0.001,
 #'                          IDs = cross_ids$fold, verbose = TRUE)}
+#'
+#' @inheritSection hdfeppml_int References
 
 xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
                      init_mu = NULL, init_x = NULL, init_z = NULL, verbose = FALSE,

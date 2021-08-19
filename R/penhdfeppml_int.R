@@ -64,7 +64,8 @@
 #'
 #' # We can also try ridge:
 #' \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
-
+#'
+#' @inheritSection hdfeppml_int References
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                         penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,

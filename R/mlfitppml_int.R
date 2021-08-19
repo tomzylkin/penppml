@@ -61,6 +61,8 @@
 #' \donttest{reg <- mlfitppml_int(y = y, x = x, fes = fes, cluster = fes$pair, method = "plugin")}
 #'
 #' # For an example with cross-validation, please see the vignette.
+#'
+#' @inheritSection hdfeppml_int References
 
 mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,

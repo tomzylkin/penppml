@@ -42,6 +42,8 @@
 #'             pair     = interaction(trade$exp, trade$imp))
 #' # Finally, we try penhdfeppml_cluster_int:
 #' reg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = fes$pair)
+#'
+#' @inheritSection hdfeppml_int References
 
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
