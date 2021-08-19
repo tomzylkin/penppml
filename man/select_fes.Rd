@@ -2,7 +2,7 @@
 % Please edit documentation in R/xvalidate.R
 \name{select_fes}
 \alias{select_fes}
-\title{Title}
+\title{Filtering fixed effect lists}
 \usage{
 select_fes(fe_list, select_obs, list = TRUE)
 }
@@ -11,14 +11,12 @@ select_fes(fe_list, select_obs, list = TRUE)
 
 \item{select_obs}{A vector of selected observations / rows.}
 
-\item{list}{Logical (TODO: check what this does).}
+\item{list}{Logical. If \code{TRUE}, it returns a list. Otherwise, a data frame.}
 }
 \value{
 A modified list of fixed effects.
 }
 \description{
-A helper function for \code{xvalidate} (TODO: add some description of what this does).
-}
-\examples{
-#TODO: add some examples.
+A helper function for \code{xvalidate} that filters a list of fixed effects and returns the modified
+list. Used to split the fixed effects for cross-validation.
 }

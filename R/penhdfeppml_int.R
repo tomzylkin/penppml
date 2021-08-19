@@ -1,10 +1,10 @@
 #' One-Shot Penalized PPML Estimation with HDFE
 #'
 #' \code{penhdfeppml_int} is the internal algorithm called by \code{penhdfeppml} to fit a penalized PPML
-#' model for a given type of penalty and a given value of the penalty parameter. It takes a vector with
-#' the dependent variable, a regressor matrix and a set of fixed effects (in list form: each element in
-#' the list should be a separate HDFE). The penalty can be either lasso or ridge, and the plugin method
-#' can be enabled via the \code{method} argument.
+#' regression for a given type of penalty and a given value of the penalty parameter. It takes a vector
+#' with the dependent variable, a regressor matrix and a set of fixed effects (in list form: each element
+#' in the list should be a separate HDFE). The penalty can be either lasso or ridge, and the plugin
+#' method can be enabled via the \code{method} argument.
 #'
 #' More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 #' transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
@@ -13,34 +13,58 @@
 #' penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
 #' computed directly using fast C++ implementation.
 #'
-#' For information on how the plugin lasso method works, see \link{penhdfeppml_cluster_int}.
+#' For information on the plugin lasso method, see \link{penhdfeppml_cluster_int}.
 #'
 #' @param lambda Penalty parameter (a number).
 #' @param glmnettol Tolerance parameter to be passed on to \code{glmnet::glmnet}.
 #' @param penalty A string indicating the penalty type. Currently supported: "lasso" and "ridge".
 #' @param penweights Optional: a vector of coefficient-specific penalties to use in plugin lasso when
 #'     \code{method == "plugin"}.
-#' @param post Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.
+#' @param post Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.
 #' @param standardize Logical. If \code{TRUE}, x variables are standardized before estimation.
 #' @param method The user can set this equal to "plugin" to perform the plugin algorithm with
 #'     coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.
-#' @param debug TODO: check what this does (ask Tom).
+#' @param debug Logical. If \code{TRUE}, this helps with debugging penalty weights by printing output
+#'    of the first iteration to the console and stopping the estimation algorithm.
 #' @inheritParams hdfeppml_int
 #'
 #' @return If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
-#'     described in \link[glmnet]{glmnet}. If \code{method == "ridge"}, a list with the following
-#'     elements:
+#'     described in \link[glmnet]{glmnet}, as well as:
+#'     \itemize{
+#'         \item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+#'         \item \code{deviance}.
+#'         \item \code{bic}: Bayesian Information Criterion.
+#'         \item \code{phi}: coefficient-specific penalty weights (only if \code{method == "plugin"}.
+#'         \item \code{x_resid}: matrix of demeaned regressors.
+#'         \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+#' }
+#'     If \code{method == "ridge"}, a list with the following elements:
 #' \itemize{
 #'   \item \code{beta}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
-#'   \item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
-#'   \item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
-#'   \item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+#'   \item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+#'   \item \code{deviance}.
+#'   \item \code{bic}: Bayesian Information Criterion.
 #'   \item \code{x_resid}: matrix of demeaned regressors.
 #'   \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 #' }
 #' @export
 #'
-#' @examples # TODO: add examples here.
+#' @examples
+#' # To reduce run time, we keep only countries in the Americas:
+#' americas <- countries$iso[countries$region == "Americas"]
+#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
+#' # Now generate the needed x, y and fes objects:
+#' y <- trade$export
+#' x <- data.matrix(trade[, -1:-6])
+#' fes <- list(exp_time = interaction(trade$exp, trade$time),
+#'             imp_time = interaction(trade$imp, trade$time),
+#'             pair     = interaction(trade$exp, trade$imp))
+#' # Finally, we try penhdfeppml_int with a lasso penalty (the default):
+#' reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1)
+#'
+#' # We can also try ridge:
+#' \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
+
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                         penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,

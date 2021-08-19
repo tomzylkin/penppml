@@ -22,25 +22,29 @@ plugin_lasso_int(
 
 \item{x}{Regressor matrix.}
 
-\item{tol}{Tolerance parameter.}
+\item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
-\item{glmnettol}{Tolerance parameter to be passed on to glmnet.}
+\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 
-\item{penweights}{TODO: check what this does (parameter-specific penalties in plugin lasso?).}
+\item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{K}{TODO: check what this does (number of iterations for plugin lasso, probably).}
+\item{K}{Maximum number of iterations.}
 
-\item{verbose}{If TRUE, prints information to the screen while evaluating.}
+\item{verbose}{Logical. If \code{TRUE}, prints information to the screen while evaluating.}
 
 \item{lambda}{Penalty parameter (a number).}
 
-\item{phipost}{TODO: check this (something with glmnet).}
+\item{phipost}{Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+selected variables and reports the coefficients from this regression.}
 }
 \value{
-A list with (TODO).
+A list with 14 elements, including \code{beta}, which is the only one we use in the wrapper.
+For a full list, see \link[glmnet]{glmnet}.
 }
 \description{
-TODO.
+This is the internal function upon which the \code{ìceberg} wrapper is built. It performs standard
+plugin lasso PPML estimation without fixed effects, relying on \code{glmnet::glmnet}. As the other
+internals in the package, it needs a y vector and an x matrix.
 }

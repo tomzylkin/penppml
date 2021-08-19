@@ -1,28 +1,62 @@
 #' Implementing Cross Validation
 #'
-#' TODO: put some description here.
+#' This is the internal function called by \code{mlfitppml_int} to perform cross-validation, if the
+#' option is enabled. It is available also on a stand-alone basis in case it is needed, but generally
+#' users will be better served by using the wrapper \code{mlfitppml}.
 #'
-#' @param testID TODO: check this.
-#' @param init_mu TODO: check this.
-#' @param init_x TODO: check this.
-#' @param init_z TODO: check this.
-#' @param folds TODO: check this.
+#' \code{xvalidate} carries out cross-validation with the user-provided IDs by holding out each one of
+#' them, sequentially, as in the k-fold procedure (unless \code{testID} is specified, in which case
+#' it just uses this ID for validation). After filtering out the holdout sample, the function simply
+#' calls \link{penhdfeppml_int} and \link{penhdfeppml_cluster_int} to estimate the coefficients, it
+#' predicts the conditional means for the held-out observations and finally it calculates the root mean
+#' squared error (RMSE).
+#'
+#' @param testID Optional. A number indicating which ID to hold out during cross-validation. If left
+#'    unspecified, the function cycles through all IDs and reports the average RMSE.
+#' @param init_mu Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
+#'     first iteration of the algorithm.
+#' @param init_x Optional: initial values of the independent variables.
+#' @param init_z Optional: initial values of the transformed dependent variable, to be used in the
+#'     first iteration of the algorithm.
 #' @param lambda Penalty parameter, to be passed on to penhdfeppml_int or penhdfeppml_cluster_int.
 #' @inheritParams mlfitppml_int
 #'
-#' @return A list (TODO: check this).
+#' @return A list with two elements:
+#' \itemize{
+#'     \item \code{rmse}: root mean squared error (RMSE).
+#'     \item \code{mu}: conditional means.
+#' }
 #' @export
 #'
-#' @examples #TODO: add examples.
+#' @examples
+#' # First, we need to transform the data. Start by filtering the data set to keep only countries in
+#' # the Americas:
+#' americas <- countries$iso[countries$region == "Americas"]
+#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
+#' # Now generate the needed x, y and fes objects:
+#' y <- trade$export
+#' x <- data.matrix(trade[, -1:-6])
+#' fes <- list(exp_time = interaction(trade$exp, trade$time),
+#'             imp_time = interaction(trade$imp, trade$time),
+#'             pair     = interaction(trade$exp, trade$imp))
+#' # We also need to create the IDs. We split the data set by agreement, not observation:
+#' id <- unique(trade[, 5])
+#' nfolds <- 10
+#' unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), replace = TRUE))
+#' cross_ids <- merge(trade[, 5, drop = FALSE], unique_ids, by = "id", all.x = TRUE)
+#' # Finally, we try xvalidate with a lasso penalty (the default) and two lambda values:
+#' \donttest{reg <- xvalidate(y = y, x = x, fes = fes, lambda = 0.001,
+#'                          IDs = cross_ids$fold, verbose = TRUE)}
 
-xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
-                     init_mu = NULL, init_x = NULL, init_z = NULL, verbose = FALSE, folds = NULL,
-                     cluster = NULL, penalty = c("none", "lasso", "ridge"), method = "placeholder",
+xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
+                     init_mu = NULL, init_x = NULL, init_z = NULL, verbose = FALSE,
+                     cluster = NULL, penalty = "lasso", method = "placeholder",
                      standardize = TRUE, penweights = rep(1, ncol(x_reg)), lambda = 0) {
 
   set.seed(1)
 
-  ## incorporate folds option. Create seed option.
+  ## incorporate folds option (removed from arguments for initial release, since it wasn't doing
+  # anything. Create seed option.
   if (is.null(init_mu)) {
     init_mu <- (y + mean(y))/2
   }
@@ -111,7 +145,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
       mu_temp <- plugin_xval$mu
       b  <-plugin_xval$beta
     }
-    else if(penalty=="ridge"){
+    else if (penalty == "ridge"){
       ridge_xval <-  penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="ridge",standardize=standardize,verbose=verbose)
       if(verbose) {
         print("hdfeppml finished")
@@ -133,7 +167,7 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
     mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
     mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
 
-    if(verbose) {
+    if (verbose) {
       print("assigned FEs and computed means")
     }
   }
@@ -161,17 +195,17 @@ xvalidate = function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, 
   returnlist <- list("rmse"=rmse,"mu"=mu)
 }
 
-#' Title
+#' Filtering fixed effect lists
 #'
-#' A helper function for \code{xvalidate} (TODO: add some description of what this does).
+#' A helper function for \code{xvalidate} that filters a list of fixed effects and returns the modified
+#' list. Used to split the fixed effects for cross-validation.
 #'
 #' @param fe_list A list of fixed effects.
 #' @param select_obs A vector of selected observations / rows.
-#' @param list Logical (TODO: check what this does).
+#' @param list Logical. If \code{TRUE}, it returns a list. Otherwise, a data frame.
 #'
 #' @return A modified list of fixed effects.
-#'
-#' @examples #TODO: add some examples.
+
 
 select_fes <- function(fe_list, select_obs, list = TRUE) {
   fes_temp <- data.frame(fe_list)
@@ -183,7 +217,7 @@ select_fes <- function(fe_list, select_obs, list = TRUE) {
       if (f == 1) {
         temp <- list(fe1 = factor(fes_temp[, f]))
       }
-      else{
+      else {
         temp[[paste("fe", f, sep = "")]] <- factor(fes_temp[, f])
       }
     }
@@ -196,20 +230,24 @@ select_fes <- function(fe_list, select_obs, list = TRUE) {
 
 #' Fixed Effects Computation
 #'
-#' Compute FEs using PPML FOCs (TODO: explain this better?).
+#' This function is a helper for \code{xvalidate} that computes FEs using PPML First Order Conditions
+#' (FOCs).
 #'
 #' @param y Dependent variable (a vector).
 #' @param fes List of fixed effects.
 #' @param x Regressor matrix.
-#' @param b TODO: check what this does.
-#' @param insample_obs Numeric vector with selected observations (TODO: check this better).
-#' @param onlymus Logical. If \code{TRUE}, returns only mus (TODO: explain this).
+#' @param b A vector of coefficient estimates.
+#' @param insample_obs Vector of observations used to estimate the \code{b} coefficients..
+#' @param onlymus Logical. If \code{TRUE}, returns only the conditional means.
 #' @param tol A tolerance parameter.
 #' @param verbose Logical. If \code{TRUE}, prints messages to the console while evaluating.
 #'
-#' @return A list (TODO: check and explain better).
-#'
-#' @examples #TODO: add some examples.
+#' @return If \code{onlymus = TRUE}, the vector of conditional means. Otherwise, a list with two
+#' elements:
+#' \itemize{
+#'     \item \code{mu}: conditional means.
+#'     \item \code{fe_values}: fixed effects.
+#' }
 
 compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
                         onlymus = FALSE, tol = 1e-8, verbose = FALSE) {
@@ -220,10 +258,10 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
   crit <- 1
   j <- 0
   tol <- tol
-  deviance = 0
+  deviance <-  0
 
-  b[which(is.na(b))]<-0
-  mus <- data.frame(fes,mu=exp(x%*%b)*(insample_obs),y=y*insample_obs)
+  b[which(is.na(b))] <- 0
+  mus <- data.frame(fes, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
 
   if(verbose) {
     print("recovering FEs")
@@ -265,7 +303,7 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
     fe_value <- paste("fe_value",f,sep="")
     mu <- mu * get(fe_value)
   }
-  if(onlymus) {
+  if (onlymus) {
     return(mu)
   }
   else{

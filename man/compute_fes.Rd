@@ -22,22 +22,25 @@ compute_fes(
 
 \item{x}{Regressor matrix.}
 
-\item{b}{TODO: check what this does.}
+\item{b}{A vector of coefficient estimates.}
 
-\item{insample_obs}{Numeric vector with selected observations (TODO: check this better).}
+\item{insample_obs}{Vector of observations used to estimate the \code{b} coefficients..}
 
-\item{onlymus}{Logical. If \code{TRUE}, returns only mus (TODO: explain this).}
+\item{onlymus}{Logical. If \code{TRUE}, returns only the conditional means.}
 
 \item{tol}{A tolerance parameter.}
 
 \item{verbose}{Logical. If \code{TRUE}, prints messages to the console while evaluating.}
 }
 \value{
-A list (TODO: check and explain better).
+If \code{onlymus = TRUE}, the vector of conditional means. Otherwise, a list with two
+elements:
+\itemize{
+\item \code{mu}: conditional means.
+\item \code{fe_values}: fixed effects.
+}
 }
 \description{
-Compute FEs using PPML FOCs (TODO: explain this better?).
-}
-\examples{
-#TODO: add some examples.
+This function is a helper for \code{xvalidate} that computes FEs using PPML First Order Conditions
+(FOCs).
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/hdfeppml_int.R
 \name{hdfeppml_int}
 \alias{hdfeppml_int}
-\title{Poisson Pseudo Maximum Likelihood Estimation with HDFE}
+\title{PPML Estimation with HDFE}
 \usage{
 hdfeppml_int(
   y,
@@ -34,7 +34,7 @@ passed on to \code{lfe::demeanlist}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{mu}{Optional: initial values of the \eqn{\mu} "weights", to be used in the
+\item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
 
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
@@ -56,9 +56,9 @@ A list with the following elements:
 \itemize{
 \item \code{coefficients}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
 \item \code{residuals}: a 1 x \code{length(y)} matrix with the residuals of the model.
-\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
-\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
-\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}:
+\item \code{bic}: Bayesian Information Criterion.
 \item \code{x_resid}: matrix of demeaned regressors.
 \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 \item \code{se}: standard errors of the coefficients.
@@ -66,9 +66,9 @@ A list with the following elements:
 }
 \description{
 \code{hdfeppml_int} is the internal algorithm called by \code{hdfeppml} to fit an (unpenalized)
-PPML model with high-dimensional fixed effects (HDFE). It takes a vector with the dependent variable,
-a regressor matrix and a set of fixed effects (in list form: each element in the list should be a
-separate HDFE).
+Poisson Pseudo Maximum Likelihood (PPML) regression with high-dimensional fixed effects (HDFE). It
+takes a vector with the dependent variable, a regressor matrix and a set of fixed effects (in list
+form: each element in the list should be a separate HDFE).
 }
 \details{
 More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a

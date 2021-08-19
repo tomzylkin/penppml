@@ -1,22 +1,52 @@
 #' Plugin Lasso Estimation
 #'
-#' Estimates coefficient-specific penalty weights that account for heteroskedasticity.
-#' Called by \code{mlfitppml_int} and \code{penhdfeppml_int}.
+#' Performs plugin lasso - PPML estimation with HDFE. This is an internal function, called by \code{mlfitppml_int} and
+#' \code{penhdfeppml_int} when users select the \code{method = "plugin"} option, but it's made available
+#' as a stand-alone option for advanced users who may prefer to avoid some overhead imposed by the
+#' wrappers.
 #'
-#' @param K TODO: check what this does.
+#' The plugin method uses coefficient-specific penalty weights that account for heteroskedasticity. The
+#' penalty parameters are calculated automatically by the function using statistical theory - for a
+#' brief discussion of this, see Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021), and
+#' for a more in-depth analysis, check Belloni, Chernozhukov, Hansen, and Kozbur (2016), which introduced
+#' the specific implementation used in this package. Heuristically, the penalty parameters are set at
+#' a level high enough so that the absolute value of the score for each regressor must be statistically
+#' large relative to its standard error in order for the regressors to be selected.
+#'
+#' @param K Maximum number of iterations.
+#' @param penalty Only "lasso" is supported at the present stage.
 #' @inheritParams penhdfeppml_int
 #'
-#' @return TODO: check this.
+#' @return An object of class \code{elnet} with the elements described in \link[glmnet]{glmnet}, as
+#'     well as the following:
+#'     \itemize{
+#'         \item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+#'         \item \code{deviance}.
+#'         \item \code{bic}: Bayesian Information Criterion.
+#'         \item \code{phi}: coefficient-specific penalty weights.
+#'         \item \code{x_resid}: matrix of demeaned regressors.
+#'         \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+#' }
+#'
 #' @export
 #'
-#' @examples # TODO: add examples here.
+#' @examples
+#' # To reduce run time, we keep only countries in the Americas:
+#' americas <- countries$iso[countries$region == "Americas"]
+#' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
+#' # Now generate the needed x, y and fes objects:
+#' y <- trade$export
+#' x <- data.matrix(trade[, -1:-6])
+#' fes <- list(exp_time = interaction(trade$exp, trade$time),
+#'             imp_time = interaction(trade$imp, trade$time),
+#'             pair     = interaction(trade$exp, trade$imp))
+#' # Finally, we try penhdfeppml_cluster_int:
+#' reg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = fes$pair)
 
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
                                 colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL) {
-
-  # allow for more penalty functions
 
   n <- length(y)
   k <- ncol(x) # BUG? should be defined after colcheck

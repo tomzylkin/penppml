@@ -43,18 +43,19 @@ passed on to \code{lfe::demeanlist}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.}
 
 \item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
 \item{method}{The user can set this equal to "plugin" to perform the plugin algorithm with
 coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.}
 
-\item{IDs}{TODO: check what this does (probably for cross validation).}
+\item{IDs}{A vector of fold IDs for k-fold cross validation. If left unspecified, each observation
+is assigned to a different fold (warning: this is likely to be very resource-intensive).}
 
 \item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
-\item{xval}{Logical. If \code{TRUE}, carries out cross-validation.}
+\item{xval}{Logical. If \code{TRUE}, it carries out cross-validation.}
 
 \item{standardize}{Logical. If \code{TRUE}, x variables are standardized before estimation.}
 
@@ -63,15 +64,61 @@ coefficient-specific penalty weights (see details). Otherwise, a single global p
 \item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
 \code{method == "plugin"}.}
 
-\item{K}{TODO: check what this does.}
+\item{K}{Maximum number of iterations for the plugin algorithm to converge.}
 }
 \value{
-A list (TODO: complete this).
+A list with the following elements:
+\itemize{
+\item \code{beta}: if \code{post = FALSE}, a \code{length(lambdas)} x \code{ncol(x)} matrix with
+coefficient (beta) estimates from the penalized regressions. If \code{post = TRUE}, this is
+the matrix of coefficients from the post-penalty regressions.
+\item \code{beta_pre}: if \code{post = TRUE}, a \code{length(lambdas)} x \code{ncol(x)} matrix with
+coefficient (beta) estimates from the penalized regressions.
+\item \code{bic}: Bayesian Information Criterion.
+\item \code{lambdas}: vector of penalty parameters.
+\item \code{ses}: standard errors of the coefficients.
+\item \code{rmse}: if \code{xval = TRUE}, a matrix with the root mean squared error (RMSE - column 2)
+for each value of lambda (column 1), obtained by cross-validation.
+\item \code{phi}: coefficient-specific penalty weights (only if \code{method == "plugin"}.
+}
 }
 \description{
-\code{mlfitppml_int} is a general wrapper function for penalized PPML estimation, calling
-\code{penhdfeppml_int}, \code{penhdfeppml_cluster} and \code{hdfeppml_int} as needed.
+\code{mlfitppml_int} is the internal wrapper called by \code{mlfitppml} for penalized PPML estimation.
+This in turn calls \code{penhdfeppml_int}, \code{penhdfeppml_cluster_int} and \code{hdfeppml_int}
+as needed. It takes a vector with the dependent variable, a regressor matrix and a set of fixed
+effects (in list form: each element in the list should be a separate HDFE). This is a flexible tool
+that allows users to select:
+\itemize{
+\item Penalty type: either lasso or ridge.
+\item Penalty parameter: users can provide a single global value for lambda (a single regression
+is estimated), a vector of lambda values (the function estimates the regression using each of them,
+sequentially) or even coefficient-specific penalty weights.
+\item Method: plugin lasso estimates can be obtained directly from this function too.
+\item Cross-validation: if this option is enabled, the function uses IDs provided by the user
+to perform k-fold cross-validation and reports the resulting RMSE for all lambda values.
+}
+}
+\details{
+For technical details on the algorithms used, see \link{hdfeppml_int} (post-lasso regression),
+\link{penhdfeppml_int} (standard penalized regression), \link{penhdfeppml_cluster_int} (plugin lasso),
+and \link{xvalidate} (cross-validation).
 }
 \examples{
-# TODO: add examples here.
+# First, we need to transform the data (this is what mlfitppml handles internally). Start by
+# filtering the data set to keep only countries in the Americas:
+americas <- countries$iso[countries$region == "Americas"]
+trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
+# Now generate the needed x, y and fes objects:
+y <- trade$export
+x <- data.matrix(trade[, -1:-6])
+fes <- list(exp_time = interaction(trade$exp, trade$time),
+            imp_time = interaction(trade$imp, trade$time),
+            pair     = interaction(trade$exp, trade$imp))
+# Finally, we try mlfitppml_int with a lasso penalty (the default) and two lambda values:
+reg <- mlfitppml_int(y = y, x = x, fes = fes, lambdas = c(0.1, 0.01))
+
+# We can also try plugin lasso:
+\donttest{reg <- mlfitppml_int(y = y, x = x, fes = fes, cluster = fes$pair, method = "plugin")}
+
+# For an example with cross-validation, please see the vignette.
 }

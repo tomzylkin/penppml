@@ -17,9 +17,8 @@ xvalidate(
   init_x = NULL,
   init_z = NULL,
   verbose = FALSE,
-  folds = NULL,
   cluster = NULL,
-  penalty = c("none", "lasso", "ridge"),
+  penalty = "lasso",
   method = "placeholder",
   standardize = TRUE,
   penweights = rep(1, ncol(x_reg)),
@@ -33,9 +32,11 @@ xvalidate(
 
 \item{fes}{List of fixed effects.}
 
-\item{IDs}{TODO: check what this does (probably for cross validation).}
+\item{IDs}{A vector of fold IDs for k-fold cross validation. If left unspecified, each observation
+is assigned to a different fold (warning: this is likely to be very resource-intensive).}
 
-\item{testID}{TODO: check this.}
+\item{testID}{Optional. A number indicating which ID to hold out during cross-validation. If left
+unspecified, the function cycles through all IDs and reports the average RMSE.}
 
 \item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
@@ -44,15 +45,15 @@ passed on to \code{lfe::demeanlist}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{init_mu}{TODO: check this.}
+\item{init_mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
+first iteration of the algorithm.}
 
-\item{init_x}{TODO: check this.}
+\item{init_x}{Optional: initial values of the independent variables.}
 
-\item{init_z}{TODO: check this.}
+\item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
+first iteration of the algorithm.}
 
 \item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
-
-\item{folds}{TODO: check this.}
 
 \item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
@@ -69,11 +70,42 @@ coefficient-specific penalty weights (see details). Otherwise, a single global p
 \item{lambda}{Penalty parameter, to be passed on to penhdfeppml_int or penhdfeppml_cluster_int.}
 }
 \value{
-A list (TODO: check this).
+A list with two elements:
+\itemize{
+\item \code{rmse}: root mean squared error (RMSE).
+\item \code{mu}: conditional means.
+}
 }
 \description{
-TODO: put some description here.
+This is the internal function called by \code{mlfitppml_int} to perform cross-validation, if the
+option is enabled. It is available also on a stand-alone basis in case it is needed, but generally
+users will be better served by using the wrapper \code{mlfitppml}.
+}
+\details{
+\code{xvalidate} carries out cross-validation with the user-provided IDs by holding out each one of
+them, sequentially, as in the k-fold procedure (unless \code{testID} is specified, in which case
+it just uses this ID for validation). After filtering out the holdout sample, the function simply
+calls \link{penhdfeppml_int} and \link{penhdfeppml_cluster_int} to estimate the coefficients, it
+predicts the conditional means for the held-out observations and finally it calculates the root mean
+squared error (RMSE).
 }
 \examples{
-#TODO: add examples.
+# First, we need to transform the data. Start by filtering the data set to keep only countries in
+# the Americas:
+americas <- countries$iso[countries$region == "Americas"]
+trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
+# Now generate the needed x, y and fes objects:
+y <- trade$export
+x <- data.matrix(trade[, -1:-6])
+fes <- list(exp_time = interaction(trade$exp, trade$time),
+            imp_time = interaction(trade$imp, trade$time),
+            pair     = interaction(trade$exp, trade$imp))
+# We also need to create the IDs. We split the data set by agreement, not observation:
+id <- unique(trade[, 5])
+nfolds <- 10
+unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), replace = TRUE))
+cross_ids <- merge(trade[, 5, drop = FALSE], unique_ids, by = "id", all.x = TRUE)
+# Finally, we try xvalidate with a lasso penalty (the default) and two lambda values:
+\donttest{reg <- xvalidate(y = y, x = x, fes = fes, lambda = 0.001,
+                         IDs = cross_ids$fold, verbose = TRUE)}
 }

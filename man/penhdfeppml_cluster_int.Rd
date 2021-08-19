@@ -40,7 +40,7 @@ passed on to \code{lfe::demeanlist}.}
 
 \item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 
-\item{penalty}{A string indicating the penalty type. Currently supported: "lasso" and "ridge".}
+\item{penalty}{Only "lasso" is supported at the present stage.}
 
 \item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
 \code{method == "plugin"}.}
@@ -48,29 +48,59 @@ passed on to \code{lfe::demeanlist}.}
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 fixed effects.}
 
-\item{mu}{Optional: initial values of the \eqn{\mu} "weights", to be used in the
+\item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
-\item{K}{TODO: check what this does.}
+\item{K}{Maximum number of iterations.}
 
 \item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
 first iteration of the algorithm.}
 
-\item{post}{Logical. If \code{TRUE}, estimates a post-penalty model with the selected variables.}
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.}
 
 \item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
 \item{lambda}{Penalty parameter (a number).}
 }
 \value{
-TODO: check this.
+An object of class \code{elnet} with the elements described in \link[glmnet]{glmnet}, as
+well as the following:
+\itemize{
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}.
+\item \code{bic}: Bayesian Information Criterion.
+\item \code{phi}: coefficient-specific penalty weights.
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+}
 }
 \description{
-Estimates coefficient-specific penalty weights that account for heteroskedasticity.
-Called by \code{mlfitppml_int} and \code{penhdfeppml_int}.
+Performs plugin lasso - PPML estimation with HDFE. This is an internal function, called by \code{mlfitppml_int} and
+\code{penhdfeppml_int} when users select the \code{method = "plugin"} option, but it's made available
+as a stand-alone option for advanced users who may prefer to avoid some overhead imposed by the
+wrappers.
+}
+\details{
+The plugin method uses coefficient-specific penalty weights that account for heteroskedasticity. The
+penalty parameters are calculated automatically by the function using statistical theory - for a
+brief discussion of this, see Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021), and
+for a more in-depth analysis, check Belloni, Chernozhukov, Hansen, and Kozbur (2016), which introduced
+the specific implementation used in this package. Heuristically, the penalty parameters are set at
+a level high enough so that the absolute value of the score for each regressor must be statistically
+large relative to its standard error in order for the regressors to be selected.
 }
 \examples{
-# TODO: add examples here.
+# To reduce run time, we keep only countries in the Americas:
+americas <- countries$iso[countries$region == "Americas"]
+trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
+# Now generate the needed x, y and fes objects:
+y <- trade$export
+x <- data.matrix(trade[, -1:-6])
+fes <- list(exp_time = interaction(trade$exp, trade$time),
+            imp_time = interaction(trade$imp, trade$time),
+            pair     = interaction(trade$exp, trade$imp))
+# Finally, we try penhdfeppml_cluster_int:
+reg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = fes$pair)
 }

@@ -9,7 +9,7 @@ iceberg(data, dep, indep = NULL, selectobs = NULL, ...)
 \arguments{
 \item{data}{A data frame containing all relevant variables.}
 
-\item{dep}{A string with the name of the independent variable or a column number.}
+\item{dep}{A string with the names of the independent variables or their column numbers.}
 
 \item{indep}{A vector with the names or column numbers of the regressors. If left unspecified,
 all remaining variables (excluding fixed effects) are included in the regressor matrix.}
@@ -17,17 +17,37 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
-\item{...}{Further arguments, to be passed on to the main function.}
+\item{...}{Further arguments, including:
+\itemize{
+\item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
+\item \code{glmnettol}: Tolerance parameter to be passed on to \code{glmnet::glmnet}.
+\item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
+\item \code{colcheck}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
+\item \code{K}: Maximum number of iterations.
+\item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
+\item \code{lambda}: Penalty parameter (a number).
+\item \code{phipost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+selected variables and reports the coefficients from this regression.
+}}
 }
 \value{
 A matrix with coefficient estimates for all dependent variables.
 }
 \description{
-TODO.
+A function performs standard plugin lasso PPML estimation (without fixed effects) for several
+dependent variables in a single step. This is still IN DEVELOPMENT: at the current stage, only
+coefficient estimates are are provided and there is no support for clustered errors.
+}
+\details{
+This functions enables users to implement the "iceberg" step in the two-step procedure described in
+Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020). To do this after using the plugin
+method in \code{mlfitppml}, just select all the variables with non-zero coefficients in
+\code{dep} and the remaining regressors in \code{indep}. The function will then perform separate
+lasso estimation on each of the selected dependent variables and report the coefficients.
 }
 \examples{
-\dontrun{iceberg_results <- iceberg(data = trade[, -(1:6)],
-        dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
-                "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
-        selectobs = (trade$time == "2016"))}
+\donttest{iceberg_results <- iceberg(data = trade[, -(1:6)],
+                                    dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
+                                            "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
+                                    selectobs = (trade$time == "2016"))}
 }

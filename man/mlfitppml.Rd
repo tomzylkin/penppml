@@ -32,13 +32,47 @@ all of them is taken as the clustering variable.}
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
-\item{...}{Further arguments, to be passed on to the main function.}
+\item{...}{Further arguments, including:
+\itemize{
+\item \code{penalty}: A string indicating the penalty type. Currently supported: "lasso" and "ridge".
+\item \code{method}: The user can set this equal to "plugin" to perform the plugin algorithm with
+coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.
+\item \code{post}: Logical. If \code{TRUE}, estimates a post-penalty regression with the
+selected variables.
+\item \code{xval}: Logical. If \code{TRUE}, cross-validation is performed using the IDs provided
+in the \code{IDs} argument as folds. Note that, by default, observations are assigned
+individual IDs, which makes the cross-validation algorithm very time-consuming.
+}
+For a full list of options, see \link{mlfitppml_int}.}
 }
 \value{
-TODO: add this.
+A list with the following elements:
+\itemize{
+\item \code{beta}: if \code{post = FALSE}, a \code{length(lambdas)} x \code{ncol(x)} matrix with
+coefficient (beta) estimates from the penalized regressions. If \code{post = TRUE}, this is
+the matrix of coefficients from the post-penalty regressions.
+\item \code{beta_pre}: if \code{post = TRUE}, a \code{length(lambdas)} x \code{ncol(x)} matrix with
+coefficient (beta) estimates from the penalized regressions.
+\item \code{bic}: Bayesian Information Criterion.
+\item \code{lambdas}: vector of penalty parameters.
+\item \code{ses}: standard errors of the coefficients.
+\item \code{rmse}: if \code{xval = TRUE}, a matrix with the root mean squared error (RMSE - column 2)
+for each value of lambda (column 1), obtained by cross-validation.
+\item \code{phi}: coefficient-specific penalty weights (only if \code{method == "plugin"}.
+}
 }
 \description{
-\code{mlfitppml} is a general wrapper function for penalized PPML estimation.
+\code{mlfitppml} is a general-purpose wrapper function for penalized PPML estimation. This is a
+flexible tool that allows users to select:
+\itemize{
+\item Penalty type: either lasso or ridge.
+\item Penalty parameter: users can provide a single global value for lambda (a single regression
+is estimated), a vector of lambda values (the function estimates the regression using each of them,
+sequentially) or even coefficient-specific penalty weights.
+\item Method: plugin lasso estimates can be obtained directly from this function too.
+\item Cross-validation: if this option is enabled, the function uses IDs provided by the user
+to perform k-fold cross-validation and reports the resulting RMSE for all lambda values.
+}
 }
 \details{
 This function is a thin wrapper around \code{mlfitppml_int}, providing a more convenient interface for
@@ -46,6 +80,10 @@ data frames. Whereas the internal function requires some preliminary handling of
 must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
 takes a full data frame in the \code{data} argument, and users can simply specify which variables
 correspond to y, x and the fixed effects, using either variable names or column numbers.
+
+For technical details on the algorithms used, see \link{hdfeppml} (post-lasso regression),
+\link{penhdfeppml} (standard penalized regression), \link{penhdfeppml_cluster} (plugin lasso),
+and \link{xvalidate} (cross-validation).
 }
 \examples{
 # To reduce run time, we keep only countries in the Americas:

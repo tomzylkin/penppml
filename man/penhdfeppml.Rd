@@ -42,24 +42,32 @@ For a full list of options, see \link{penhdfeppml_int}.}
 }
 \value{
 If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
-described in \link[glmnet]{glmnet}. If \code{method == "ridge"}, a list with the following
-elements:
+described in \link[glmnet]{glmnet}, as well as:
+\itemize{
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}.
+\item \code{bic}: Bayesian Information Criterion.
+\item \code{phi}: coefficient-specific penalty weights (only if \code{method == "plugin"}.
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+}
+If \code{method == "ridge"}, a list with the following elements:
 \itemize{
 \item \code{beta}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
-\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
-\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
-\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}.
+\item \code{bic}: Bayesian Information Criterion.
 \item \code{x_resid}: matrix of demeaned regressors.
 \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 }
 }
 \description{
-\code{penhdfeppml} fits a penalized PPML model for a given type of penalty and a given
+\code{penhdfeppml} fits a penalized PPML regression for a given type of penalty and a given
 value of the penalty parameter.  The penalty can be either lasso or ridge, and the plugin method
 can be enabled via the \code{method} argument.
 }
 \details{
-This function is a thin wrapper around \link{penppml_int}, providing a more convenient interface
+This function is a thin wrapper around \link{penhdfeppml_int}, providing a more convenient interface
 for data frames. Whereas the internal function requires some preliminary handling of data sets (\code{y}
 must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
 takes a full data frame in the \code{data} argument, and users can simply specify which variables

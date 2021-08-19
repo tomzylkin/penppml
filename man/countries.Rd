@@ -7,7 +7,7 @@
 \format{
 A data frame with 249 rows and 4 variables.
 \itemize{
-\item iso: Country ISO code.
+\item iso: Country ISO 3166 code.
 \item name: Country name.
 \item region: Continent.
 \item subregion: sub-continental region.
@@ -21,7 +21,7 @@ on GitHub (\url{https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes#
 countries
 }
 \description{
-An auxiliary data set with basic geographic information about ISO codes included in the \code{trade}
-data set.
+An auxiliary data set with basic geographic information about country ISO 3166 codes included in the
+\code{trade} data set.
 }
 \keyword{datasets}

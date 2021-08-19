@@ -25,21 +25,33 @@ all remaining variables (excluding fixed effects) are included in the regressor 
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
 
-\item{cluster}{Optional. A string with the name of the clustering variable or a column number.
+\item{cluster}{A string with the name of the clustering variable or a column number.
 It's also possible to input a vector with several variables, in which case the interaction of
-all of them is taken as the clustering variable.}
+all of them is taken as the clustering variable. Note that this is NOT OPTIONAL in this case:
+our plugin algorithm requires clusters to be specified.}
 
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
-\item{...}{Further arguments, to be passed on to the main function.}
+\item{...}{Further options. For a full list of options, see \link{penhdfeppml_cluster_int}.}
 }
 \value{
-TODO: add this.
+An object of class \code{elnet} with the elements described in \link[glmnet]{glmnet}, as
+well as the following:
+\itemize{
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}.
+\item \code{bic}: Bayesian Information Criterion.
+\item \code{phi}: coefficient-specific penalty weights.
+\item \code{x_resid}: matrix of demeaned regressors.
+\item \code{z_resid}: vector of demeaned (transformed) dependent variable.
+}
 }
 \description{
-Estimates coefficient-specific penalty weights that account for heteroskedasticity.
-Called by \code{mlfitppml} and \code{penhdfeppml}.
+Performs plugin lasso - PPML estimation with HDFE. This is an internal function, called by
+\code{mlfitppml} and \code{penhdfeppml} when users select the \code{method = "plugin"}
+option, but it's made available as a stand-alone option for advanced users who may prefer to avoid
+some overhead imposed by the wrappers.
 }
 \details{
 This function is a thin wrapper around \code{penppml_cluster_int}, providing a more convenient interface
@@ -47,6 +59,14 @@ for data frames. Whereas the internal function requires some preliminary handlin
 must be a vector, \code{x} must be a matrix and \code{fes} must be provided in a list), the wrapper
 takes a full data frame in the \code{data} argument, and users can simply specify which variables
 correspond to y, x and the fixed effects, using either variable names or column numbers.
+
+The plugin method uses coefficient-specific penalty weights that account for heteroskedasticity. The
+penalty parameters are calculated automatically by the function using statistical theory - for a
+brief discussion of this, see Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021), and
+for a more in-depth analysis, check Belloni, Chernozhukov, Hansen, and Kozbur (2016), which introduced
+the specific implementation used in this package. Heuristically, the penalty parameters are set at
+a level high enough so that the absolute value of the score for each regressor must be statistically
+large relative to its standard error in order for the regressors to be selected.
 }
 \examples{
 # To reduce run time, we keep only countries in the Americas:

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrappers.R
 \name{hdfeppml}
 \alias{hdfeppml}
-\title{Poisson Pseudo Maximum Likelihood Estimation with HDFE}
+\title{PPML Estimation with HDFE}
 \usage{
 hdfeppml(
   data,
@@ -39,16 +39,17 @@ A list with the following elements:
 \itemize{
 \item \code{coefficients}: a 1 x \code{ncol(x)} matrix with coefficient (beta) estimates.
 \item \code{residuals}: a 1 x \code{length(y)} matrix with the residuals of the model.
-\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the \eqn{\mu} "weights".
-\item \code{deviance}: (TODO: ask Tom about this; it seems similar to the pseudo log-likelihood)
-\item \code{bic}: Bayesian Information Criterion (BIC - TODO: ask Tom to confirm this).
+\item \code{mu}: a 1 x \code{length(y)} matrix with the final values of the conditional mean \eqn{\mu}.
+\item \code{deviance}:
+\item \code{bic}: Bayesian Information Criterion.
 \item \code{x_resid}: matrix of demeaned regressors.
 \item \code{z_resid}: vector of demeaned (transformed) dependent variable.
 \item \code{se}: standard errors of the coefficients.
 }
 }
 \description{
-\code{hdfeppml} fits an (unpenalized) PPML model with high-dimensional fixed effects (HDFE).
+\code{hdfeppml} fits an (unpenalized) Poisson Pseudo Maximum Likelihood (PPML) model with
+high-dimensional fixed effects (HDFE).
 }
 \details{
 This function is a thin wrapper around \link{hdfeppml_int}, providing a more convenient interface for

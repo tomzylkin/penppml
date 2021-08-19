@@ -1,24 +1,42 @@
 #' Iceberg Lasso Implementation (in development)
 #'
-#' TODO.
+#' A function performs standard plugin lasso PPML estimation (without fixed effects) for several
+#' dependent variables in a single step. This is still IN DEVELOPMENT: at the current stage, only
+#' coefficient estimates are are provided and there is no support for clustered errors.
+#'
+#' This functions enables users to implement the "iceberg" step in the two-step procedure described in
+#' Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020). To do this after using the plugin
+#' method in \code{mlfitppml}, just select all the variables with non-zero coefficients in
+#' \code{dep} and the remaining regressors in \code{indep}. The function will then perform separate
+#' lasso estimation on each of the selected dependent variables and report the coefficients.
 #'
 #' @param data A data frame containing all relevant variables.
-#' @param dep A string with the name of the independent variable or a column number.
+#' @param dep A string with the names of the independent variables or their column numbers.
 #' @param indep A vector with the names or column numbers of the regressors. If left unspecified,
 #'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
 #' @param selectobs Optional. A vector indicating which observations to use (either a logical vector
 #'     or a numeric vector with row numbers, as usual when subsetting in R).
-#' @param ... Further arguments, to be passed on to the main function.
-#'
+#' @param ... Further arguments, including:
+#' \itemize{
+#' \item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
+#' \item \code{glmnettol}: Tolerance parameter to be passed on to \code{glmnet::glmnet}.
+#' \item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
+#' \item \code{colcheck}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
+#' \item \code{K}: Maximum number of iterations.
+#' \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
+#' \item \code{lambda}: Penalty parameter (a number).
+#' \item \code{phipost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+#'     selected variables and reports the coefficients from this regression.
+#' }
 #'
 #' @return A matrix with coefficient estimates for all dependent variables.
 #' @export
 #'
 #' @examples
-#' \dontrun{iceberg_results <- iceberg(data = trade[, -(1:6)],
-#'         dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
-#'                 "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
-#'         selectobs = (trade$time == "2016"))}
+#' \donttest{iceberg_results <- iceberg(data = trade[, -(1:6)],
+#'                                     dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
+#'                                             "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
+#'                                     selectobs = (trade$time == "2016"))}
 
 iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
   # First we do the data handling with genmodel:
@@ -39,21 +57,24 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
 
 #' Iceberg Lasso Implementation (in development)
 #'
-#' TODO.
+#' This is the internal function upon which the `ìceberg` wrapper is built. It performs standard
+#' plugin lasso PPML estimation without fixed effects, relying on \code{glmnet::glmnet}. As the other
+#' internals in the package, it needs a y vector and an x matrix.
 #'
 #' @param y Dependent variable (a vector).
 #' @param x Regressor matrix.
-#' @param tol Tolerance parameter.
-#' @param glmnettol Tolerance parameter to be passed on to glmnet.
-#' @param penweights TODO: check what this does (parameter-specific penalties in plugin lasso?).
+#' @param tol Tolerance parameter for convergence of the IRLS algorithm.
+#' @param glmnettol Tolerance parameter to be passed on to \code{glmnet::glmnet}.
+#' @param penweights Optional: a vector of coefficient-specific penalties to use in plugin lasso.
 #' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
-#' @param K TODO: check what this does (number of iterations for plugin lasso, probably).
-#' @param verbose If TRUE, prints information to the screen while evaluating.
+#' @param K Maximum number of iterations.
+#' @param verbose Logical. If \code{TRUE}, prints information to the screen while evaluating.
 #' @param lambda Penalty parameter (a number).
-#' @param phipost TODO: check this (something with glmnet).
+#' @param phipost Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+#'     selected variables and reports the coefficients from this regression.
 #'
-#' @return A list with (TODO).
-
+#' @return A list with 14 elements, including \code{beta}, which is the only one we use in the wrapper.
+#' For a full list, see \link[glmnet]{glmnet}.
 
 plugin_lasso_int <- function(y, x, tol = 1e-8,
                          glmnettol = 1e-12, penweights = NULL,
@@ -113,9 +134,9 @@ plugin_lasso_int <- function(y, x, tol = 1e-8,
     penreg <- glmnet::glmnet(x = x, y = y, weights = rep(1/n, n), lambda = lambda_glmnet, thresh = glmnettol,
                      penalty.factor = phi, standardize = FALSE)
 
-    if (phipost == TRUE){
+    if (phipost == TRUE) {
       x_select <- x[, as.numeric(penreg$beta) != 0]
-      if(length(x_select) != 0){
+      if (length(x_select) != 0) {
         b_temp <- rep(0, length(include_x))
         b_temp[as.numeric(penreg$beta) != 0] <- fastolsCpp(x_select, y)
         b[include_x] <- b_temp
