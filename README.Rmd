@@ -77,7 +77,7 @@ ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficie
                 title = "Figure 1: Regularization path for lasso")
 ```
 
-For more examples and details on how to use the package, see the vignettes.
+For more examples and details on how to use the package, see the vignette.
 
 ## References
 

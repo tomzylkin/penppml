@@ -63,7 +63,7 @@ We can plot the resulting regularization path as follows:
 <img src="man/figures/README-regularization_path-1.png" width="100%" />
 
 For more examples and details on how to use the package, see the
-vignettes.
+vignette.
 
 ## References
 
