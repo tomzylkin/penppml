@@ -101,13 +101,12 @@ reg2 <- mlfitppml(data = trade2,
                               c("imp", "time"),
                               c("exp", "imp")),
                   penalty = "lasso",
-                  lambdas = lambdas,
-                  post = FALSE) # This disables the post-lasso regression step, which is optional.
+                  lambdas = lambdas)
 ```
 
 The function returns a list that contains a matrix with the coefficient estimates for each value of lambda (in the `beta` element). We can plot the regularization path as follows:
 
-```{r plot regularization path 1}
+```{r plot regularization path}
 results <- as.data.frame(reg2$beta)
 names(results) <- lambdas
 results$provision <- row.names(results)
@@ -140,7 +139,7 @@ reg3 <- penhdfeppml(data = trade2,
 We can easily check that the coefficient estimates of `penhdfeppml` and `mlfitppml` are equal for a lambda value of 0.005 (within a numerical tolerance):
 
 ```{r check penhdfeppml results}
-all.equal(as.vector(reg3$beta[!is.na(reg3$beta)]), as.vector(reg2$beta[, 5]), tol = 1e-07)
+all.equal(as.vector(reg3$beta[!is.na(reg3$beta)]), as.vector(reg2$beta_pre[, 5]), tol = 1e-05)
 ```
 
 For more details on `penhdfeppml`, run `?penhdfeppml`.
@@ -270,11 +269,11 @@ knitr::kable(iceberg_results,
 
 Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin, T. (2021). "Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements", Policy Research Working Paper; No. 9629. World Bank, Washington, DC.
 
-Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional fixed effects", \emph{STATA Journal}, 20, 90-115.
+Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional fixed effects", *STATA Journal*, 20, 90-115.
 
-Gaure, S (2013). "OLS with multiple high dimensional category variables", \emph{Computational Statistics & Data Analysis}, 66, 8-18.
+Gaure, S (2013). "OLS with multiple high dimensional category variables", *Computational Statistics & Data Analysis*, 66, 8-18.
 
-Friedman, J., T. Hastie, and R. Tibshirani (2010). "Regularization paths for generalized linear models via coordinate descent", \emph{Journal of Statistical Software}, 33, 1-22.
+Friedman, J., T. Hastie, and R. Tibshirani (2010). "Regularization paths for generalized linear models via coordinate descent", *Journal of Statistical Software*, 33, 1-22.
 
 Belloni, A., V. Chernozhukov, C. Hansen and D. Kozbur (2016). "Inference in high dimensional panel
-models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
+models with an application to gun control", *Journal of Business & Economic Statistics*, 34, 590-605.
