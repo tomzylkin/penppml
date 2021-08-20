@@ -3,3 +3,4 @@
 .Rproj
 ^penppml\.Rproj$
 ^data-raw$
+^README\.Rmd$
