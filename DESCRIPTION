@@ -1,5 +1,5 @@
 Package: penppml
-Title: Penalized Poisson Pseudo Maximum Likelihood Regressions
+Title: Penalized Poisson Pseudo Maximum Likelihood Regression
 Version: 0.0.0.9000
 Authors@R: c(
     person(given = "Diego",
