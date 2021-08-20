@@ -4,3 +4,4 @@
 ^penppml\.Rproj$
 ^data-raw$
 ^README\.Rmd$
+^cran-comments\.md$
