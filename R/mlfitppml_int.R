@@ -136,6 +136,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     # if method != "plugin", do the following:
     lambdas = sort(lambdas,decreasing=TRUE)
     pen_beta <- matrix(nrow = ncol(x), ncol = length(lambdas))
+    if (post==TRUE) pen_beta_pre <- matrix(nrow = ncol(x), ncol = length(lambdas))
     pen_ses  <- matrix(nrow = ncol(x), ncol = length(lambdas))
     pen_bic  <- matrix(nrow = 1, ncol = length(lambdas))
 
@@ -177,6 +178,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
           # if selected x's same as for previous value of lambda, carry forward result.
           if (same==1 & v>1) {
+            pen_beta_pre[,v] <- penreg$beta
             pen_beta[,v] <- pen_beta[,v-1]
             pen_ses[,v]  <- pen_ses[,v-1]
             pen_bic[,v]  <- pen_bic[,v-1]
@@ -185,7 +187,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
             if(length(x_select)!=0){
               ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
                                     mu = penreg$mu, colcheck = FALSE, cluster = cluster, vcv = vcv)
-              pen_beta_pre <- pen_beta
+              pen_beta_pre[,v] <- penreg$beta
 
               pen_beta[which(penreg$beta!=0),v]  <- ppml_temp$coefficients
               pen_ses[which(penreg$beta!=0),v]   <- ppml_temp$se
