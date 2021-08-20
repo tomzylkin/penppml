@@ -11,8 +11,9 @@ Authors@R: c(
            role = "aut",
            email = "tzylkin@richmond.edu")
     )       
-Description: A set of tools that enables estimation of penalized Poisson Pseudo Maximum Likelihood 
-    regressions, using lasso or ridge penalties, for models that feature high-dimensional fixed effects.
+Description: A set of tools that enables efficient estimation of penalized 
+    Poisson Pseudo Maximum Likelihood (PPML) regressions, using lasso or ridge penalties, for models 
+    that feature one or more sets of high-dimensional fixed effects (HDFE).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

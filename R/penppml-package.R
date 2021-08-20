@@ -1,13 +1,9 @@
-#' penppml: Penalized Poisson Pseudo Maximum Likelihood Regression
-#'
-#' The `penppml` package is a set of tools that enables efficient estimation of penalized Poisson
-#' Pseudo Maximum Likelihood (PPML) regressions, using lasso or ridge penalties, for models that
-#' feature one or more sets of high-dimensional fixed effects (HDFE). The methodology is based on
-#' Breinlich, Corradi, Rocha, Ruta, Santos Silva, and Zylkin (2021) and takes advantage of the method
-#' of alternating projections of Gaure (2013) for dealing with HDFE, as well as the coordinate descent
-#' algorithm of Friedman, Hastie and Tibshirani (2010) for fitting lasso regressions. The package is
-#' also able to carry out cross-validation and to implement the plugin lasso of Belloni, Chernozhukov,
-#' Hansen and Kozbur (2016).
+#' @section Details:
+#' The methodology is based on Breinlich, Corradi, Rocha, Ruta, Santos Silva, and Zylkin (2021) and
+#' takes advantage of the method of alternating projections of Gaure (2013) for dealing with HDFE, as
+#' well as the coordinate descent algorithm of Friedman, Hastie and Tibshirani (2010) for fitting lasso
+#' regressions. The package is also able to carry out cross-validation and to implement the plugin lasso
+#' of Belloni, Chernozhukov, Hansen and Kozbur (2016).
 #'
 #' @section Functions:
 #' The workhorse of this package is the \code{mlfitppml} function, which allows users to carry out
@@ -29,8 +25,13 @@
 #' function.
 #'
 #' @inheritSection hdfeppml_int References
-#' @docType package
-#' @name penppml
+#' @keywords internal
+"_PACKAGE"
+
+# The following block is used by usethis to automatically manage
+# roxygen namespace tags. Modify with care!
+## usethis namespace: start
+## usethis namespace: end
 NULL
 
 ## usethis namespace: start
@@ -42,4 +43,3 @@ NULL
 #' @importFrom Rcpp sourceCpp
 ## usethis namespace: end
 NULL
-
