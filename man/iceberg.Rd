@@ -47,8 +47,8 @@ lasso estimation on each of the selected dependent variables and report the coef
 }
 \section{References}{
 
-Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin,
-T. (2021). "Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements",
+Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin (2021).
+"Machine Learning in International Trade Research: Evaluating the Impact of Trade Agreements",
 Policy Research Working Paper; No. 9629. World Bank, Washington, DC.
 
 Correia, S., P. Guimaraes and T. Zylkin (2020). "Fast Poisson estimation with high dimensional
