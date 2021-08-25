@@ -13,11 +13,11 @@ Authors@R: c(
     person(given = "Nicolas",
            family = "Apfel",
            role = "cre",
-           email = "Nicolas.Apfel@wiwi.uni-regensburg.de")   
+           email = "nicolas.apfel@gmail.com")   
     )       
 Description: A set of tools that enables efficient estimation of penalized 
-    Poisson Pseudo Maximum Likelihood (PPML) regressions, using lasso or ridge penalties, for models 
-    that feature one or more sets of high-dimensional fixed effects (HDFE).
+    Poisson Pseudo Maximum Likelihood regressions, using lasso or ridge penalties, for models 
+    that feature one or more sets of high-dimensional fixed effects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -7,8 +7,8 @@
 \title{penppml: Penalized Poisson Pseudo Maximum Likelihood Regression}
 \description{
 A set of tools that enables efficient estimation of penalized 
-    Poisson Pseudo Maximum Likelihood (PPML) regressions, using lasso or ridge penalties, for models 
-    that feature one or more sets of high-dimensional fixed effects (HDFE).
+    Poisson Pseudo Maximum Likelihood regressions, using lasso or ridge penalties, for models 
+    that feature one or more sets of high-dimensional fixed effects.
 }
 \section{Details}{
 
@@ -68,7 +68,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Nicolas Apfel \email{Nicolas.Apfel@wiwi.uni-regensburg.de}
+\strong{Maintainer}: Nicolas Apfel \email{nicolas.apfel@gmail.com}
 
 Authors:
 \itemize{
