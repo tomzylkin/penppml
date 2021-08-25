@@ -67,11 +67,24 @@ reg1 <- hdfeppml(data = trade2,
                               c("exp", "imp")))
 ```
 
-As we can see, the function is designed to be data-frame-friendly: the user sets a data frame of reference in the `data` argument and then picks the dependent, independent and fixed effect variables either by name or by column number within the provided data frame. As explained in the note, if `indep` is empty, the function uses all remaining columns in the data frame by default. Internally, the function will do the necessary transformations of the columns into vectors and matrices, as needed by the algorithm. 
+As we can see, the function is designed to be data-frame-friendly: the user sets a data frame of reference in the `data` argument and then picks the dependent, independent and fixed effect variables either by name or by column number within the provided data frame. Also, note the following points about the syntax:
+
+- The `fixed` argument can take either a single vector (just like the `dep` argument; each element will be used as a separate fixed effect) or a list of vectors. The latter option is useful in cases where the desired fixed effect is the result of the interaction of two or more variables, as in the gravity model of trade. In those cases, you can specify any number of separate fixed effects in distinct elements of the list and, inside each element, which variables in the data set you want to interact.
+
+- As explained in the note, if `indep` is empty, the function uses all remaining columns in the data frame by default.
+
+Internally, the function will do the necessary transformations of the columns into vectors and matrices, as needed by the algorithm. 
 
 Alternatively, more advanced users who prefer to handle data transformations themselves can use the internal function `hdfeppml_int`. For more information and examples on this issue, run `?hdfeppml` or `?hdfeppml_int`. Note also that this applies to all of the main functions in our package: both the data-frame-friendly wrapper and the internal function are available for use.
 
 The results of our PPML model are:
+
+```{r hdfeppml results, results = FALSE}
+results <- data.frame(prov = rownames(reg1$coefficients), b = reg1$coefficients, se = 0)
+results$se[!is.na(reg1$coefficients)] <- reg1$se
+results
+```
+
 
 ```{r display results, echo = FALSE}
 results <- data.frame(prov = rownames(reg1$coefficients), b = reg1$coefficients, se = 0)
@@ -104,10 +117,10 @@ reg2 <- mlfitppml(data = trade2,
                   lambdas = lambdas)
 ```
 
-The function returns a list that contains a matrix with the coefficient estimates for each value of lambda (in the `beta` element). We can plot the regularization path as follows:
+The function returns a list that contains two sets of coefficients for each value of lambda: the penalized coefficients (in the `beta_pre` element) and the post-penalty or unpenalized coefficients (in the `beta` element; these are calculated by estimating a post-penalty regression with just the selected variables). We can plot the regularization path of the penalized coefficients as follows:
 
 ```{r plot regularization path}
-results <- as.data.frame(reg2$beta)
+results <- as.data.frame(reg2$beta_pre)
 names(results) <- lambdas
 results$provision <- row.names(results)
 results <- reshape2::melt(results, id.vars = "provision", variable.name = "lambda", 
@@ -124,7 +137,7 @@ ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficie
                 title = "Figure 1: Regularization path for lasso")
 ```
 
-If the user wishes to fit the model for a single value of lambda, they can either use `mlfitppml` as described above (just setting `lambdas == x`, where `x` is a number) or use the `penhdfeppml` function, upon which `mlfitppml` is built, directly. For instance:
+If the user wishes to obtain the penalized estimates for a single value of lambda, they can either use `mlfitppml` as described above (just setting `lambdas == x`, where `x` is a number) or use the `penhdfeppml` function, upon which `mlfitppml` is built, directly. For instance:
 
 ```{r try penhdfeppml, results = FALSE}
 reg3 <- penhdfeppml(data = trade2,
@@ -136,7 +149,7 @@ reg3 <- penhdfeppml(data = trade2,
                   lambda = 0.005)
 ```
 
-We can easily check that the coefficient estimates of `penhdfeppml` and `mlfitppml` are equal for a lambda value of 0.005 (within a numerical tolerance):
+We can easily check that the penalized coefficient estimates of `penhdfeppml` and `mlfitppml` are equal for a lambda value of 0.005 (within a numerical tolerance):
 
 ```{r check penhdfeppml results}
 all.equal(as.vector(reg3$beta[!is.na(reg3$beta)]), as.vector(reg2$beta_pre[, 5]), tol = 1e-05)
@@ -144,7 +157,7 @@ all.equal(as.vector(reg3$beta[!is.na(reg3$beta)]), as.vector(reg2$beta_pre[, 5])
 
 For more details on `penhdfeppml`, run `?penhdfeppml`.
 
-## Ridge regression
+## Ridge regression (in development)
 
 `mlfitppml` also allows user to use the ridge penalty in their PPML regressions. Simply run:
 
@@ -160,6 +173,8 @@ reg4 <- mlfitppml(data = trade2,
                   lambdas = lambdas)
 ```
 
+Note that this feature is still in development and may contain bugs.
+
 ## Penalty selection
 
 ### Cross-validation
@@ -171,24 +186,30 @@ id <- unique(trade[(trade$exp %in% selected) & (trade$imp %in% selected), 5])
 nfolds <- 20
 unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), replace = TRUE))
 
-cross_ids <- merge(trade[(trade$exp %in% selected) & (trade$imp %in% selected), 5, drop = FALSE], unique_ids, by = "id", all.x = TRUE)
+cross_ids <- merge(trade[(trade$exp %in% selected) & (trade$imp %in% selected), 5, drop = FALSE], 
+                   unique_ids, by = "id", all.x = TRUE)
 ```
 
 Now we activate the cross-validation option in `mlfitppml` and input the ID vector:
 
-```{r try cross validation, results = FALSE, eval = FALSE}
+```{r try cross validation, eval = FALSE}
 reg5 <- mlfitppml(data = trade2,
                   dep = "export",
                   fixed = list(c("exp", "time"), 
                               c("imp", "time"),
                               c("exp", "imp")),
                   penalty = "lasso",
-                  lambdas = c(seq(0.5, 0.1, by = -0.1), 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0)
+                  lambdas = c(seq(0.5, 0.1, by = -0.1), 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0),
                   xval = TRUE,
                   IDs =  cross_ids$fold)
 ```
 
-Now the function also returns a `rmse` element that includes the cross-validation results (the average RMSE or root mean squared error for each value of lambda). Users can employ this tool to choose a value for the penalty parameter:
+Now the function also returns a `rmse` element that includes the cross-validation results (the average RMSE or root mean squared error for each value of lambda). Users can employ this tool to choose the value of the penalty parameter that minimizes the RMSE:
+
+```{r xval results, eval = FALSE}
+reg5$rmse
+```
+
 
 ```{r display xval results, echo = FALSE}
 # Note for package maintainer: notice that the code above is not being evaluated when building the vignette (due to the eval = FALSE option). This is for convenience: the cross-validation algorithm takes forever to run and, since vignettes are rebuilt a couple of times every time R CMD check is run, this makes it too cumbersome to check the package. Instead, I've run the code above in a separate R session and stored the results, which I'm reproducing below (re-running the code above should produce similar results):
@@ -206,20 +227,11 @@ knitr::kable(rmse,
              digits = 4)
 ```
 
-We can also graph the relationship between the penalty parameter and the RMSE:
-
-```{r graph xval results, echo = FALSE}
-ggplot2::ggplot(data = rmse, mapping = ggplot2::aes(x = lambda, y = rmse)) +
-  ggplot2::geom_line(ggplot2::aes(col = "red"), show.legend = FALSE) +
-  ggplot2::scale_x_reverse() +
-  ggplot2::labs(x = "Penalty parameter (lambda)", y = "RMSE", title = "Figure 2: Cross-validation Results") +
-    ggplot2::theme_classic()
-```
-For instance, this suggest that the penalty should be set at 0 in this case. In other words, the results in Table 3 are the ones that minimize the mean squared error of the regression, according to 20-fold cross-validation.
+In this case, the RMSE criterion suggest that the penalty should be set at 0. In other words, the results in Table 3 are the ones that minimize the mean squared error of the regression, according to 20-fold cross-validation.
 
 ### Plugin lasso
 
-This package also enables the use of the plugin lasso method, incorporating coefficient-specific penalty weights calculated automatically by the package. The most convenient way to do this is to set `method = "plugin"` in `mlfitppml`. Note that a clustering variable is required by the plugin algorithm:
+This package also enables the use of the plugin lasso method, incorporating coefficient-specific penalty weights calculated automatically by the package. The most convenient way to do this is to set `method = "plugin"` in `mlfitppml`. Note that the plugin algorithm requires a clustering variable  - we are using the interaction of the exporter and importer variables in the `trade` data set:
 
 ```{r try plugin lasso, results = FALSE}
 reg6 <- mlfitppml(data = trade2,
@@ -232,12 +244,16 @@ reg6 <- mlfitppml(data = trade2,
                   cluster = c("exp", "imp"))
 ```
 
-```{r display plugin results, echo = FALSE}
-results <- data.frame(prov = rownames(reg6$beta), b = reg6$beta, se = 0)
+```{r plugin results, results = FALSE}
+results <- data.frame(prov = rownames(reg6$beta), b_pre = reg6$beta_pre, b = reg6$beta, se = 0)
 results$se[!is.na(reg6$beta)] <- reg6$ses
+results
+```
+
+```{r display plugin results, echo = FALSE}
 knitr::kable(list(results[1:7,], results[8:14,]), 
              format = "pipe",
-             col.names = c("Provision", "Coefficient", "SE"), 
+             col.names = c("Provision", "Lasso Coefficient", "Post-Lasso Coefficient", "SE"), 
              caption = "Table 5: Plugin Lasso results",
              row.names = FALSE,
              digits = 4)
@@ -255,15 +271,36 @@ iceberg_results <- iceberg(data = trade2[, -(1:4)],
                            selectobs = (trade2$time == "2016"))
 ```
 
-Currently, the function returns a matrix with coefficient estimates for each of the selected provisions. Support for standard errors (including clustered) is in development as of the current version of the package.
+Currently, the function returns a matrix with coefficient estimates for each of the selected provisions. Support for standard errors (including clustered) is in development as of the current version of the package. The iceberg lasso coefficients are:
+
+```{r iceberg results, results = FALSE}
+iceberg_results
+```
+
 
 ```{r display iceberg results, echo = FALSE}
 knitr::kable(iceberg_results, 
              format = "pipe",
-             caption = "Table 6: Iceberg Lasso results",
+             caption = "Table 6: Iceberg Lasso coefficients",
              row.names = TRUE,
              digits = 4)
 ```
+
+Since PPML coefficients can't be easily interpreted, you may find it useful to see the raw correlations between the variables in the iceberg lasso step:
+
+```{r iceberg correlations, results = FALSE}
+provcorr <- cor(trade2[, results$prov])
+(provcorr <- provcorr[, results$prov[results$b != 0]])
+```
+
+```{r iceberg correlations table, echo = FALSE}
+knitr::kable(provcorr, 
+             format = "pipe",
+             caption = "Table 7: Iceberg Lasso correlations",
+             row.names = TRUE,
+             digits = 4)
+```
+
 
 # References
 
