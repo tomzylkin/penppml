@@ -198,8 +198,8 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
             }
           }
         } else pen_beta_pre[,v] <- penreg$beta
-          # I've added line 198 to solve a bug: when post is TRUE and no variables are selected, the
-          # beta_pre object should still be overwritten by 0s. Otherwise, NAs remain.
+          # I've added the following to solve a bug: when post is TRUE and no variables are selected,
+          # the beta_pre object should still be overwritten by 0s. Otherwise, NAs remain.
       } else {
         pen_beta[,v] <- penreg$beta
         pen_bic[,v]  <- penreg$bic
