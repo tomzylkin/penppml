@@ -55,7 +55,8 @@ the matrix of coefficients from the post-penalty regressions.
 coefficient (beta) estimates from the penalized regressions.
 \item \code{bic}: Bayesian Information Criterion.
 \item \code{lambdas}: vector of penalty parameters.
-\item \code{ses}: standard errors of the coefficients.
+\item \code{ses}: standard errors of the coefficients of the post-penalty regression. Note that
+these are only provided when \code{post = TRUE}.
 \item \code{rmse}: if \code{xval = TRUE}, a matrix with the root mean squared error (RMSE - column 2)
 for each value of lambda (column 1), obtained by cross-validation.
 \item \code{phi}: coefficient-specific penalty weights (only if \code{method == "plugin"}.
