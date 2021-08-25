@@ -1,15 +1,19 @@
 Package: penppml
 Title: Penalized Poisson Pseudo Maximum Likelihood Regression
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(
     person(given = "Diego",
            family = "Ferreras Garrucho",
-           role = c("aut", "cre"),
+           role = "aut",
            email = "d.ferreras-garrucho@lse.ac.uk"),
     person(given = "Tom",
            family = "Zylkin",
            role = "aut",
-           email = "tzylkin@richmond.edu")
+           email = "tzylkin@richmond.edu"),
+    person(given = "Nicolas",
+           family = "Apfel",
+           role = "cre",
+           email = "Nicolas.Apfel@wiwi.uni-regensburg.de")   
     )       
 Description: A set of tools that enables efficient estimation of penalized 
     Poisson Pseudo Maximum Likelihood (PPML) regressions, using lasso or ridge penalties, for models 
@@ -33,8 +37,8 @@ Imports:
     magrittr
 Depends: 
     R (>= 2.10)
-URL: https://github.com/diegoferrerasg/penppml
-BugReports: https://github.com/diegoferrerasg/penppml/issues
+URL: https://github.com/tomzylkin/penppml
+BugReports: https://github.com/tomzylkin/penppml/issues
 Suggests: 
     testthat (>= 3.0.0),
     MASS,

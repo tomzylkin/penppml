@@ -62,16 +62,17 @@ models with an application to gun control", \emph{Journal of Business & Economic
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/diegoferrerasg/penppml}
-  \item Report bugs at \url{https://github.com/diegoferrerasg/penppml/issues}
+  \item \url{https://github.com/tomzylkin/penppml}
+  \item Report bugs at \url{https://github.com/tomzylkin/penppml/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Diego Ferreras Garrucho \email{d.ferreras-garrucho@lse.ac.uk}
+\strong{Maintainer}: Nicolas Apfel \email{Nicolas.Apfel@wiwi.uni-regensburg.de}
 
 Authors:
 \itemize{
+  \item Diego Ferreras Garrucho \email{d.ferreras-garrucho@lse.ac.uk}
   \item Tom Zylkin \email{tzylkin@richmond.edu}
 }
 
