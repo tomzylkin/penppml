@@ -122,14 +122,17 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
         print(ppml_temp$se)
         ses[which(penreg$beta!=0),1] <- ppml_temp$se
       }
-    }
-    else{
+    } else {
       pen_beta <- penreg$beta
       pen_bic <- penreg$bic
     }
     pen_beta <- t(pen_beta)
     colnames(pen_beta) <- xnames
-
+    # The following reproduces lines 208-211 for plugin lasso.
+    if (post) {
+      pen_beta_pre <- t(pen_beta_pre)
+      colnames(pen_beta_pre) <- xnames
+    }
     # store results
     results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "deviance" = penreg$deviance, "bic" = penreg$bic, "lambda" = penreg$lambda, "phi" =penreg$phi, "ses" =t(ses))
   } else {
