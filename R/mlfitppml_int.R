@@ -183,7 +183,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
             pen_beta[,v] <- pen_beta[,v-1]
             pen_ses[,v]  <- pen_ses[,v-1]
             pen_bic[,v]  <- pen_bic[,v-1]
-          } else{
+          } else {
             # pass mu, x, z as arguments here.
             if(length(x_select)!=0){
               ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
@@ -195,8 +195,9 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
               pen_bic[,v]   <- ppml_temp$bic
             }
           }
-        }
-
+        } else pen_beta_pre[,v] <- penreg$beta
+          # I've added line 198 to solve a bug: when post is TRUE and no variables are selected, the
+          # beta_pre object should still be overwritten by 0s. Otherwise, NAs remain.
       } else {
         pen_beta[,v] <- penreg$beta
         pen_bic[,v]  <- penreg$bic
