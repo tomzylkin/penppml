@@ -1,10 +1,3 @@
-#' @section Details:
-#' The methodology is based on Breinlich, Corradi, Rocha, Ruta, Santos Silva, and Zylkin (2021) and
-#' takes advantage of the method of alternating projections of Gaure (2013) for dealing with HDFE, as
-#' well as the coordinate descent algorithm of Friedman, Hastie and Tibshirani (2010) for fitting lasso
-#' regressions. The package is also able to carry out cross-validation and to implement the plugin lasso
-#' of Belloni, Chernozhukov, Hansen and Kozbur (2016).
-#'
 #' @section Functions:
 #' The workhorse of this package is the \code{mlfitppml} function, which allows users to carry out
 #' penalized HDFE-PPML estimation with a wide variety of options. The syntax is very simple, allowing

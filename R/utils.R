@@ -139,19 +139,6 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
 #    and column numbers are supported).
 #'
 #' @return A list containing the desired interactions of \code{vars}, with the same length as \code{inter}.
-#'
-#' @examples
-#' # We create a very simple data frame:
-#' data <- data.frame(exporter = c("Spain", "Spain", "Portugal", "France"),
-#'                    importer = c("China", "Swaziland", "Mozambique", "Tunisia"),
-#'                    year = c("1998", "1999", "1998", "1999"))
-#' # We can specify the interactions by column number:
-#' \dontrun{fes <- genfes(data, inter = list(1:2, 2:3, c(1, 3)))}
-#' # We can also specify the interactions by variable names, if desired:
-#' \dontrun{fes <- genfes(data,
-#'               inter = list(c("exporter", "importer"),
-#'                            c("importer", "year"),
-#'                            c("exporter", "year")))}
 
 genfes <- function(data, inter) {
   fes <- list()
