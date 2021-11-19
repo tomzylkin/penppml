@@ -9,7 +9,7 @@
 #' More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 #' transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
 #' In each iteration, the function calculates the transformed dependent variable, partials out the fixed
-#' effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet::glmnet} if the selected
+#' effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
 #' penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
 #' computed directly using fast C++ implementation.
 #'
@@ -138,8 +138,8 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       }
 
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
-      z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-      x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+      z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+      x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
       if (is.null(penweights)) {
         #penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize)

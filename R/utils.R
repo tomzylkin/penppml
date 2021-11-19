@@ -18,8 +18,8 @@ collinearity_check <- function(y, x, fes, hdfetol) {
   reg_x  <- x
   mu  <- (y + mean(y)) / 2
 
-  z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-  x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+  z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+  x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
   check <- stats::lm.wfit(x_resid, z_resid, mu)
   check$coefficients

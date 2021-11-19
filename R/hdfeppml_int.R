@@ -8,7 +8,7 @@
 #' More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 #' transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
 #' \code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
-#' variable, partials out the fixed effects (calling \code{collapse::fhdwithin}, which uses the algorithm in
+#' variable, partials out the fixed effects (calling \code{lfe::demeanlist}, which uses the algorithm in
 #' Gaure (2013)) and then solves a weighted least squares problem (using fast C++ implementation).
 #'
 #' @param y Dependent variable (a vector)
@@ -16,7 +16,7 @@
 #' @param fes List of fixed effects.
 #' @param tol Tolerance parameter for convergence of the IRLS algorithm.
 #' @param hdfetol Tolerance parameter for the within-transformation step,
-#'     passed on to \code{collapse::fhdwithin}.
+#'     passed on to \code{lfe::demeanlist}.
 #' @param colcheck Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 #' @param mu Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 #'     first iteration of the algorithm.
@@ -132,8 +132,8 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     if (verbose == TRUE) {
       print("within transformation step")
     }
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+    z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+    x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
     if (verbose == TRUE) {
       print("obtaining coefficients")

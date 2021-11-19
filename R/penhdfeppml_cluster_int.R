@@ -107,8 +107,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     }
     print(iter)
 
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+    z_resid <- lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol)
+    x_resid <- lfe::demeanlist(reg_x, fes, weights = sqrt(mu), eps = hdfetol)
 
     # the "cluster_matrix" command computes the variance of the score based on the assumed clustering
     if (iter == 1) {
