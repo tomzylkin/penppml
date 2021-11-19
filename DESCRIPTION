@@ -37,7 +37,7 @@ LinkingTo:
 Imports: 
     Rcpp,
     glmnet,
-    lfe,
+    collapse,
     ncvreg,
     tidyr,
     rlang,
