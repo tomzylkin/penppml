@@ -61,7 +61,7 @@ variables correspond to y, x and the fixed effects, using either variable names 
 More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
 \code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
-variable, partials out the fixed effects (calling \code{lfe::demeanlist}) and then solves a weighted
+variable, partials out the fixed effects (calling \code{collapse:fhdwithin}) and then solves a weighted
 least squares problem (using fast C++ implementation).
 }
 \section{References}{

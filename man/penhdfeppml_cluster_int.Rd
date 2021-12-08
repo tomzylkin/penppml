@@ -36,7 +36,7 @@ penhdfeppml_cluster_int(
 \item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
-passed on to \code{lfe::demeanlist}.}
+passed on to \code{collapse::fhdwithin}.}
 
 \item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 

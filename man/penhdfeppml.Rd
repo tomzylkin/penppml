@@ -76,7 +76,7 @@ correspond to y, x and the fixed effects, using either variable names or column 
 More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2021).
 In each iteration, the function calculates the transformed dependent variable, partials out the fixed
-effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
+effects (calling \code{lfe::fhdwithin}) and then and then calls \code{glmnet::glmnet} if the selected
 penalty is lasso (the default). If the user has selected ridge, the analytical solution is instead
 computed directly using fast C++ implementation.
 

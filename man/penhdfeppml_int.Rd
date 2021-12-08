@@ -38,7 +38,7 @@ penhdfeppml_int(
 \item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
-passed on to \code{lfe::demeanlist}.}
+passed on to \code{collapse::fhdwithin}.}
 
 \item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
 
@@ -104,7 +104,7 @@ method can be enabled via the \code{method} argument.
 More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
 In each iteration, the function calculates the transformed dependent variable, partials out the fixed
-effects (calling \code{lfe::demeanlist}) and then and then calls \code{glmnet::glmnet} if the selected
+effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet::glmnet} if the selected
 penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
 computed directly using fast C++ implementation.
 

@@ -39,7 +39,7 @@ mlfitppml_int(
 \item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
-passed on to \code{lfe::demeanlist}.}
+passed on to \code{collapse::fhdwithin}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 

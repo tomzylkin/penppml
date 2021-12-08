@@ -30,7 +30,7 @@ hdfeppml_int(
 \item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
-passed on to \code{lfe::demeanlist}.}
+passed on to \code{collapse::fhdwithin}.}
 
 \item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
@@ -74,7 +74,7 @@ form: each element in the list should be a separate HDFE).
 More formally, \code{hdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 transformed model, as described in Correia, Guimarães and Zylkin (2020) and similar to the
 \code{ppmlhdfe} package in Stata. In each iteration, the function calculates the transformed dependent
-variable, partials out the fixed effects (calling \code{lfe::demeanlist}, which uses the algorithm in
+variable, partials out the fixed effects (calling \code{collapse::fhdwithin}, which uses the algorithm in
 Gaure (2013)) and then solves a weighted least squares problem (using fast C++ implementation).
 }
 \section{References}{
