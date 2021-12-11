@@ -42,7 +42,7 @@ test_that("Fast ridge regression works", {
   beta <- c(0, 1, 0, 2, 3)
   e <- rnorm(n = 1000)
 
-  y <- X %x% beta + e
+  y <- X %*% beta + e # This %*% was a Kronecker product
 
   expect_equal(length(fastridgeCpp(X, y, 0)), ncol(X))
   expect_true(is.numeric(fastridgeCpp(X, y, 0)))
@@ -58,7 +58,7 @@ test_that("Fast standard deviation works", {
   beta <- c(0, 1, 0, 2, 3)
   e <- rnorm(n = 1000)
 
-  y <- X %x% beta + e
+  y <- X %*% beta + e
 
   w = rep(1, nrow(X))
 

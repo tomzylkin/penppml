@@ -3,12 +3,13 @@
 
 rm(list = ls())
 require(haven)
+require(stringi)
 
 # Trade data (Total trade, every 4 years)
-WB_TRADE_DATA <- read_dta("/Users/diego/Documents/OneDrive - London School of Economics/CEP/Summer RA 2020/Files as of June 2021 (for Diego)/Data/temp_trade_only.dta")
+WB_TRADE_DATA <- read_dta("C:/Users/LocalAdmin/Dropbox/Machine Learning and International Trade/Data/temp_trade_only.dta")
 
 # Large provisions data
-WB_LARGE <- read_dta("/Users/diego/Documents/OneDrive - London School of Economics/CEP/Summer RA 2020/Files as of June 2021 (for Diego)/Data/temp_provisions_largedataset_essential_Jan302021.dta")
+WB_LARGE <- read_dta("C:/Users/LocalAdmin/Dropbox/Machine Learning and International Trade/Data/temp_provisions_largedataset_essential_Jan302021.dta")
 
 # Merge:
 
@@ -38,13 +39,18 @@ colnames(trade)[1:3] <- c("exp", "imp", "time")
 
 provisions <- names(trade[, -(1:9)])
 selected <- c("ad_prov_14", "cp_prov_23", "tbt_prov_07", "tbt_prov_33", "tf_prov_41", "tf_prov_45")
-provisions <- provisions[!(provisions %in% selected)]
-selected <- c(selected, sample(provisions, size = 10))
-
+randomly_selected <- c("env_prov_18", "et_prov_38", "inv_prov_22",
+              "ipr_prov_15", "ipr_prov_44", "lm_prov_10", "moc_prov_21",
+              "ser_prov_47", "ste_prov_30", "cp_prov_26")
+# Previously randomly_selected was selected with this, but since
+# no seed was set, I choose this here.
+#provisions <- provisions[!(provisions %in% selected)]
+#selected <- c(selected, sample(provisions, size = 10))#
+selected <- c(selected, randomly_selected)
 trade <- trade[, c("exp", "imp", "time", "export", "id", "agreement", selected)]
+trade$agreement <- iconv(trade$agreement, "utf-8", "ASCII", sub="")
 
 # Save as .Rdata file, with compression to stay below CRAN's 5Mb size limit:
-
 usethis::use_data(trade, compress = "xz", overwrite = TRUE)
 
 # We may also want to include a complementary data set with information about specific countries. This one

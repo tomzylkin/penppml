@@ -1,6 +1,6 @@
 Package: penppml
 Title: Penalized Poisson Pseudo Maximum Likelihood Regression
-Version: 0.1.0.901
+Version: 0.1.0.902
 Authors@R: c(
     person(given = "Diego",
            family = "Ferreras Garrucho",
@@ -37,9 +37,8 @@ LinkingTo:
 Imports: 
     Rcpp,
     glmnet,
-    collapse,
-    tidyr,
-    ncvreg,
+    fixest,
+    collapse, 
     rlang,
     magrittr
 Depends: 
