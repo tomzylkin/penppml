@@ -16,6 +16,7 @@ test_that("Faster matrix multiplication works", {
 
 test_that("Fast OLS works", {
 
+  set.seed(123)
   V <- matrix(runif(n = 25, min = -1, max = 1), nrow = 5, ncol = 5)
   V <- t(V) %*% V
 
