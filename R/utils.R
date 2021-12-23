@@ -121,7 +121,7 @@ fastridge <- function(x, y, weights = rep(1/n, n), lambda, standardize = TRUE) {
   n <- length(y)
   if (standardize) {
     b <- fastridgeCpp(sqrt(weights) * standardize_wt(x, weights), sqrt(weights) * y, lambda)
-    beta <- b * faststddev(x, weights)
+    beta <- b / faststddev(x, weights)
   } else {
     beta <- fastridgeCpp(sqrt(weights) * x, sqrt(weights) * y, lambda)
   }

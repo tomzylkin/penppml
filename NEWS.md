@@ -1,5 +1,7 @@
 # penppml 0.1.1.900
 
+* When standardize option = TRUE and selected penalty is ridge, there was a mistake in last
+* version when rescaling the coefficients. The rescaling is now performed correctly. 
 * collapse::fhdwithin has replaced lfe::demeanlist in internal hdfeppml_int()-function.
 * This has no practical implications for users.
 
