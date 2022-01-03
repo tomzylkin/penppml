@@ -33,6 +33,7 @@ When not including fixest in Imports, additional errors arise.
 ## Test environments
 * Windows 10, 64 bit, R 4.1.2
 * Debian Linux, R-devel, GCC, no long double
+* macOS 10.13.6 High Sierra, R-release, CRAN's setup
 
 ## R CMD check results
 
@@ -41,3 +42,6 @@ When not including fixest in Imports, additional errors arise.
 
 * Linux:
 0 errors | 0 warnings | 2 notes
+
+* macOS
+0 errors | 0 warnings | 1 note
