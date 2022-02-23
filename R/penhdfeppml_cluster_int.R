@@ -86,7 +86,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
     if (iter == 1) {
 
-      # initilize "mu"
+      # initialize "mu"
       if (is.null(mu)) mu  <- (y + mean(y)) / 2
       z   <- (y - mu) / mu + log(mu)
       eta <- log(mu)

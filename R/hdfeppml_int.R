@@ -103,6 +103,7 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
   }
 
   while (crit>tol & iter<maxiter) {
+    print(iter)
     iter <- iter + 1
 
     if (verbose == TRUE) {
@@ -111,6 +112,8 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
 
     if (iter == 1) {
       ## initialize "mu"
+
+
       if (is.null(mu)) mu  <- (y + mean(y))/2
       z   <- (y-mu)/mu + log(mu)
       eta <- log(mu)
@@ -125,6 +128,7 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     } else {
       last_z <- z
       z <- (y-mu)/mu + log(mu)
+      z[which(z==Inf)] <- 0
       reg_z  <- matrix(z - last_z + z_resid)
       reg_x  <- x_resid
       ## colnames(reg_x)   <- colnames(x)
@@ -132,8 +136,10 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     if (verbose == TRUE) {
       print("within transformation step")
     }
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
+    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
+    print("FEs:")
+    print(fes)
 
     if (verbose == TRUE) {
       print("obtaining coefficients")
@@ -153,6 +159,18 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
       reg$residuals <- z_resid - x_resid %*% b[include_x]
     }
     mu <- as.numeric(exp(z - reg$residuals))
+    # if(prod(mu!=0)!=1){
+    #   mu <- mu[which(mu>0)]
+    #   x_resid <- x_resid[which(mu>0),]
+    #   z_resid <- z_resid[which(mu>0)]
+    #z[which(mu==0)] <- 0
+    #   y <- y[which(mu>0)]
+    #   fes <- sapply(fes, "[", which(mu>0))
+    # }
+    print("How many mu equal zero:")
+    print(length(which(mu==0)))
+    print("Mean Resid:")
+    print(mean(reg$residuals))
     if (verbose == TRUE) {
       print("info on residuals")
       print(max(reg$residuals))
@@ -174,9 +192,15 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
+    temp <- na.omit(temp)
 
+    print("Temp and n")
+    print(sum(temp))
+    print(n)
     deviance <- -2 * sum(temp) / n
 
+    print("Deviance:")
+    print(deviance)
     if (deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance

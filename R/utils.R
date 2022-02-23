@@ -11,17 +11,35 @@
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
 
-collinearity_check <- function(y, x, fes, hdfetol) {
+collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol) {
+  # Actually collinearity check does not make sense without x
+  if(missing(x)){
+    stop("Please provide x.")
+  }
   mu  <- (y + mean(y)) / 2
   z   <- (y - mu) / mu + log(mu)
+  z[which(z==Inf)] <- 0 # test
   reg_z  <- matrix(z)
+  if(!missing(x)){
   reg_x  <- x
+  }
   mu  <- (y + mean(y)) / 2
 
-  z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-  x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+  if(!missing(fes)){
+    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu,  eps = hdfetol)
+    if(!missing(x)){
+    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu,  eps = hdfetol)
+    }
+  } else {
+    z_resid <- reg_z
+    if(!missing(x)){
+    x_resid <- reg_x
+    }
+  }
 
+  if(!missing(x)){
   check <- stats::lm.wfit(x_resid, z_resid, mu)
+  }
   check$coefficients
   include_x <- which(!is.na(check$coefficients))
 }

@@ -118,7 +118,14 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       if (iter == 1) {
 
         # initilize "mu"
-        if (is.null(mu)) mu  <- (y + mean(y))/2
+        # If mu not specified, use default
+        # Which is the mu resulting from hdfeppml
+        # when using only FE on RHS
+        if (is.null(mu)){
+          only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                                   init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
+          mu <- only_fes$mu
+        }
         z   <- (y - mu)/mu + log(mu)
         eta <- log(mu)
         last_z <- z
@@ -132,14 +139,42 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       } else {
         last_z <- z
         z <- (y - mu)/mu + log(mu)
+        z[which(mu==1e-190)] <- 1e-190
+        z[which(z==Inf)] <- 1
         reg_z  <- matrix(z - last_z + z_resid)
+        #print("reg_z")
+        #print(sum(is.na(reg_z)))
         reg_x  <- x_resid
         ## colnames(reg_x)   <- colnames(x)
       }
-
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
-      z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-      x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+      z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
+      x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
+     # print("z_resid")
+      #print(head(z_resid))
+      # print(sum(is.na(z_resid)))
+      # print(mean(z_resid))
+      # print(sd(z_resid))
+      if(length(reg_z)!=length(z_resid)){
+        mu_t <- mu
+        reg_z_t <- reg_z
+        temp1 <- (collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol))
+        temp2 <- (lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol))
+        print("check")
+        print(all.equal(temp1,temp2))
+        print(sum(is.na(temp2)))
+      }
+
+#       print(length(z))
+#       print(length(reg_z))
+      # print("mu")
+      # print(length(mu))
+      # print(sum(mu==0))
+      # print("data")
+      #  print(length(z_resid))
+      #  print(dim(reg_x))
+      # print(length(z_resid))
+      # print(dim(x_resid))
 
       if (is.null(penweights)) {
         #penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize)
@@ -198,10 +233,16 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       residuals <- z_resid - x_resid %*% b[include_x]
 
       mu <- as.numeric(exp(z - residuals))
+      mu[mu < 0 | mu == 0] <- 1e-190
+      mu[mu == Inf] <- 1e190
 
       # calculate deviance
-      temp <-  -(y * log(y/mu) - (y-mu))
+      temp <-  -(y * log(y/mu) - (y-mu)) # Problem sits here: - Inf + Inf = NaN
       temp[which(y == 0)] <- -mu[which(y == 0)]
+     # temp[which(mu==1e-308)] <- 0
+      # print("temp")
+      # print(y[which(is.na(temp))])
+      # print(mu[which(is.na(temp))])
 
       deviance <- -2 * sum(temp)/n
 

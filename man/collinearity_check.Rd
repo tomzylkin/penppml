@@ -4,7 +4,7 @@
 \alias{collinearity_check}
 \title{Checking for Perfect Multicollinearity}
 \usage{
-collinearity_check(y, x, fes, hdfetol)
+collinearity_check(y, x = NULL, fes = NULL, hdfetol)
 }
 \arguments{
 \item{y}{Dependent variable (a numeric vector).}
