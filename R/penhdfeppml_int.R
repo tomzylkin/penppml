@@ -116,11 +116,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       iter <- iter + 1
 
       if (iter == 1) {
-
         # initilize "mu"
-        # If mu not specified, use default
-        # Which is the mu resulting from hdfeppml
-        # when using only FE on RHS
         if (is.null(mu)){
           only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
@@ -150,11 +146,17 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
       z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
       x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
-     # print("z_resid")
-      #print(head(z_resid))
-      # print(sum(is.na(z_resid)))
-      # print(mean(z_resid))
-      # print(sd(z_resid))
+
+      if(iter%in%seq(1001,10001,by=1000)){
+        print(iter)
+      }
+      if(sd(z_resid)==Inf){
+      print("z_resid")
+      print(head(z_resid))
+      print(sum(is.na(z_resid)))
+      print(mean(z_resid))
+      print(sd(z_resid))
+      }
       if(length(reg_z)!=length(z_resid)){
         mu_t <- mu
         reg_z_t <- reg_z

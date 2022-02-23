@@ -74,11 +74,15 @@
 #' models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
 #'
 
-hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
-                     init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
+hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                             init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
+  if(missing(x) & missing(fes)){
+    stop("Please provide at least one of the arguments x or fes.")
+  }
 
-  x <- data.matrix(x)
-
+  if(!missing(x)){
+    x <- data.matrix(x)
+  }
   # number of observations (needed for deviance)
   n <- length(y)
 
@@ -86,16 +90,27 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
   crit <- 1
   iter <- 0
   old_deviance <- 0
-  include_x <- 1:ncol(x)
 
-  b <- matrix(NA, nrow = ncol(x), ncol = 1)
-  xnames <- colnames(x)
-  if (colcheck == TRUE){
-    if (verbose == TRUE) {
-      print("checking collinearity")
+  if(!missing(x)){
+    include_x <- 1:ncol(x)
+
+    b <- matrix(NA, nrow = ncol(x), ncol = 1)
+    xnames <- colnames(x)
+
+    # The collinearity check is only relevant if we have x in the model
+    if (colcheck == TRUE){
+      if (verbose == TRUE) {
+        print("checking collinearity")
+      }
+      if(!missing(fes)){
+        include_x <- collinearity_check(y=y, x=x, fes=fes, hdfetol=1e-6)
+        x <- x[, include_x]
+      } else {
+        include_x <- collinearity_check(y=y, x=x, hdfetol=1e-6)
+        x <- x[, include_x]
+      }
     }
-    include_x <- collinearity_check(y, x, fes, 1e-6)
-    x <- x[, include_x]
+
   }
 
   if (verbose == TRUE) {
@@ -103,7 +118,6 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
   }
 
   while (crit>tol & iter<maxiter) {
-    print(iter)
     iter <- iter + 1
 
     if (verbose == TRUE) {
@@ -112,8 +126,6 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
 
     if (iter == 1) {
       ## initialize "mu"
-
-
       if (is.null(mu)) mu  <- (y + mean(y))/2
       z   <- (y-mu)/mu + log(mu)
       eta <- log(mu)
@@ -123,54 +135,61 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
       } else {
         reg_z <- init_z
       }
-      reg_x  <- x
+      if(!missing(x)){
+        reg_x  <- x
+      }
 
     } else {
       last_z <- z
       z <- (y-mu)/mu + log(mu)
-      z[which(z==Inf)] <- 0
       reg_z  <- matrix(z - last_z + z_resid)
-      reg_x  <- x_resid
+      if(!missing(x)){
+        reg_x  <- x_resid
+      }
       ## colnames(reg_x)   <- colnames(x)
     }
     if (verbose == TRUE) {
       print("within transformation step")
     }
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
-    print("FEs:")
-    print(fes)
+
+    if(!missing(fes)){
+      z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
+      if(!missing(x)){
+        x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+      }
+    } else {
+      z_resid <- reg_z
+      if(!missing(x)){
+        x_resid <- reg_x
+      }
+    }
 
     if (verbose == TRUE) {
       print("obtaining coefficients")
     }
-    reg <- fastolsCpp(sqrt(mu) * x_resid, sqrt(mu) * z_resid)  #faster without constant
-    b[include_x] <- reg
-    reg <- list("coefficients" = b) # this rewrites reg each time. Better to initialize upfront?
 
     if (verbose == TRUE) {
       print(iter)
       #print(b)
     }
 
-    if (length(include_x) == 1) {
-      reg$residuals <- z_resid - x_resid * b[include_x]
+    if(!missing(x)){
+      reg <- fastolsCpp(sqrt(mu) * x_resid, sqrt(mu) * z_resid)  #faster without constant
+      b[include_x] <- reg
+      reg <- list("coefficients" = b) # this rewrites reg each time. Better to initialize upfront?
+
+      if (length(include_x) == 1) {
+        reg$residuals <- z_resid - x_resid * b[include_x]
+      } else {
+        reg$residuals <- z_resid - x_resid %*% b[include_x]
+      }
     } else {
-      reg$residuals <- z_resid - x_resid %*% b[include_x]
+      reg <- NULL
+      reg$residuals <- z_resid
     }
+
     mu <- as.numeric(exp(z - reg$residuals))
-    # if(prod(mu!=0)!=1){
-    #   mu <- mu[which(mu>0)]
-    #   x_resid <- x_resid[which(mu>0),]
-    #   z_resid <- z_resid[which(mu>0)]
-    #z[which(mu==0)] <- 0
-    #   y <- y[which(mu>0)]
-    #   fes <- sapply(fes, "[", which(mu>0))
-    # }
-    print("How many mu equal zero:")
-    print(length(which(mu==0)))
-    print("Mean Resid:")
-    print(mean(reg$residuals))
+
     if (verbose == TRUE) {
       print("info on residuals")
       print(max(reg$residuals))
@@ -192,15 +211,9 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
-    temp <- na.omit(temp)
 
-    print("Temp and n")
-    print(sum(temp))
-    print(n)
     deviance <- -2 * sum(temp) / n
 
-    print("Deviance:")
-    print(deviance)
     if (deviance < 0) deviance = 0
 
     delta_deviance <- old_deviance - deviance
@@ -228,40 +241,47 @@ hdfeppml_int <- function(y, x, fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
   }
 
   ## elements to return
-  k   <- ncol(matrix(x))
-  n   <- length(y)
-  reg$mu  <- mu
-  reg$deviance <- -2 * sum(temp) / n
-  reg$bic <- deviance + k * log(n) / n
-
-  rownames(reg$coefficients) <- xnames
+  if(!missing(x)){
+    k   <- ncol(matrix(x))
+    n   <- length(y)
+    reg$mu  <- mu
+    reg$deviance <- -2 * sum(temp) / n
+    reg$bic <- deviance + k * log(n) / n
+    rownames(reg$coefficients) <- xnames
+  } else {
+    reg$mu  <- mu
+  }
 
   # k = number of elements in x here
   # BIC would be BIC = deviance + k * ln(n)
 
   #returnlist <- list("coefficients" = b, "mu" = mu, "bic" = bic, "deviance" = deviance)
   if (saveX == TRUE) {
-    reg[["x_resid"]] <- x_resid
+    if(!missing(x)){
+      reg[["x_resid"]] <- x_resid
+    }
     reg[["z_resid"]] <- z_resid
   }
-  if (vcv) {
-    if(!is.null(cluster)) {
-      nclusters  <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
-      het_matrix <- (1 / nclusters) * cluster_matrix((y - mu) / sum(sqrt(mu)), cluster, x_resid)
-      W          <- (1/nclusters) * (t(mu*x_resid) %*% x_resid) / sum(sqrt(mu))
-      R <- try(chol(W), silent = FALSE)
-      V          <- (1/nclusters) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
-      #V          <- (1/nclusters)*solve(W)%*%het_matrix%*%solve(W)
-      V          <- nclusters / (nclusters - 1) * V
-    } else {
-      e = y - mu
-      het_matrix = (1/n) * t(x_resid*e)  %*% (x_resid*e)
-      W          = (1/n) * (t(mu*x_resid) %*% x_resid)
-      R          = try(chol(W), silent = TRUE)
-      V          = (1/n) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
-      V          = (n / (n - 1)) * V
+  if(!missing(x)){
+    if (vcv) {
+      if(!is.null(cluster)) {
+        nclusters  <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
+        het_matrix <- (1 / nclusters) * cluster_matrix((y - mu) / sum(sqrt(mu)), cluster, x_resid)
+        W          <- (1/nclusters) * (t(mu*x_resid) %*% x_resid) / sum(sqrt(mu))
+        R <- try(chol(W), silent = FALSE)
+        V          <- (1/nclusters) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
+        #V          <- (1/nclusters)*solve(W)%*%het_matrix%*%solve(W)
+        V          <- nclusters / (nclusters - 1) * V
+      } else {
+        e = y - mu
+        het_matrix = (1/n) * t(x_resid*e)  %*% (x_resid*e)
+        W          = (1/n) * (t(mu*x_resid) %*% x_resid)
+        R          = try(chol(W), silent = TRUE)
+        V          = (1/n) * chol2inv(R) %*% het_matrix %*% chol2inv(R)
+        V          = (n / (n - 1)) * V
+      }
     }
+    reg[["se"]] <- sqrt(diag(V))
   }
-  reg[["se"]] <- sqrt(diag(V))
   return(reg)
 }

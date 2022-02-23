@@ -87,7 +87,11 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     if (iter == 1) {
 
       # initialize "mu"
-      if (is.null(mu)) mu  <- (y + mean(y)) / 2
+      if (is.null(mu)){
+        only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                                 init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
+        mu <- only_fes$mu
+      }
       z   <- (y - mu) / mu + log(mu)
       eta <- log(mu)
       last_z <- z
@@ -107,8 +111,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     }
     print(iter)
 
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
+    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
 
     # the "cluster_matrix" command computes the variance of the score based on the assumed clustering
     if (iter == 1) {
