@@ -79,10 +79,14 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
   if(missing(x) & missing(fes)){
     stop("Please provide at least one of the arguments x or fes.")
   }
-
   if(!missing(x)){
     x <- data.matrix(x)
   }
+
+  #if(missing(fes)){
+  #  x <- data.matrix(cbind(1,x))
+  #}
+
   # number of observations (needed for deviance)
   n <- length(y)
 
@@ -153,13 +157,20 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     }
 
     if(!missing(fes)){
+      if(is.null(fes)){
+        z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
+        if(!missing(x)){
+          x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
+        }
+      }else{
       z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
       if(!missing(x)){
         x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+        }
       }
     } else {
-      z_resid <- reg_z
-      if(!missing(x)){
+        z_resid <- reg_z
+        if(!missing(x)){
         x_resid <- reg_x
       }
     }

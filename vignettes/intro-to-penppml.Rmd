@@ -137,6 +137,18 @@ ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficie
                 title = "Figure 1: Regularization path for lasso")
 ```
 
+The user can also get a penalized PPML regression without high-dimensional fixed effects. To do so, simply set the option fixed to NULL.
+
+```{r try mlfitpenppml lasso, results = FALSE}
+lambdas <- c(0.025, 0.01, 0.0075, 0.005, 0.0025, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 0)
+
+reg2_nofe <- mlfitppml(data = trade2,
+                  dep = "export",
+                  fixed = NULL,
+                  penalty = "lasso",
+                  lambdas = lambdas)
+```
+
 If the user wishes to obtain the penalized estimates for a single value of lambda, they can either use `mlfitppml` as described above (just setting `lambdas == x`, where `x` is a number) or use the `penhdfeppml` function, upon which `mlfitppml` is built, directly. For instance:
 
 ```{r try penhdfeppml, results = FALSE}
@@ -147,6 +159,11 @@ reg3 <- penhdfeppml(data = trade2,
                               c("exp", "imp")),
                   penalty = "lasso",
                   lambda = 0.005)
+penhdfeppml(data = trade2,
+                  dep = "export",
+                  fixed = NULL,
+                  penalty = "lasso",
+                  lambda = 0.025)
 ```
 
 We can easily check that the penalized coefficient estimates of `penhdfeppml` and `mlfitppml` are equal for a lambda value of 0.005 (within a numerical tolerance):

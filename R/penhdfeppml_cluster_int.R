@@ -111,9 +111,24 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     }
     print(iter)
 
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
-
+    if(!missing(fes)){
+      if(is.null(fes)){
+        z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
+        if(!missing(x)){
+          x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
+        }
+      }else{
+        z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
+        if(!missing(x)){
+          x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+        }
+      }
+    } else {
+      z_resid <- reg_z
+      if(!missing(x)){
+        x_resid <- reg_x
+      }
+    }
     # the "cluster_matrix" command computes the variance of the score based on the assumed clustering
     if (iter == 1) {
       e <- mu * z_resid

@@ -71,7 +71,9 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                         penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,
                         init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                         method = "placeholder", cluster = NULL, debug = FALSE) {
-
+  old_x <- x
+  old_y <- y
+  old_fes <- fes
   # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
     penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
@@ -107,22 +109,23 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 
     # number of obs (needed for deviance)
     n <- length(y)
-
     # estimation algorithm (this implements a version of the algorithm from p. 110 of CGZ SJ 2020 but with penalized WLS in place of the WLS step)
     crit <- 1
     old_deviance <-0
     iter <-0
     while (crit > tol) {
       iter <- iter + 1
-
       if (iter == 1) {
         # initilize "mu"
         if (is.null(mu)){
           only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
           mu <- only_fes$mu
+    #      mu <- mu[mu>0]
+        #  print(length(mu))
         }
         z   <- (y - mu)/mu + log(mu)
+   #     z <- z[mu>0]
         eta <- log(mu)
         last_z <- z
         if (is.null(init_z)) {
@@ -130,26 +133,50 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
         } else {
           reg_z <- init_z
         }
-        reg_x  <- x
+        reg_x  <- x[which(mu>0),]
+        n <- length(z)
 
       } else {
         last_z <- z
+        n <- length(mu)
+       # print(n)
+#        y <- y[mu>0]
         z <- (y - mu)/mu + log(mu)
-        z[which(mu==1e-190)] <- 1e-190
-        z[which(z==Inf)] <- 1
-        reg_z  <- matrix(z - last_z + z_resid)
+        #z[which(mu==1e-190)] <- 1e-190
+        #z[which(z==Inf)] <- 1
+        reg_z  <- matrix(z - last_z[which(mu>0)] + z_resid[which(mu>0)])
         #print("reg_z")
         #print(sum(is.na(reg_z)))
-        reg_x  <- x_resid
+        reg_x  <- x_resid[which(mu>0),]
         ## colnames(reg_x)   <- colnames(x)
       }
+#      fes <- lapply(fes, "[", which(mu>0))
+      # print(length(reg_z))
+      # print(dim(reg_x)[1])
+      # print(length(mu))
+      # print(length(fes[[1]]))
+      # print(length(fes[[2]]))
+      # print(length(fes[[3]]))
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
-      z_resid <- collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol)
-      x_resid <- collapse::fhdwithin(reg_x, fes, w = mu, eps = hdfetol)
-
-      if(iter%in%seq(1001,10001,by=1000)){
-        print(iter)
+      if(!missing(fes)){
+        if(is.null(fes)){
+          z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
+          if(!missing(x)){
+            x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
+          }
+        }else{
+          z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
+          if(!missing(x)){
+            x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+          }
+        }
+      } else {
+        z_resid <- reg_z
+        if(!missing(x)){
+          x_resid <- reg_x
+        }
       }
+
       if(sd(z_resid)==Inf){
       print("z_resid")
       print(head(z_resid))
@@ -169,8 +196,9 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 
 #       print(length(z))
 #       print(length(reg_z))
-      # print("mu")
-      # print(length(mu))
+      #print("mu")
+      #print(length(mu))
+      #print(reg_z)
       # print(sum(mu==0))
       # print("data")
       #  print(length(z_resid))
@@ -235,13 +263,17 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       residuals <- z_resid - x_resid %*% b[include_x]
 
       mu <- as.numeric(exp(z - residuals))
-      mu[mu < 0 | mu == 0] <- 1e-190
-      mu[mu == Inf] <- 1e190
+      mu <- mu[which(mu > 0)]
+      #mu[which(mu < 1e-16)] <- 1e-16
+      #mu[mu > 1e20] <- 1e20
+      y <- y[which(mu > 0)]
+      #print(length(mu[which(mu == 1e-16)]))
+      #print(length(mu[which(mu == 1e16)]))
 
       # calculate deviance
       temp <-  -(y * log(y/mu) - (y-mu)) # Problem sits here: - Inf + Inf = NaN
       temp[which(y == 0)] <- -mu[which(y == 0)]
-     # temp[which(mu==1e-308)] <- 0
+      #temp[which(mu==Inf)] <- 0
       # print("temp")
       # print(y[which(is.na(temp))])
       # print(mu[which(is.na(temp))])

@@ -79,7 +79,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     colnames(x) <- xnames[include_x]
     xnames <- xnames[include_x]
   }
-
   # "xval" = "cross-validation". If this option is selected, set up vectors to store cross-validation results
   if (xval==TRUE) {
     xval_rmse  <- matrix(nrow = 1, ncol = length(lambdas))
@@ -146,9 +145,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     last_penbeta <- matrix(0,nrow=ncol(x),ncol=1)
     for (v in 1:length(lambdas)) {
       # compute lasso results for a single lambda
-      print("<<<<<<<<<<<<<<<<<<<")
       print(lambdas[v])
-      print("<<<<<<<<<<<<<<<<<<<")
       if (v==1) {
         penreg <- penhdfeppml_int(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
                               penalty=penalty,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)

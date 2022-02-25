@@ -26,14 +26,21 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol) {
   mu  <- (y + mean(y)) / 2
 
   if(!missing(fes)){
-    z_resid <- collapse::fhdwithin(reg_z, fes, w = mu,  eps = hdfetol)
-    if(!missing(x)){
-    x_resid <- collapse::fhdwithin(reg_x, fes, w = mu,  eps = hdfetol)
+    if(is.null(fes)){
+      z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
+      if(!missing(x)){
+        x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
+      }
+    }else{
+      z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
+      if(!missing(x)){
+        x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
+      }
     }
   } else {
     z_resid <- reg_z
     if(!missing(x)){
-    x_resid <- reg_x
+      x_resid <- reg_x
     }
   }
 
@@ -191,7 +198,7 @@ genfes <- function(data, inter) {
 #'   \item \code{cluster}: cluster vector.
 #' }
 
-genmodel <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL) {
+genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL) {
   # First, we filter using selectobs:
   if (!is.null(selectobs)) data <- data[selectobs, ]
 
