@@ -75,10 +75,6 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
   old_y <- y
   old_fes <- fes
   
-  if(is.null(fes)){
-    print("No fixed effects specified, but model contains intercept.")
-  }
-  
   # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
     penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
