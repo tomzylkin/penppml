@@ -222,6 +222,15 @@ Now the function also returns a `rmse` element that includes the cross-validatio
 reg5$rmse
 ```
 
+```{r try cross validation, eval = FALSE}
+reg5_nofe <- mlfitppml(data = trade2,
+                  dep = "export",
+                  fixed = NULL,
+                  penalty = "lasso",
+                  lambdas = c(seq(0.5, 0.1, by = -0.1), 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0),
+                  xval = TRUE,
+                  IDs =  cross_ids$fold)
+```
 
 ```{r display xval results, echo = FALSE}
 # Note for package maintainer: notice that the code above is not being evaluated when building the vignette (due to the eval = FALSE option). This is for convenience: the cross-validation algorithm takes forever to run and, since vignettes are rebuilt a couple of times every time R CMD check is run, this makes it too cumbersome to check the package. Instead, I've run the code above in a separate R session and stored the results, which I'm reproducing below (re-running the code above should produce similar results):

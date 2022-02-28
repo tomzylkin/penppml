@@ -74,7 +74,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
   old_x <- x
   old_y <- y
   old_fes <- fes
-  
+
   # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
     penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
@@ -265,8 +265,8 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 
       mu <- as.numeric(exp(z - residuals))
       mu <- mu[which(mu > 0)]
-      #mu[which(mu < 1e-16)] <- 1e-16
-      #mu[mu > 1e20] <- 1e20
+      mu[which(mu < 1e-16)] <- 1e-16
+      mu[mu > 1e20] <- 1e20
       y <- y[which(mu > 0)]
       #print(length(mu[which(mu == 1e-16)]))
       #print(length(mu[which(mu == 1e16)]))
@@ -280,7 +280,10 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(mu[which(is.na(temp))])
 
       deviance <- -2 * sum(temp)/n
-
+# print("pen")
+# print(temp[which(is.na(temp))])
+# print(mu[which(is.na(temp))])
+# print(y[which(is.na(temp))])
       if(deviance<0) deviance = 0
 
       delta_deviance <- old_deviance - deviance

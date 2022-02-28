@@ -59,7 +59,16 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
   ## incorporate folds option (removed from arguments for initial release, since it wasn't doing
   # anything. Create seed option.
   if (is.null(init_mu)) {
-    init_mu <- (y + mean(y))/2
+   # init_mu <- (y + mean(y))/2
+    if(is.null(fes)){
+      only_fes <- hdfeppml_int(y, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                             init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
+      init_mu <- only_fes$mu
+    } else {
+      only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+                               init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
+      mu <- only_fes$mu
+    }
   }
   if (is.null(init_x)) {
     init_x <- x
@@ -105,7 +114,10 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
     x_temp   <- x[insample,]
     x_reg    <- init_x[insample,]
 
-    # this is all to create some temporary fixed efects and fixed effects names
+    # this is all to create some temporary fixed effects and fixed effects names
+    if(is.null(fes)){
+      fes_temp <- NULL
+    }else{
     fes_temp <- select_fes(fes,insample,list=FALSE)
     for (f in 1:length(fes)) {
       fe_name <- paste("fe",f,sep="")
@@ -119,7 +131,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
     }
     fes_temp <- temp
     rm(temp)
-
+    }
 
     # initialize mu and z
     mu_temp  <- init_mu[insample]
@@ -165,8 +177,12 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
       b  <-lasso_xval$beta
     }
 
-    mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
-    mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
+    if(!is.null(fes)){
+      mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
+      mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
+    } else {
+      mu_temp <- mu_temp
+    }
 
     if (verbose) {
       print("assigned FEs and computed means")
