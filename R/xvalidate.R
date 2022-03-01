@@ -79,6 +79,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
   uniq_IDs <- levels(factor(IDs))
   n_IDs    <- length(uniq_IDs)
   mu <- init_mu
+  # < Initialize mu, x
 
   #ID = 0 assumed to be omitted group
   if (min(IDs)==0) {
@@ -176,6 +177,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
       mu_temp <- lasso_xval$mu
       b  <-lasso_xval$beta
     }
+    # < Calculate coefficients b with subsample
 
     if(!is.null(fes)){
       mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
@@ -272,19 +274,56 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
   n <- length(y)
 
   # recover FEs
+  # Initialize critical values and loop value
   crit <- 1
   j <- 0
   tol <- tol
   deviance <-  0
 
+  # If coefficient not selected set to zero
   b[which(is.na(b))] <- 0
-  mus <- data.frame(fes, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
+  if(is.null(fes)){
+    print("fes null")
+    mus <- data.frame(intercept=1, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
+  } else {
+    mus <- data.frame(fes, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
+  }
 
   if(verbose) {
     print("recovering FEs")
   }
 
   # iteratively solve for FEs
+  if(is.null(fes)){
+    print("fes null")
+    while (crit>tol) {
+        if (j==0) {
+          assign("intercept",rep(1,n)) #initialize (exponentiated) FEs using 1's
+         # names(mus)["intercept"] <- 1        #change name of FE id within mus to a generic id
+        }
+        mus <- within(mus, {y_sum  = stats::ave(y,mus$intercept,FUN=sum)} )
+        mus <- within(mus, {mu_sum = stats::ave(mu,mus$intercept,FUN=sum)} )
+
+        # update FEs using PPML FOCs
+        adj <- (mus$y_sum / mus$mu_sum)
+        adj[which(mus$y_sum==0)]<-0
+        if(onlymus==TRUE){
+        assign(fe_value,get(fe_value)*adj)
+        }
+        mus$mu <- mus$mu * adj
+
+      # compute deviance and verify convergence
+      last_dev <- deviance
+      temp <- mus$y * log(mus$y/mus$mu) - (mus$y-mus$mu)
+      temp[which(mus$y==0)] <- -mus$mu[which(mus$y==0)]
+      deviance <- 2 * sum(temp)
+      denom_eps = max( min(deviance, last_dev) , 0.1 )
+      crit <- abs(deviance-last_dev)/denom_eps
+
+      j <- j + 1
+    }
+  } else {
+
   while (crit>tol) {
     for (f in 1:length(fes)) {
       fe_name  <- paste("fe",f,sep="")
@@ -302,6 +341,7 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
       assign(fe_value,get(fe_value)*adj)
       mus$mu <- mus$mu * adj
     }
+}
 
     # compute deviance and verify convergence
     last_dev <- deviance

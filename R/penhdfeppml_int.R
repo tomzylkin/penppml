@@ -166,10 +166,15 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
             x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
           }
         }else{
+          # print("prefhd1")
+          # print(length(reg_z))
+          # print(length(fes[[1]]))
+          # print(length(mu))
           z_resid <-  collapse::fhdwithin(reg_z, fes, w = mu)
           if(!missing(x)){
             x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
           }
+        #  print("postfhd1")
         }
       } else {
         z_resid <- reg_z
@@ -264,12 +269,15 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       residuals <- z_resid - x_resid %*% b[include_x]
 
       mu <- as.numeric(exp(z - residuals))
-      mu <- mu[which(mu > 0)]
-      mu[which(mu < 1e-16)] <- 1e-16
-      mu[mu > 1e20] <- 1e20
-      y <- y[which(mu > 0)]
-      #print(length(mu[which(mu == 1e-16)]))
-      #print(length(mu[which(mu == 1e16)]))
+      #print("smaller zero")
+#     print(length(which(mu <= 0)))
+#      mu <- mu[which(mu > 0)]
+      mu[which(mu < 1e-19)] <- 1e-19
+      mu[mu > 1e190] <- 1e190
+      #y <- y[which(mu > 0)]
+      # print("mu")
+      # print(length(mu[which(mu == 1e-16)]))
+      # print(length(mu[which(mu == 1e16)]))
 
       # calculate deviance
       temp <-  -(y * log(y/mu) - (y-mu)) # Problem sits here: - Inf + Inf = NaN
@@ -280,6 +288,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(mu[which(is.na(temp))])
 
       deviance <- -2 * sum(temp)/n
+ #     print(deviance)
 # print("pen")
 # print(temp[which(is.na(temp))])
 # print(mu[which(is.na(temp))])
