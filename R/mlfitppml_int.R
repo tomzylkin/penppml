@@ -84,7 +84,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     xval_rmse  <- matrix(nrow = 1, ncol = length(lambdas))
     xval_dev   <- matrix(nrow = 1, ncol = length(lambdas))
   }
-
   # if "ridge" regression is selected there is no need to post estimates
   if (penalty=="ridge") {
     post=FALSE
@@ -147,6 +146,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       # compute lasso results for a single lambda
       print(lambdas[v])
       if (v==1) {
+        print("penreg")
         penreg <- penhdfeppml_int(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
                               penalty=penalty,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       } else {
@@ -154,17 +154,18 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
         penreg <- penhdfeppml_int(y=y,x=penreg$x_resid,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
                               penalty=penalty,mu=penreg$mu,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       }
-
+      print("done penreg")
       pen_beta[,v] <- penreg$beta
 
       # if "xval" is enabled, implement cross-validation (see xvalidate.R)
       if(xval==TRUE) {
-
+        print("xval")
         # opportunity to pass pen weights here.
         xval_reg   <- xvalidate(y=y,x=x,fes=fes,IDs=IDs,tol=tol,hdfetol=hdfetol,colcheck=TRUE,lambda=lambdas[v],cluster=cluster,
                                 init_mu=penreg$mu,init_x=x,init_z=penreg$z_resid,verbose=verbose,standardize=standardize,penalty=penalty,method=method,penweights=penweights)
 
         xval_rmse[,v] <- xval_reg$rmse
+        print("xval done")
       }
 
       x_select <- penreg$x_resid[,as.numeric(penreg$beta)!=0]

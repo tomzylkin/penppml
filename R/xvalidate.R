@@ -61,6 +61,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
   if (is.null(init_mu)) {
    # init_mu <- (y + mean(y))/2
     if(is.null(fes)){
+      print("fes are null")
       only_fes <- hdfeppml_int(y, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
                              init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
       init_mu <- only_fes$mu
@@ -94,8 +95,9 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
   }
 
   #drop 1 id at a time and predict its mean values out of sample
+print(n_IDs)
   for (i in start_loop:n_IDs) {
-
+print(i)
     omitID <- uniq_IDs[i]
     if(!is.null(testID)) {
       omitID <- testID
@@ -177,14 +179,13 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
       mu_temp <- lasso_xval$mu
       b  <-lasso_xval$beta
     }
+    print("penhdfe done in xval")
     # < Calculate coefficients b with subsample
 
-    if(!is.null(fes)){
-      mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
-      mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
-    } else {
-      mu_temp <- mu_temp
-    }
+    print("do compute")
+    mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
+    mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
+    print("compute fes done in xval")
 
     if (verbose) {
       print("assigned FEs and computed means")
@@ -283,7 +284,6 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
   # If coefficient not selected set to zero
   b[which(is.na(b))] <- 0
   if(is.null(fes)){
-    print("fes null")
     mus <- data.frame(intercept=1, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
   } else {
     mus <- data.frame(fes, mu = exp(x %*% b) * (insample_obs), y = y * insample_obs)
@@ -323,7 +323,7 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
       j <- j + 1
     }
   } else {
-
+  print("fes not null")
   while (crit>tol) {
     for (f in 1:length(fes)) {
       fe_name  <- paste("fe",f,sep="")
@@ -341,7 +341,6 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
       assign(fe_value,get(fe_value)*adj)
       mus$mu <- mus$mu * adj
     }
-}
 
     # compute deviance and verify convergence
     last_dev <- deviance
@@ -352,6 +351,7 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
     crit <- abs(deviance-last_dev)/denom_eps
 
     j <- j + 1
+  }
   }
 
   # return values

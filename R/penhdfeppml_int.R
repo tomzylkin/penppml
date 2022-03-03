@@ -160,13 +160,13 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(length(fes[[3]]))
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
       if(!missing(fes)){
+     #   print("fes not missing")
         if(is.null(fes)){
           z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
           if(!missing(x)){
             x_resid <- collapse::fwithin(x=reg_x,g=factor(rep(1,length(reg_z))), w = mu)
           }
         }else{
-          # print("prefhd1")
           # print(length(reg_z))
           # print(length(fes[[1]]))
           # print(length(mu))
@@ -174,9 +174,10 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
           if(!missing(x)){
             x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
           }
-        #  print("postfhd1")
+         # print("postfhd1")
         }
       } else {
+        print("fes missing")
         z_resid <- reg_z
         if(!missing(x)){
           x_resid <- reg_x
@@ -273,7 +274,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 #     print(length(which(mu <= 0)))
 #      mu <- mu[which(mu > 0)]
       mu[which(mu < 1e-19)] <- 1e-19
-      mu[mu > 1e190] <- 1e190
+      mu[mu > 1e20] <- 1e20
       #y <- y[which(mu > 0)]
       # print("mu")
       # print(length(mu[which(mu == 1e-16)]))
@@ -288,7 +289,6 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(mu[which(is.na(temp))])
 
       deviance <- -2 * sum(temp)/n
- #     print(deviance)
 # print("pen")
 # print(temp[which(is.na(temp))])
 # print(mu[which(is.na(temp))])
@@ -304,15 +304,13 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       denom_crit = max(c( min(c(deviance, old_deviance)) , 0.1 ))
       crit = abs(delta_deviance) / denom_crit
 
-      #print(deviance)
       if (verbose == TRUE) {
-        #print(deviance)
         print(crit)
       }
 
       old_deviance <- deviance
     }
-
+    print("end while")
     ## elements to return
     k   <- ncol(matrix(x))
     n   <- length(y)
