@@ -95,9 +95,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
   }
 
   #drop 1 id at a time and predict its mean values out of sample
-print(n_IDs)
   for (i in start_loop:n_IDs) {
-print(i)
     omitID <- uniq_IDs[i]
     if(!is.null(testID)) {
       omitID <- testID
@@ -179,13 +177,10 @@ print(i)
       mu_temp <- lasso_xval$mu
       b  <-lasso_xval$beta
     }
-    print("penhdfe done in xval")
     # < Calculate coefficients b with subsample
 
-    print("do compute")
     mu_temp <- compute_fes(y=y,fes=fes,x=x,b=b,insample_obs=(IDs!=omitID),onlymus=TRUE,tol=tol,verbose=verbose)
     mu[which(IDs==omitID)] <- mu_temp[which(IDs==omitID)]
-    print("compute fes done in xval")
 
     if (verbose) {
       print("assigned FEs and computed means")
@@ -295,20 +290,19 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
 
   # iteratively solve for FEs
   if(is.null(fes)){
-    print("fes null")
     while (crit>tol) {
         if (j==0) {
-          assign("intercept",rep(1,n)) #initialize (exponentiated) FEs using 1's
+          intercept <- rep(1,n) #initialize (exponentiated) FEs using 1's
          # names(mus)["intercept"] <- 1        #change name of FE id within mus to a generic id
         }
-        mus <- within(mus, {y_sum  = stats::ave(y,mus$intercept,FUN=sum)} )
-        mus <- within(mus, {mu_sum = stats::ave(mu,mus$intercept,FUN=sum)} )
-
+        mus <- within(mus, {y_sum  = sum(y)} )
+        mus <- within(mus, {mu_sum = sum(mu)} )
+        print(head(mus))
         # update FEs using PPML FOCs
         adj <- (mus$y_sum / mus$mu_sum)
         adj[which(mus$y_sum==0)]<-0
         if(onlymus==TRUE){
-        assign(fe_value,get(fe_value)*adj)
+          intercept <- intercept * adj
         }
         mus$mu <- mus$mu * adj
 
@@ -321,9 +315,8 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
       crit <- abs(deviance-last_dev)/denom_eps
 
       j <- j + 1
-    }
+    } # < end while
   } else {
-  print("fes not null")
   while (crit>tol) {
     for (f in 1:length(fes)) {
       fe_name  <- paste("fe",f,sep="")
@@ -356,14 +349,19 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
 
   # return values
   mu <- exp(x%*%b)
+  if(!is.null(fes)){
   for (f in 1:length(fes)) {
     fe_value <- paste("fe_value",f,sep="")
     mu <- mu * get(fe_value)
+  }
+  }else{
+    mu <- mu * intercept
   }
   if (onlymus) {
     return(mu)
   }
   else{
+    if(!is.null(fes)){
     fe_values <- matrix(nrow=n,ncol=length(fes))
     fe_values <- data.frame(fe_values)
     for (f in 1:length(fes)) {
@@ -373,5 +371,8 @@ compute_fes <- function(y, fes, x, b, insample_obs = rep(1, n),
       names(fe_values)[f] <- fe_name
     }
     returnlist = list("mu"=mu,"fe_values"=fe_values)
+    } else {
+    returnlist = list("mu"=mu,"fe_values"=intercept)
+    }
   }
 }

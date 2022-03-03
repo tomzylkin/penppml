@@ -310,7 +310,6 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 
       old_deviance <- deviance
     }
-    print("end while")
     ## elements to return
     k   <- ncol(matrix(x))
     n   <- length(y)
