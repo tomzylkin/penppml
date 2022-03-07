@@ -47,9 +47,9 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol) {
   if(!missing(x)){
   check <- stats::lm.wfit(x_resid, z_resid, mu)
   }
-  check$coefficients
+  message(paste("The following variables have been dropped, due to collinearity: ", paste(names(which(is.na(check$coefficients))), collapse=" ")))
   include_x <- which(!is.na(check$coefficients))
-}
+ }
 
 
 #' Cluster-robust Standard Error Estimation
