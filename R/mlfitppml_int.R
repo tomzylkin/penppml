@@ -65,7 +65,7 @@
 #'
 #' @inheritSection hdfeppml_int References
 
-mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
+mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = TRUE, colcheck_x_fes = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
                      standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15) {
 
@@ -73,11 +73,16 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
   n      <- length(y)
 
   # collinearity check: if option selected drop x's that are perfectly collinear beforehand
-  if (colcheck==TRUE){
-    include_x <- collinearity_check(y,x,fes,1e-6)
+  if (colcheck_x==TRUE | colcheck_x_fes==TRUE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
     x <- x[,include_x]
     colnames(x) <- xnames[include_x]
     xnames <- xnames[include_x]
+    colcheck_x_post = FALSE
+    colcheck_x_fes_post = FALSE
+  } else {
+    colcheck_x_post = TRUE
+    colcheck_x_fes_post = TRUE
   }
   # "xval" = "cross-validation". If this option is selected, set up vectors to store cross-validation results
   if (xval==TRUE) {
@@ -97,7 +102,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
     # this is the subcommand that implements the iterative plugin estimator
     penreg   <- penhdfeppml_cluster_int(y=y,x=x,fes=fes,tol=tol,hdfetol=hdfetol,penalty=penalty,
-                                    cluster=cluster,colcheck=FALSE,post=FALSE,verbose=verbose,K=K)
+                                    cluster=cluster,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,verbose=verbose,K=K)
 
     ses <- matrix(NA,nrow = ncol(x), ncol = 1)
 
@@ -109,9 +114,10 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       pen_beta_pre <- penreg$beta
       #x_select <- x[,as.numeric(penreg$beta)!=0]
       if(length(x_select)!=0){
+        print("post1")
         ppml_temp <- hdfeppml_int(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
-                              colcheck=FALSE,cluster=cluster)
-
+                              colcheck_x=colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post, cluster=cluster)
+        print("post2")
         print(ppml_temp$coefficients)
 
         pen_beta[which(penreg$beta!=0),1]  <- ppml_temp$coefficients
@@ -147,18 +153,18 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       print(lambdas[v])
       if (v==1) {
         penreg <- penhdfeppml_int(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
-                              penalty=penalty,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
+                              penalty=penalty,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       } else {
         last_penbeta <- penreg$beta
         penreg <- penhdfeppml_int(y=y,x=penreg$x_resid,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
-                              penalty=penalty,mu=penreg$mu,colcheck=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
+                              penalty=penalty,mu=penreg$mu,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
       }
       pen_beta[,v] <- penreg$beta
 
       # if "xval" is enabled, implement cross-validation (see xvalidate.R)
       if(xval==TRUE) {
         # opportunity to pass pen weights here.
-        xval_reg   <- xvalidate(y=y,x=x,fes=fes,IDs=IDs,tol=tol,hdfetol=hdfetol,colcheck=TRUE,lambda=lambdas[v],cluster=cluster,
+        xval_reg   <- xvalidate(y=y,x=x,fes=fes,IDs=IDs,tol=tol,hdfetol=hdfetol,colcheck_x=FALSE,colcheck_x_fes=FALSE,lambda=lambdas[v],cluster=cluster,
                                 init_mu=penreg$mu,init_x=x,init_z=penreg$z_resid,verbose=verbose,standardize=standardize,penalty=penalty,method=method,penweights=penweights)
 
         xval_rmse[,v] <- xval_reg$rmse
@@ -184,7 +190,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
             # pass mu, x, z as arguments here.
             if(length(x_select)!=0){
               ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
-                                    mu = penreg$mu, colcheck = FALSE, cluster = cluster, vcv = vcv)
+                                    mu = penreg$mu, colcheck_x_fes = colcheck_x_fes_post, colcheck_x = colcheck_x_post, cluster = cluster, vcv = vcv)
               pen_beta_pre[,v] <- penreg$beta
 
               pen_beta[which(penreg$beta!=0),v]  <- ppml_temp$coefficients

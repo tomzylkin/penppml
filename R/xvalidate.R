@@ -50,7 +50,7 @@
 #'
 #' @inheritSection hdfeppml_int References
 
-xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE,
+xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4, colcheck_x=TRUE,colcheck_x_fes=TRUE,
                      init_mu = NULL, init_x = NULL, init_z = NULL, verbose = FALSE,
                      cluster = NULL, penalty = "lasso", method = "placeholder",
                      standardize = TRUE, penweights = rep(1, ncol(x_reg)), lambda = 0) {
@@ -62,11 +62,11 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
    # init_mu <- (y + mean(y))/2
     if(is.null(fes)){
       print("fes are null")
-      only_fes <- hdfeppml_int(y, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+      only_fes <- hdfeppml_int(y, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck_x=FALSE,colcheck_x_fes=FALSE, mu = NULL, saveX = TRUE,
                              init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
       init_mu <- only_fes$mu
     } else {
-      only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+      only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck_x=FALSE,colcheck_x_fes=FALSE, mu = NULL, saveX = TRUE,
                                init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
       mu <- only_fes$mu
     }
@@ -152,7 +152,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
     # may not need colcheck? really just need mu here.
     if (method == "plugin"){
       cluster_reg    <- cluster[insample]
-      plugin_xval <- penhdfeppml_cluster_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,cluster=cluster_reg,tol=tol,hdfetol=hdfetol,verbose=FALSE)
+      plugin_xval <- penhdfeppml_cluster_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,cluster=cluster_reg,tol=tol,hdfetol=hdfetol,verbose=FALSE, colcheck_x=FALSE,colcheck_x_fes=FALSE)
       if(verbose) {
         print("hdfeppml finished")
       }
@@ -160,7 +160,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
       b  <-plugin_xval$beta
     }
     else if (penalty == "ridge"){
-      ridge_xval <-  penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="ridge",standardize=standardize,verbose=verbose)
+      ridge_xval <-  penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="ridge",standardize=standardize,verbose=verbose,colcheck_x=FALSE,colcheck_x_fes=FALSE)
       if(verbose) {
         print("hdfeppml finished")
       }
@@ -169,7 +169,7 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
 
     } else {
       lasso_xval <- penhdfeppml_int(y=y_temp,x=x_reg,fes=fes_temp,lambda=lambda,tol=tol,hdfetol=hdfetol,penalty="lasso",
-                                standardize=standardize,verbose=verbose,penweights=penweights)
+                                standardize=standardize,verbose=verbose,penweights=penweights,colcheck_x=FALSE,colcheck_x_fes=FALSE)
 
       if(verbose) {
        print("hdfeppml finished")

@@ -11,7 +11,7 @@
 #'
 #' @return A numeric vector containing the variables that pass the collinearity check.
 
-collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol) {
+collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALSE, colcheck_x=FALSE) {
   # Actually collinearity check does not make sense without x
   if(missing(x)){
     stop("Please provide x.")
@@ -45,10 +45,41 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol) {
   }
 
   if(!missing(x)){
-  check <- stats::lm.wfit(x_resid, z_resid, mu)
+
+    #Exclude x which have zero variance
+    x_var <- var(x)
+    include_x_var <- which(diag(x_var)!=0)
+    if (length(which(diag(x_var)==0)) != 0){
+      message(paste("The following variables are dropped because their variation is equal zero:", paste(names(which(diag(x_var)==0)), collapse=" ")))
+    }
+
+    if(colcheck_x_fes==TRUE){
+      orig_sds <- matrixStats::colSds(x)
+      res_sds <- matrixStats::colSds(x_resid)
+      frac_sds <- res_sds/orig_sds
+      include_x_first <- union(which(!is.na(frac_sds)), which(frac_sds >= 1e-5))
+      rm(res_sds, orig_sds)
+      if(!is.null(names(which(frac_sds < 1e-5)))){
+      message(
+      paste("The following variables have been dropped, because most of their variation is explained by the fixed effects: ", paste(names(which(frac_sds < 1e-2)), collapse=" ")))
+      }
+    }
+
+  if(colcheck_x==TRUE){
+    check <- stats::lm.wfit(x_resid, z_resid, mu)
+    if(length(names(which(is.na(check$coefficients)))) != 0){
+    message(paste("The following variables have been dropped, due to collinearity: ", paste(names(which(is.na(check$coefficients))), collapse=" ")))
+    }
   }
-  message(paste("The following variables have been dropped, due to collinearity: ", paste(names(which(is.na(check$coefficients))), collapse=" ")))
-  include_x <- which(!is.na(check$coefficients))
+  }
+
+  if(colcheck_x_fes==TRUE & colcheck_x==TRUE ){
+    include_x <- union(union(include_x_first, which(!is.na(check$coefficients))), include_x_var)
+  } else  if (colcheck_x_fes==FALSE & colcheck_x == TRUE ){
+      include_x <- union(which(!is.na(check$coefficients)), include_x_var)
+  } else if(colcheck_x_fes==TRUE & colcheck_x == FALSE){
+        include_x <- union(include_x_first, include_x_var)
+  }
  }
 
 

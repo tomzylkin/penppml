@@ -68,19 +68,18 @@
 #' @inheritSection hdfeppml_int References
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                        penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck = TRUE,
+                        penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = TRUE, colcheck_x_fes = TRUE,
                         init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                         method = "placeholder", cluster = NULL, debug = FALSE) {
   old_x <- x
   old_y <- y
   old_fes <- fes
-
   # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
     penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
                                   hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
                                   penweights = penweights, saveX = saveX,
-                                  mu = mu, colcheck = colcheck, K = 15, init_z = init_z, post = FALSE,
+                                  mu = mu, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes, K = 15, init_z = init_z, post = FALSE,
                                   verbose = verbose, lambda = NULL)
   }
   else {
@@ -100,12 +99,17 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
     }
 
     # collinearity check
-    if (colcheck == TRUE) {
-      include_x <- collinearity_check(y, x, fes, 1e-6)
+    if (colcheck_x == TRUE | colcheck_x_fes == TRUE) {
+      include_x <- collinearity_check(y, x, fes, 1e-6, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes)
       x <- x[, include_x]
       if (!is.null(penweights)) {
         penweights = penweights[include_x]
       }
+      colcheck_x_post <- FALSE
+      colcheck_x_fes_post <- FALSE
+    } else {
+      colcheck_x_post <- TRUE
+      colcheck_x_fes_post <- TRUE
     }
 
     # number of obs (needed for deviance)
@@ -119,7 +123,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       if (iter == 1) {
         # initilize "mu"
         if (is.null(mu)){
-          only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+          only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = FALSE, mu = NULL, saveX = TRUE,
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
           mu <- only_fes$mu
     #      mu <- mu[mu>0]
@@ -274,7 +278,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 #     print(length(which(mu <= 0)))
 #      mu <- mu[which(mu > 0)]
       mu[which(mu < 1e-19)] <- 1e-19
-      mu[mu > 1e20] <- 1e20
+      mu[mu > 1e19] <- 1e19
       #y <- y[which(mu > 0)]
       # print("mu")
       # print(length(mu[which(mu == 1e-16)]))
@@ -326,10 +330,9 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       x_select <- x_resid[, as.numeric(penreg$beta) != 0]
       if (length(x_select) != 0){
         ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
-                              mu = penreg$mu, colcheck = FALSE)
-
+                              mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post)
         penreg$pencoefs <- penreg$beta
-        penreg$beta[which(penreg$beta != 0), 1]  <- ppml_temp$coefficients
+        penreg$beta[which(as.logical(penreg$beta != 0)), 1]  <- ppml_temp$coefficients
         b[include_x] <- penreg$beta
         mu    <- ppml_temp$mu
         bic   <- ppml_temp$bic

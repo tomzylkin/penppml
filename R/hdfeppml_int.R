@@ -74,7 +74,8 @@
 #' models with an application to gun control", \emph{Journal of Business & Economic Statistics}, 34, 590-605.
 #'
 
-hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck_x = TRUE,
+                             colcheck_x_fes = TRUE, mu = NULL, saveX = TRUE,
                              init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
   if(missing(x) & missing(fes)){
     stop("Please provide at least one of the arguments x or fes.")
@@ -102,15 +103,17 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     xnames <- colnames(x)
 
     # The collinearity check is only relevant if we have x in the model
-    if (colcheck == TRUE){
+    if (colcheck_x == TRUE | colcheck_x_fes == TRUE){
       if (verbose == TRUE) {
         print("checking collinearity")
       }
       if(!missing(fes)){
-        include_x <- collinearity_check(y=y, x=x, fes=fes, hdfetol=1e-6)
+        include_x <- collinearity_check(y=y, x=x, fes=fes, hdfetol=1e-6, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes)
         x <- x[, include_x]
       } else {
-        include_x <- collinearity_check(y=y, x=x, hdfetol=1e-6)
+        print("do collinearity check")
+        include_x <- collinearity_check(y=y, x=x, hdfetol=1e-6, colcheck_x = colcheck_x, colcheck_x_fes = FALSE)
+        print(include_x)
         x <- x[, include_x]
       }
     }
@@ -201,7 +204,7 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
 
     mu <- as.numeric(exp(z - reg$residuals))
     mu[which(mu < 1e-19)] <- 1e-19
-    mu[mu > 1e20] <- 1e20
+    mu[mu > 1e19] <- 1e19
 
     if (verbose == TRUE) {
       print("info on residuals")

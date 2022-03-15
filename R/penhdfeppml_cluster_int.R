@@ -47,7 +47,7 @@
 
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
-                                colcheck = TRUE, K = 15, init_z = NULL, post = FALSE,
+                                colcheck_x = TRUE, colcheck_x_fes = TRUE, K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL) {
 
   n <- length(y)
@@ -69,9 +69,14 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   rownames(b) <- colnames(x)
   include_x <- 1:ncol(x)
 
-  if (colcheck == TRUE) {
-    include_x <- collinearity_check(y, x, fes, 1e-6)
+  if (colcheck_x == TRUE | colcheck_x_fes == TRUE) {
+    include_x <- collinearity_check(y, x, fes, 1e-6, colcheck_x=colcheck_x, colcheck_x_fes = colcheck_x_fes)
     x <- x[, include_x]
+    colcheck_x_post = FALSE
+    colcheck_x_fes_post = FALSE
+  } else {
+    colcheck_x_post = TRUE
+    colcheck_x_fes_post = TRUE
   }
 
   # number of obs (needed for deviance)
@@ -88,7 +93,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
       # initialize "mu"
       if (is.null(mu)){
-        only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck = TRUE, mu = NULL, saveX = TRUE,
+        only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = FALSE, mu = NULL, saveX = TRUE,
                                  init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
         mu <- only_fes$mu
       }
@@ -168,7 +173,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
     mu <- as.numeric(exp(z - residuals))
     mu[which(mu < 1e-19)] <- 1e-19
-    mu[mu > 1e20] <- 1e20
+    mu[mu > 1e19] <- 1e19
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))
@@ -214,7 +219,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     x_select <- x_resid[, as.numeric(penreg$beta) != 0]
     if (length(x_select) != 0) {
       ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
-                            mu = penreg$mu, colcheck = FALSE, cluster = cluster)
+                            mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post, cluster = cluster)
 
       penreg$beta[which(penreg$beta != 0), 1]  <- ppml_temp$coefficients
       b[include_x] <- penreg$beta
