@@ -8,7 +8,6 @@
 using namespace Rcpp;
 using namespace Eigen;
 
-
 //' Faster Matrix Multiplication
 //'
 //' Faster matrix multiplication using C++.

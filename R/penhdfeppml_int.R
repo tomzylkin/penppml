@@ -9,14 +9,14 @@
 #' More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 #' transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
 #' In each iteration, the function calculates the transformed dependent variable, partials out the fixed
-#' effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet::glmnet} if the selected
+#' effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet} if the selected
 #' penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
 #' computed directly using fast C++ implementation.
 #'
 #' For information on the plugin lasso method, see \link{penhdfeppml_cluster_int}.
 #'
 #' @param lambda Penalty parameter (a number).
-#' @param glmnettol Tolerance parameter to be passed on to \code{glmnet::glmnet}.
+#' @param glmnettol Tolerance parameter to be passed on to \code{glmnet}.
 #' @param penalty A string indicating the penalty type. Currently supported: "lasso" and "ridge".
 #' @param penweights Optional: a vector of coefficient-specific penalties to use in plugin lasso when
 #'     \code{method == "plugin"}.
@@ -68,19 +68,19 @@
 #' @inheritSection hdfeppml_int References
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                        penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = TRUE, colcheck_x_fes = TRUE,
-                        init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
-                        method = "placeholder", cluster = NULL, debug = FALSE) {
+                            penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = TRUE, colcheck_x_fes = TRUE,
+                            init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
+                            method = "placeholder", cluster = NULL, debug = FALSE) {
   old_x <- x
   old_y <- y
   old_fes <- fes
   # implements plugin method; calls penhdfeppml_cluster_int subcommand
   if (method == "plugin") {
     penreg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = cluster, tol = tol,
-                                  hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
-                                  penweights = penweights, saveX = saveX,
-                                  mu = mu, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes, K = 15, init_z = init_z, post = FALSE,
-                                  verbose = verbose, lambda = NULL)
+                                      hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
+                                      penweights = penweights, saveX = saveX,
+                                      mu = mu, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes, K = 15, init_z = init_z, post = FALSE,
+                                      verbose = verbose, lambda = NULL)
   }
   else {
 
@@ -126,11 +126,11 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
           only_fes <- hdfeppml_int(y, fes=fes, tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = FALSE, mu = NULL, saveX = TRUE,
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
           mu <- only_fes$mu
-    #      mu <- mu[mu>0]
-        #  print(length(mu))
+          #      mu <- mu[mu>0]
+          #  print(length(mu))
         }
         z   <- (y - mu)/mu + log(mu)
-   #     z <- z[mu>0]
+        #     z <- z[mu>0]
         eta <- log(mu)
         last_z <- z
         if (is.null(init_z)) {
@@ -144,8 +144,8 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       } else {
         last_z <- z
         n <- length(mu)
-       # print(n)
-#        y <- y[mu>0]
+        # print(n)
+        #        y <- y[mu>0]
         z <- (y - mu)/mu + log(mu)
         #z[which(mu==1e-190)] <- 1e-190
         #z[which(z==Inf)] <- 1
@@ -155,7 +155,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
         reg_x  <- x_resid[which(mu>0),]
         ## colnames(reg_x)   <- colnames(x)
       }
-#      fes <- lapply(fes, "[", which(mu>0))
+      #      fes <- lapply(fes, "[", which(mu>0))
       # print(length(reg_z))
       # print(dim(reg_x)[1])
       # print(length(mu))
@@ -164,7 +164,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(length(fes[[3]]))
       # HDFE estimation works with the residuals of z and x after purging them of the FEs (see CGZ Stata Journal 2020)
       if(!missing(fes)){
-     #   print("fes not missing")
+        #   print("fes not missing")
         if(is.null(fes)){
           z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
           if(!missing(x)){
@@ -178,7 +178,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
           if(!missing(x)){
             x_resid <- collapse::fhdwithin(reg_x, fes, w = mu)
           }
-         # print("postfhd1")
+          # print("postfhd1")
         }
       } else {
         print("fes missing")
@@ -189,11 +189,11 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       }
 
       if(sd(z_resid)==Inf){
-      print("z_resid")
-      print(head(z_resid))
-      print(sum(is.na(z_resid)))
-      print(mean(z_resid))
-      print(sd(z_resid))
+        print("z_resid")
+        print(head(z_resid))
+        print(sum(is.na(z_resid)))
+        print(mean(z_resid))
+        print(sd(z_resid))
       }
       if(length(reg_z)!=length(z_resid)){
         mu_t <- mu
@@ -205,8 +205,8 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
         print(sum(is.na(temp2)))
       }
 
-#       print(length(z))
-#       print(length(reg_z))
+      #       print(length(z))
+      #       print(length(reg_z))
       #print("mu")
       #print(length(mu))
       #print(reg_z)
@@ -218,7 +218,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(dim(x_resid))
 
       if (is.null(penweights)) {
-        #penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize)
+        #penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"), warm.g=NULL)
       }
       else{
         if(debug) {
@@ -233,13 +233,13 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
         }
       }
 
-# The SCAD option is DISABLED:
-#      if (penalty == "SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
-#        wz_resid <- sqrt(mu) * z_resid
-#        wx_resid <- sqrt(mu) * x_resid
-#        penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty = "SCAD", lambda = lambda)  # add penalty weights
-#
-#      }  else if (penalty == "ridge") {
+      # The SCAD option is DISABLED:
+      #      if (penalty == "SCAD") {  ## !! currently *very* slow... can be sped up using warm starts??
+      #        wz_resid <- sqrt(mu) * z_resid
+      #        wx_resid <- sqrt(mu) * x_resid
+      #        penreg <- ncvreg::ncvreg(wx_resid, wz_resid, penalty = "SCAD", lambda = lambda)  # add penalty weights
+      #
+      #      }  else if (penalty == "ridge") {
       if (penalty == "ridge") {
         penreg <- fastridge(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = n * lambda,
                             standardize = standardize) # ,penalty.factor=penweights
@@ -250,19 +250,19 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
           warning(penalty, " penalty is not supported. Lasso is used by default.")
         }
         if (debug) {
-          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
-                                   thresh = glmnettol, standardize = standardize)
+          penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                                thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"), warm.g=NULL)
           print((penreg$beta))
           print(penweights)
         }
         if (debug) {
-          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
-                                   thresh = glmnettol, standardize = standardize)
+          penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                                thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"), warm.g=NULL)
           print((penreg$beta))
           print(penweights)
         }
-        penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
-                                 thresh = glmnettol, penalty.factor = penweights, standardize = standardize)
+        penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+                              thresh = glmnettol, penalty.factor = penweights, standardize = standardize, family=gaussian(link = "identity"), warm.g=NULL)
         if (debug) {
           print((penreg$beta))
           stop()
@@ -275,10 +275,10 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
 
       mu <- as.numeric(exp(z - residuals))
       #print("smaller zero")
-#     print(length(which(mu <= 0)))
-#      mu <- mu[which(mu > 0)]
-      mu[which(mu < 1e-19)] <- 1e-19
-      mu[mu > 1e19] <- 1e19
+      #     print(length(which(mu <= 0)))
+      #      mu <- mu[which(mu > 0)]
+      # mu[which(mu < 1e-19)] <- 1e-19
+      # mu[mu > 1e19] <- 1e19
       #y <- y[which(mu > 0)]
       # print("mu")
       # print(length(mu[which(mu == 1e-16)]))
@@ -293,10 +293,10 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(mu[which(is.na(temp))])
 
       deviance <- -2 * sum(temp)/n
-# print("pen")
-# print(temp[which(is.na(temp))])
-# print(mu[which(is.na(temp))])
-# print(y[which(is.na(temp))])
+      # print("pen")
+      # print(temp[which(is.na(temp))])
+      # print(mu[which(is.na(temp))])
+      # print(y[which(is.na(temp))])
       if(deviance<0) deviance = 0
 
       delta_deviance <- old_deviance - deviance
@@ -330,7 +330,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       x_select <- x_resid[, as.numeric(penreg$beta) != 0]
       if (length(x_select) != 0){
         ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
-                              mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post)
+                                  mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post)
         penreg$pencoefs <- penreg$beta
         penreg$beta[which(as.logical(penreg$beta != 0)), 1]  <- ppml_temp$coefficients
         b[include_x] <- penreg$beta

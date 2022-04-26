@@ -24,6 +24,9 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
   reg_x  <- x
   }
   mu  <- (y + mean(y)) / 2
+  # print("Dimensions")
+  # print(length(mu))
+  # print(dim(reg_x))
 
   if(!missing(fes)){
     if(is.null(fes)){
@@ -233,13 +236,6 @@ genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NUL
   # First, we filter using selectobs:
   if (!is.null(selectobs)) data <- data[selectobs, ]
 
-  # Then we deal with y:
-  if (is.numeric(dep) | is.character(dep)) {
-    y <- data[, dep]
-  } else {
-    stop("Unsupported format for dependent variable: dep must be a character or numeric vector.")
-  }
-
   # Now the fes:
   if (is.numeric(fixed) | is.character(fixed)) {
     fes <- as.list(data[, fixed])
@@ -250,6 +246,41 @@ genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NUL
   } else {
     stop("Unsupported format for fixed effects: fixed must be a numeric or character vector or a list
          of numeric or character vectors.")
+  }
+
+  mat_fes <- matrix(unlist(fes), ncol=length(fes))
+  data_fes <- data.frame(data, mat_fes)
+
+  obs_before <- dim(data)[1]
+
+  for(fe_ind in 1:length(fes)){
+    fe_name_temp <- paste("X",fe_ind,sep="")
+    #print(fe_name_temp)
+    #print("Nr obs before")
+    #print(dim(data_fes)[1])
+    data_sum <- data_fes %>% dplyr::group_by(!!rlang::sym(fe_name_temp)) %>% dplyr::summarise(sum_dep = sum(value))
+    data_var <- data_fes %>% dplyr::group_by(!!rlang::sym(fe_name_temp)) %>% dplyr::summarise(var_dep = var(value))
+    data_temp <- dplyr::left_join(data_fes, data_sum, by=fe_name_temp)
+    data_temp <- dplyr::left_join(data_temp, data_var, by=fe_name_temp)
+    # Include observations where sum and variance unequal zero and var not NA, i.e. at least two observations in group
+    incl_obs <- which(data_temp$sum_dep!=0 & !is.na(data_temp$var_dep) & data_temp$var_dep != 0)
+    data_fes <- data_temp[incl_obs,]
+    fes <- lapply(fes, "[", incl_obs)
+    print(length(fes[[fe_ind]]))
+    data_fes <- data_fes %>% dplyr::select(-any_of(c("sum_dep", "var_dep", fe_name_temp)))
+  }
+  data <- data_fes
+  message(paste(obs_before - dim(data)[1], "Observations are omitted because their sum or variance is zero inside a fixed effects category or because their variance is NA, indicating that there is only one observation inside that category."))
+
+  # temp_fe_mat <- as.matrix(data[,1:length(fes)])
+  # fes <- split(temp_fe_mat, rep(1:ncol(temp_fe_mat), each = nrow(temp_fe_mat)))
+  # print(head(fes))
+
+  # Then we deal with y:
+  if (is.numeric(dep) | is.character(dep)) {
+    y <- data[, dep]
+  } else {
+    stop("Unsupported format for dependent variable: dep must be a character or numeric vector.")
   }
 
   # Next the clusters (if any):
@@ -272,6 +303,7 @@ genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NUL
   } else {
     stop("Unsupported format for independent variables: x must be a character or numeric vector.")
   }
+
   if (is.null(cluster)) {
     return(list(y = y, x = x, fes = fes))
   } else {

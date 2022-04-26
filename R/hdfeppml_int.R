@@ -203,8 +203,8 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     }
 
     mu <- as.numeric(exp(z - reg$residuals))
-    mu[which(mu < 1e-19)] <- 1e-19
-    mu[mu > 1e19] <- 1e19
+    # mu[which(mu < 1e-19)] <- 1e-19
+    # mu[mu > 1e19] <- 1e19
 
     if (verbose == TRUE) {
       print("info on residuals")

@@ -6,7 +6,7 @@
 \usage{
 genmodel(
   data,
-  dep = 1,
+  dep = NULL,
   indep = NULL,
   fixed = NULL,
   cluster = NULL,

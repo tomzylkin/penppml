@@ -16,7 +16,8 @@ penhdfeppml_int(
   penweights = NULL,
   saveX = TRUE,
   mu = NULL,
-  colcheck = TRUE,
+  colcheck_x = TRUE,
+  colcheck_x_fes = TRUE,
   init_z = NULL,
   post = FALSE,
   verbose = FALSE,
@@ -40,7 +41,7 @@ penhdfeppml_int(
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
 
-\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
+\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet}.}
 
 \item{penalty}{A string indicating the penalty type. Currently supported: "lasso" and "ridge".}
 
@@ -52,8 +53,6 @@ fixed effects.}
 
 \item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
-
-\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the
 first iteration of the algorithm.}
@@ -104,7 +103,7 @@ method can be enabled via the \code{method} argument.
 More formally, \code{penhdfeppml_int} performs iteratively re-weighted least squares (IRLS) on a
 transformed model, as described in Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020).
 In each iteration, the function calculates the transformed dependent variable, partials out the fixed
-effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet::glmnet} if the selected
+effects (calling \code{collapse::fhdwithin}) and then and then calls \code{glmnet} if the selected
 penalty is lasso (the default). If the user selects ridge, the analytical solution is instead
 computed directly using fast C++ implementation.
 

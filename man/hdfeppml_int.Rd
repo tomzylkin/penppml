@@ -6,11 +6,12 @@
 \usage{
 hdfeppml_int(
   y,
-  x,
-  fes,
+  x = NULL,
+  fes = NULL,
   tol = 1e-08,
   hdfetol = 1e-04,
-  colcheck = TRUE,
+  colcheck_x = TRUE,
+  colcheck_x_fes = TRUE,
   mu = NULL,
   saveX = TRUE,
   init_z = NULL,
@@ -32,8 +33,6 @@ hdfeppml_int(
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
 
-\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
-
 \item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
 
@@ -50,6 +49,8 @@ first iteration of the algorithm.}
 \item{cluster}{Optional: a vector classifying observations into clusters (to use when calculating SEs).}
 
 \item{vcv}{Logical. If \code{TRUE} (the default), it returns standard errors.}
+
+\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 }
 \value{
 A list with the following elements:

@@ -51,6 +51,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
                                 verbose = FALSE, lambda = NULL) {
 
   n <- length(y)
+  print(n)
   k <- ncol(x) # BUG? should be defined after colcheck
   nclusters <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
   x <- data.matrix(x)
@@ -114,7 +115,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       reg_x  <- x_resid
       ## colnames(reg_x)   <- colnames(x)
     }
-    print(iter)
+    print(paste("Iteration No:", iter))
 
     if(!missing(fes)){
       if(is.null(fes)){
@@ -159,8 +160,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       if (penalty != "lasso" & iter == 1) {
         warning(penalty, " penalty is not supported. Lasso is used by default.")
       }
-      penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
-                               thresh = glmnettol, penalty.factor = phi, standardize = FALSE)
+      penreg <- glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
+                               thresh = glmnettol, penalty.factor = phi, standardize = FALSE, family=gaussian(link = "identity"), warm.g=NULL)
 #    }
 
     b[include_x] <- penreg$beta #[-1,]   #does using [,include_x] make a difference?
@@ -172,8 +173,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     residuals <- z_resid - x_resid %*% b[include_x]  #technically this reflects (y-mu)/mu
 
     mu <- as.numeric(exp(z - residuals))
-    mu[which(mu < 1e-19)] <- 1e-19
-    mu[mu > 1e19] <- 1e19
+    # mu[which(mu < 1e-19)] <- 1e-19
+    # mu[mu > 1e19] <- 1e19
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))
@@ -188,6 +189,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     deviance <- -2 * sum(temp) / n
 
     if (deviance < 0) deviance = 0
+
+    print(paste("Deviance:", deviance))
 
     delta_deviance <- old_deviance - deviance
 
@@ -209,8 +212,9 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   select_x <- which(b!=0)
 
   k   <- length(select_x)
-  print(k)
+  print(paste("No of variables:", k))
   bic <- deviance + k * log(n) / n
+  print(paste("BIC:", bic))
   # k = number of elements in x here
   # BIC would be BIC = deviance + k * ln(n)
 

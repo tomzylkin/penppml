@@ -12,7 +12,8 @@ xvalidate(
   testID = NULL,
   tol = 1e-08,
   hdfetol = 1e-04,
-  colcheck = TRUE,
+  colcheck_x = TRUE,
+  colcheck_x_fes = TRUE,
   init_mu = NULL,
   init_x = NULL,
   init_z = NULL,
@@ -42,8 +43,6 @@ unspecified, the function cycles through all IDs and reports the average RMSE.}
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
-
-\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{init_mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}

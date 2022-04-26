@@ -16,7 +16,8 @@ penhdfeppml_cluster_int(
   penweights = NULL,
   saveX = TRUE,
   mu = NULL,
-  colcheck = TRUE,
+  colcheck_x = TRUE,
+  colcheck_x_fes = TRUE,
   K = 15,
   init_z = NULL,
   post = FALSE,
@@ -38,7 +39,7 @@ penhdfeppml_cluster_int(
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
 
-\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet::glmnet}.}
+\item{glmnettol}{Tolerance parameter to be passed on to \code{glmnet}.}
 
 \item{penalty}{Only "lasso" is supported at the present stage.}
 
@@ -50,8 +51,6 @@ fixed effects.}
 
 \item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
-
-\item{colcheck}{Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.}
 
 \item{K}{Maximum number of iterations.}
 
