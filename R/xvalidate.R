@@ -54,8 +54,8 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
                      init_mu = NULL, init_x = NULL, init_z = NULL, verbose = FALSE,
                      cluster = NULL, penalty = "lasso", method = "placeholder",
                      standardize = TRUE, penweights = rep(1, ncol(x_reg)), lambda = 0) {
-
-
+  message("start xval")
+  dim(IDs)
   ## incorporate folds option (removed from arguments for initial release, since it wasn't doing
   # anything. Create seed option.
   if (is.null(init_mu)) {
@@ -94,8 +94,11 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
     n_IDs      <- testID
   }
 
+  print("length ids and omitid")
+  print(length(IDs))
   #drop 1 id at a time and predict its mean values out of sample
   for (i in start_loop:n_IDs) {
+    print(i)
     omitID <- uniq_IDs[i]
     if(!is.null(testID)) {
       omitID <- testID
@@ -109,6 +112,11 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
       print(length(insample))
       print(length(y))
     }
+
+    print("length insample, length omitted, length y")
+    print(length(insample))
+    print(length(which(IDs==omitID)))
+    print(length(y))
 
     #select y and x
     y_temp   <- y[insample]
