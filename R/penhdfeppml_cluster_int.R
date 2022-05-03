@@ -173,8 +173,11 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     residuals <- z_resid - x_resid %*% b[include_x]  #technically this reflects (y-mu)/mu
 
     mu <- as.numeric(exp(z - residuals))
-    # mu[which(mu < 1e-19)] <- 1e-19
-    # mu[mu > 1e19] <- 1e19
+    mu[which(mu < 1e-19)] <- 1e-19
+    mu[mu > 1e19] <- 1e19
+
+    print("mu")
+    print(length(mu[which(mu == 1e-19)]))
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))

@@ -277,11 +277,11 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       #print("smaller zero")
       #     print(length(which(mu <= 0)))
       #      mu <- mu[which(mu > 0)]
-      # mu[which(mu < 1e-19)] <- 1e-19
-      # mu[mu > 1e19] <- 1e19
+      mu[which(mu < 1e-19)] <- 1e-19
+      mu[mu > 1e19] <- 1e19
       #y <- y[which(mu > 0)]
-      # print("mu")
-      # print(length(mu[which(mu == 1e-16)]))
+      print("mu")
+      print(length(mu[which(mu == 1e-19)]))
       # print(length(mu[which(mu == 1e16)]))
 
       # calculate deviance
