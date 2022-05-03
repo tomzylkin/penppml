@@ -90,6 +90,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   while (crit > tol) {
     iter <- iter + 1
 
+    if(iter > 500){message("Plugin Lasso exceeded 500 iterations. Break loop and return last model."); break}
+
     if (iter == 1) {
 
       # initialize "mu"
@@ -115,7 +117,6 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       reg_x  <- x_resid
       ## colnames(reg_x)   <- colnames(x)
     }
-    print(paste("Iteration No:", iter))
 
     if(!missing(fes)){
       if(is.null(fes)){
@@ -190,8 +191,6 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
     if (deviance < 0) deviance = 0
 
-    print(paste("Deviance:", deviance))
-
     delta_deviance <- old_deviance - deviance
 
     if (!is.na(delta_deviance) & (deviance < 0.1 * delta_deviance)) {
@@ -212,9 +211,9 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   select_x <- which(b!=0)
 
   k   <- length(select_x)
-  print(paste("No of variables:", k))
+  message(paste("No of variables:", k))
   bic <- deviance + k * log(n) / n
-  print(paste("BIC:", bic))
+  message(paste("BIC:", bic))
   # k = number of elements in x here
   # BIC would be BIC = deviance + k * ln(n)
 
