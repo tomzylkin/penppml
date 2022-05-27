@@ -203,8 +203,8 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     }
 
     mu <- as.numeric(exp(z - reg$residuals))
-    # mu[which(mu < 1e-19)] <- 1e-19
-    # mu[mu > 1e19] <- 1e19
+    mu[which(mu < 1e-190)] <- 1e-190
+    mu[mu > 1e190] <- 1e190
 
     if (verbose == TRUE) {
       print("info on residuals")
@@ -227,6 +227,8 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
+    print("How many temp NA:")
+    print(which(is.na(temp)))
     #temp[which(is.na(temp))] <- 0
 
     deviance <- -2 * sum(temp) / n

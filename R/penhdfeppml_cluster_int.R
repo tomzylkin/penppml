@@ -90,7 +90,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   while (crit > tol) {
     iter <- iter + 1
 
-    if(iter > 500){message("Plugin Lasso exceeded 500 iterations. Break loop and return last model."); break}
+    if(iter > 200){message("Plugin Lasso exceeded 200 iterations. Break loop and return last model."); break}
 
     if (iter == 1) {
 
@@ -174,11 +174,11 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     residuals <- z_resid - x_resid %*% b[include_x]  #technically this reflects (y-mu)/mu
 
     mu <- as.numeric(exp(z - residuals))
-    mu[which(mu < 1e-19)] <- 1e-19
-    mu[mu > 1e19] <- 1e19
+    mu[which(mu < 1e-190)] <- 1e-190
+    mu[mu > 1e190] <- 1e190
 
     print("mu")
-    print(length(mu[which(mu == 1e-19)]))
+    print(length(mu[which(mu == 1e-190)]))
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))
