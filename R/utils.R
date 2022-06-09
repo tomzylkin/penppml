@@ -235,7 +235,6 @@ genfes <- function(data, inter) {
 genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL) {
   # First, we filter using selectobs:
   if (!is.null(selectobs)) data <- data[selectobs, ]
-  print("start genmodel")
   # Now the fes:
   if (is.numeric(fixed) | is.character(fixed)) {
     fes <- as.list(data[, fixed])

@@ -119,7 +119,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
     old_deviance <-0
     iter <-0
     while (crit > tol) {
-      print(iter)
+      #print(iter)
       iter <- iter + 1
 
       if(iter > 50){message("Lasso exceeded 50 iterations. Break loop and return last model."); break}
@@ -284,8 +284,8 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       mu[which(mu < 1e-190)] <- 1e-190
       mu[mu > 1e190] <- 1e190
       #y <- y[which(mu > 0)]
-      print("mu")
-      print(length(mu[which(mu == 1e-190)]))
+      # print("mu")
+      # print(length(mu[which(mu == 1e-190)]))
       # print(length(mu[which(mu == 1e16)]))
 
       # calculate deviance

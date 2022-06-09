@@ -177,8 +177,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
     mu[which(mu < 1e-190)] <- 1e-190
     mu[mu > 1e190] <- 1e190
 
-    print("mu")
-    print(length(mu[which(mu == 1e-190)]))
+    # print("mu")
+    # print(length(mu[which(mu == 1e-190)]))
 
     # calculate deviance
     temp <-  -(y * log(y / mu) - (y - mu))

@@ -94,8 +94,8 @@ xvalidate <- function(y, x, fes, IDs, testID = NULL, tol = 1e-8, hdfetol = 1e-4,
     n_IDs      <- testID
   }
 
-  print("length ids and omitid")
-  print(length(IDs))
+  # print("length ids and omitid")
+  # print(length(IDs))
   #drop 1 id at a time and predict its mean values out of sample
   for (i in start_loop:n_IDs) {
     print(i)

@@ -227,8 +227,8 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
     # calculate deviance
     temp <-  -(y * log(y/mu) - (y-mu))
     temp[which(y == 0)] <- -mu[which(y == 0)]
-    print("How many temp NA:")
-    print(which(is.na(temp)))
+    # print("How many temp NA:")
+    # print(which(is.na(temp)))
     #temp[which(is.na(temp))] <- 0
 
     deviance <- -2 * sum(temp) / n
