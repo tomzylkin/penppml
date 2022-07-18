@@ -291,7 +291,7 @@ knitr::kable(list(results[1:7,], results[8:14,]),
              digits = 4)
 ```
 
-We can see that the plugin lasso is very strict: only two provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
+We can see that the plugin lasso is very strict: only three provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
 
 ### Iceberg lasso (in development)
 
@@ -331,6 +331,48 @@ knitr::kable(provcorr,
              caption = "Table 7: Iceberg Lasso correlations",
              row.names = TRUE,
              digits = 4)
+```
+
+# Bootstrap Lasso
+
+```{r try plugin lasso, results = FALSE}
+
+bs_sample_size <- 8000
+selected_vars <- NULL
+for(bs_i in 1:3) {
+  tryCatch({
+    bs_sample_ind <- sort(sample(1:dim(trade2)[1], bs_sample_size, replace=FALSE))
+    data_bs <- trade2[bs_sample_ind,]
+    reg_bs <- mlfitppml(data = data_bs,
+                  dep = "export",
+                  fixed = list(c("exp", "time"), 
+                              c("imp", "time"),
+                              c("exp", "imp")),
+                  penalty = "lasso",
+                  method = "plugin",
+                  cluster = c("exp", "imp"))
+    selected_vars <- c(selected_vars, which(reg_bs$beta != 0))
+  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+}
+
+selected_bs <- NULL
+plugin_bs <- function(df,i){
+    data_bs <- df[i,]
+    reg_bs <- mlfitppml(data = data_bs,
+                  dep = "export",
+                  fixed = list(c("exp", "time"), 
+                              c("imp", "time"),
+                              c("exp", "imp")),
+                  penalty = "lasso",
+                  method = "plugin",
+                  cluster = c("exp", "imp"))
+       selected_bs <- c(selected_bs, which(reg_bs$beta!=0))
+#    selected_vars <- c(selected_vars, which(reg_bs$beta != 0))
+}
+
+tic()
+boot_plugin <- boot(trade2, plugin_bs, R=2, parallel="snow")
+toc()
 ```
 
 
