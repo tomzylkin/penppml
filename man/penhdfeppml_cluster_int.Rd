@@ -52,6 +52,12 @@ fixed effects.}
 \item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
 first iteration of the algorithm.}
 
+\item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+collinear variables.}
+
+\item{colcheck_x_fes}{Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+by the fixed effects drops those that are perfectly explained.}
+
 \item{K}{Maximum number of iterations.}
 
 \item{init_z}{Optional: initial values of the transformed dependent variable, to be used in the

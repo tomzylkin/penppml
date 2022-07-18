@@ -25,6 +25,10 @@
 #' @param xval Logical. If \code{TRUE}, it carries out cross-validation.
 #' @param K Maximum number of iterations for the plugin algorithm to converge.
 #' @param vcv Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.
+#' @param colcheck_x Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+#' collinear variables.
+#' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+#' by the fixed effects drops those that are perfectly explained.
 #' @inheritParams penhdfeppml_int
 #'
 #' @return A list with the following elements:
@@ -65,9 +69,9 @@
 #'
 #' @inheritSection hdfeppml_int References
 
-mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = TRUE, colcheck_x_fes = TRUE,
+mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
-                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15) {
+                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15, gamma_val=NULL) {
 
   xnames <- colnames(x)
   n      <- length(y)

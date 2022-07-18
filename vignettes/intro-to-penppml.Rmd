@@ -99,6 +99,17 @@ knitr::kable(list(results[1:8, ], results[9:16, ]),
 
 (Note that the functions is automatically dropping perfectly collinear variables from the estimation algorithm and reporting `NA` as the coefficient.)
 
+If we want to specify the independent variable, we can specify indep as pointing to columns 5 to 7 with the following code. 
+
+```{r try hdfeppml}
+reg1_indep <- hdfeppml(data = trade2, indep=5:7,
+                 dep = "export",
+                 fixed = list(c("exp", "time"), 
+                              c("imp", "time"),
+                              c("exp", "imp")))
+```
+
+
 # Penalized PPML estimation with HDFE
 
 ## Lasso regression

@@ -113,7 +113,7 @@ hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colche
       } else {
         print("do collinearity check")
         include_x <- collinearity_check(y=y, x=x, hdfetol=1e-6, colcheck_x = colcheck_x, colcheck_x_fes = FALSE)
-        print(include_x)
+       # print(include_x)
         x <- x[, include_x]
       }
     }

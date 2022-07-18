@@ -26,6 +26,10 @@
 #'     coefficient-specific penalty weights (see details). Otherwise, a single global penalty is used.
 #' @param debug Logical. If \code{TRUE}, this helps with debugging penalty weights by printing output
 #'    of the first iteration to the console and stopping the estimation algorithm.
+#' @param colcheck_x Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+#' collinear variables.
+#' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+#' by the fixed effects drops those that are perfectly explained.
 #' @inheritParams hdfeppml_int
 #'
 #' @return If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
@@ -68,9 +72,9 @@
 #' @inheritSection hdfeppml_int References
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                            penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = TRUE, colcheck_x_fes = TRUE,
+                            penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,
                             init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
-                            method = "placeholder", cluster = NULL, debug = FALSE) {
+                            method = "placeholder", cluster = NULL, debug = FALSE, gamma_val=NULL) {
   old_x <- x
   old_y <- y
   old_fes <- fes
@@ -80,7 +84,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                                       hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
                                       penweights = penweights, saveX = saveX,
                                       mu = mu, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes, K = 15, init_z = init_z, post = FALSE,
-                                      verbose = verbose, lambda = NULL)
+                                      verbose = verbose, lambda = NULL, gamma_val=gamma_val)
   }
   else {
 

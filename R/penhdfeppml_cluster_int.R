@@ -48,7 +48,7 @@
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
                                 colcheck_x = TRUE, colcheck_x_fes = TRUE, K = 15, init_z = NULL, post = FALSE,
-                                verbose = FALSE, lambda = NULL) {
+                                verbose = FALSE, lambda = NULL, gamma_val=NULL) {
 
   n <- length(y)
   print(n)
@@ -58,7 +58,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
   if(is.null(lambda)){
     c <- 1.1
-    gamma <- .1 / log(n)
+    if(gamma_val <- 0.1/log(n))
+    gamma <- gamma_val
     lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
   }
 

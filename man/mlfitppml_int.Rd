@@ -12,7 +12,7 @@ mlfitppml_int(
   penalty = "lasso",
   tol = 1e-08,
   hdfetol = 1e-04,
-  colcheck_x = TRUE,
+  colcheck_x = FALSE,
   colcheck_x_fes = TRUE,
   post = TRUE,
   cluster = NULL,
@@ -41,6 +41,12 @@ mlfitppml_int(
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
+
+\item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+collinear variables.}
+
+\item{colcheck_x_fes}{Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+by the fixed effects drops those that are perfectly explained.}
 
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.}
 
