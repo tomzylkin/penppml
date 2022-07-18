@@ -30,6 +30,7 @@
 #' collinear variables.
 #' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
 #' by the fixed effects drops those that are perfectly explained.
+#' @param gamma_val Numerical value that determines the regularization threshold as defined in Belloni, Chernozhukov, Hansen, and Kozbur (2016). NULL default sets parameter to 0.1/log(n).
 #' @inheritParams hdfeppml_int
 #'
 #' @return If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements

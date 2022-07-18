@@ -58,7 +58,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
 
   if(is.null(lambda)){
     c <- 1.1
-    if(gamma_val <- 0.1/log(n))
+    if(is.null(gamma_val)){gamma_val <- 0.1/log(n)}
     gamma <- gamma_val
     lambda <- c * sqrt(n) * stats::qnorm(1 - gamma / (2 * k))
   }

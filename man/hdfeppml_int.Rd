@@ -33,8 +33,7 @@ hdfeppml_int(
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
 
-\item{mu}{Optional: initial values of the conditional mean \eqn{\mu}, to be used as weights in the
-first iteration of the algorithm.}
+\item{mu}{A vector of initial values for mu that can be passed to the command.}
 
 \item{saveX}{Logical. If \code{TRUE}, it returns the values of x and z after partialling out the
 fixed effects.}

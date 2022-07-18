@@ -293,6 +293,22 @@ knitr::kable(list(results[1:7,], results[8:14,]),
 
 We can see that the plugin lasso is very strict: only three provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
 
+We can also set the gamma value as defined in Belloni et al. to something less strict, e.g. 0.3. 
+
+```{r try plugin lasso, results = FALSE}
+reg6_gamma <- mlfitppml(data = trade2,
+                  dep = "export",
+                  fixed = list(c("exp", "time"), 
+                              c("imp", "time"),
+                              c("exp", "imp")),
+                  penalty = "lasso",
+                  method = "plugin",
+                  cluster = c("exp", "imp"), gamma_val=0.3)
+rownames(reg6$beta)[which(reg6_gamma$beta != 0)]
+```
+
+When doing this, we see that more provisions than before are selected.
+
 ### Iceberg lasso (in development)
 
 This package also allows users to implement the two-step lasso described in Breinlich et al. (2021). This method consists in, first, running a plugin lasso estimation and second, running individual lasso regressions on each of the variables selected in the first stage. The `iceberg` function is designed precisely with this second step in mind. It takes a vector of dependent variables and returns a lasso regression for each one of them:

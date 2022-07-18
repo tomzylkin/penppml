@@ -23,7 +23,9 @@ mlfitppml_int(
   standardize = TRUE,
   vcv = TRUE,
   penweights = NULL,
-  K = 15
+  K = 15,
+  gamma_val = NULL,
+  mu = NULL
 )
 }
 \arguments{
@@ -70,6 +72,10 @@ is assigned to a different fold (warning: this is likely to be very resource-int
 \code{method == "plugin"}.}
 
 \item{K}{Maximum number of iterations for the plugin algorithm to converge.}
+
+\item{gamma_val}{Numerical value that determines the regularization threshold as defined in Belloni, Chernozhukov, Hansen, and Kozbur (2016). NULL default sets parameter to 0.1/log(n).}
+
+\item{mu}{A vector of initial values for mu that can be passed to the command.}
 }
 \value{
 A list with the following elements:

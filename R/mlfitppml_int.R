@@ -71,7 +71,7 @@
 
 mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
-                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15, gamma_val=NULL) {
+                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15, gamma_val=NULL, mu=NULL) {
 
   xnames <- colnames(x)
   n      <- length(y)
@@ -100,13 +100,13 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
   # method == "plugin" => use plugin method, which iterates on regressor-specific penalty weights.
   if (method == "plugin" & xval == FALSE) {
-
+    if(is.null(gamma_val)){gamma_val <- 0.1/log(n)}
     # for storing current estimates
     pen_beta <- matrix(0,nrow = ncol(x), ncol = 1)
 
     # this is the subcommand that implements the iterative plugin estimator
     penreg   <- penhdfeppml_cluster_int(y=y,x=x,fes=fes,tol=tol,hdfetol=hdfetol,penalty=penalty,
-                                    cluster=cluster,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,verbose=verbose,K=K)
+                                    cluster=cluster,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,verbose=verbose,K=K, gamma_val=gamma_val, mu=mu)
 
     ses <- matrix(NA,nrow = ncol(x), ncol = 1)
 
@@ -157,7 +157,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       print(lambdas[v])
       if (v==1) {
         penreg <- penhdfeppml_int(y=y,x=x,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,
-                              penalty=penalty,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights)
+                              penalty=penalty,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,standardize=standardize,method=method,cluster=cluster,penweights=penweights, mu=mu)
       } else {
         last_penbeta <- penreg$beta
         penreg <- penhdfeppml_int(y=y,x=penreg$x_resid,fes=fes,lambda=lambdas[v],tol=tol,hdfetol=hdfetol,

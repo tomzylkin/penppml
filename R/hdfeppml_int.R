@@ -28,6 +28,7 @@
 #' @param maxiter Maximum number of iterations (a number).
 #' @param cluster Optional: a vector classifying observations into clusters (to use when calculating SEs).
 #' @param vcv Logical. If \code{TRUE} (the default), it returns standard errors.
+#' @param mu A vector of initial values for mu that can be passed to the command.
 #'
 #' @return A list with the following elements:
 #' \itemize{
