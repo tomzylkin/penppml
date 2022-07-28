@@ -26,9 +26,13 @@ To install and load `penppml`, you can use the following commands:
 
 ```{r setup 1, eval = FALSE}
 install.packages(penppml)
+library(penppml)
 ```
 ```{r setup 2}
-library(penppml)
+library(data.table)
+library(devtools)
+library(glmnet)
+load_all()
 ```
 
 # Data Sets
@@ -351,13 +355,186 @@ knitr::kable(provcorr,
 
 # Bootstrap Lasso
 
-```{r try plugin lasso, results = FALSE}
+To illustrate this, we select the trade data, but now not dropping id and agreement variable.
 
-bs_sample_size <- 8000
+```{r filter for bootstrap}
+trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, we need id and agreement variable
+```
+
+We want to cluster by agreement, that means that we draw observations with the same agreement ID. 
+
+
+```{r}
+# Let's cluster by agreement
+trade3$alt_id <- trade3$id # ID refers to agreement ID
+trade3$alt_id[is.na(trade3$alt_id)] <- 0
+exp  <- factor(trade3$exp)
+imp  <- factor(trade3$imp)
+pair     <- interaction(exp, imp)
+trade3$pair <- pair
+trade3 <- within(trade3, {alt_id2 = ave(alt_id,pair,FUN=max)} )
+
+trade3$alt_id2[trade3$alt_id2==0] <- trade3$pair[trade3$alt_id2==0]
+unique(trade3$alt_id2) # This cluster variable collects pairs for pairs that are in agreement, uses the pair ID for those that are not.
+# Thus, it allows errors to be clustered within agreements.
+alt_id2 <- factor(trade3$alt_id2)
+clus <- alt_id2
+```
+
+```{r try plugin lasso, results = FALSE}
+set.seed(123)
+bs1 <- bootstrap(data=trade3, dep="export", cluster_id="alt_id2", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
+
+
+bootreps =3
+uniq_clus <- levels(factor(clus)) # Unique clusters, as characters
+save_betas     <- matrix(nrow = ncol(trade3[,7:22]), ncol = bootreps, dimnames = list(colnames(trade3)[7:22],1:bootreps))
+save_betas_pre <- matrix(nrow = ncol(trade3[,7:22]), ncol = bootreps, dimnames = list(colnames(trade3)[7:22],1:bootreps))
+save_phis      <- matrix(nrow = ncol(trade3[,7:22]), ncol = bootreps, dimnames = list(colnames(trade3)[7:22],1:bootreps))
+is_included    <- matrix(nrow = ncol(trade3[,7:22]), ncol = bootreps, dimnames = list(colnames(trade3)[7:22],1:bootreps))
+draws     <- matrix(nrow = length(uniq_clus), ncol = bootreps)
+
+set.seed(123)
+for (b in 1:bootreps) { # draw matrix has resampled cluster IDs in it
+  draws[,b] <- sort(sample(uniq_clus,replace=TRUE))
+}
+
+# Run bootstrap repetitions
+for (b in 1:bootreps) {
+  draw  <- draws[,b] # Take one draw
+  draw  <- data.table(draw)[,.N,by=draw] # Object containing cluster number and times it drawn
+  colnames(draw)[1] <- "clus" # First column contains cluster IDs
+  boot_data  <- merge(cbind(clus,trade3), draw, "clus", all.x=FALSE, all.y=TRUE) # Merge (cluster, data) and draw, keep only those drawn, i.e. those that appear in draw
+  boot_index <-  rep(row.names(boot_data), boot_data$N) # Repeat row name the times indicated in draw
+  boot_data  <- boot_data[boot_index, ] # Get the row names indicated like this
+  boot_data$rep <- (as.numeric(rownames(boot_data)) %% 1)*10+1 # This creates an ID for 
+  
+  boot_exp  <- factor(boot_data$exp)
+  boot_imp  <- factor(boot_data$imp)
+  boot_time <- factor(boot_data$time)
+
+  boot_rep  <- factor(boot_data$rep)
+  boot_exp_time <- interaction(boot_exp, boot_time)
+  boot_imp_time <- interaction(boot_imp, boot_time)
+  boot_pair     <- interaction(boot_exp, boot_imp)
+
+  #boot_ID = boot_data$id
+  #boot_ID[is.na(WB_TRADE_DATA$alt_id)] <- 0
+  #boot_data$pair <- interaction(boot_exp, boot_imp)
+  #boot_data <- within(boot_data, {alt_id2 = ave(alt_id,pair,FUN=max)} )
+  #boot_data$alt_id2[boot_data$alt_id2==0] <- boot_data$pair[boot_data$alt_id2==0]
+
+  boot_clus    <- boot_data$alt_id2
+  boot_clus    <- interaction(boot_clus, boot_rep)
+  boot_data$clus2 <- boot_clus
+
+  boot_fes      <- list(boot_exp_time,boot_imp_time,boot_pair)
+  boot_trade    <- boot_data$export
+  boot_x        <- boot_data[,8:23]
+
+  #boot_mu       <- boot_data$mu
+  boot_rta      <- ((rowSums(boot_x ))>0)*1
+  boot_data$rta <- boot_rta
+  boot_rta_only <- hdfeppml(dep="export", indep="rta",                  fixed = list(c("exp", "time"), c("imp", "time"), c("exp", "imp")),
+  tol=1e-6,hdfetol=1e-2,cluster="clus2", data=boot_data)
+  boot_mu <- boot_rta_only$mu
+
+  # This runs bootstrap repetition of plugin
+  plugin_boot <- mlfitppml(dep="export",indep=8:23,fixed = list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), tol=1e-6,hdfetol=1e-2,cluster="clus2",method="plugin", colcheck_x=FALSE, mu=boot_mu, data=boot_data) # add option for orig.
+  save_betas[rownames(plugin_boot$beta),b]     <- plugin_boot$beta
+  save_betas_pre[rownames(plugin_boot$beta),b] <- plugin_boot$beta_pre
+  save_phis[rownames(plugin_boot$beta),b]      <- plugin_boot$phi
+  is_included[rownames(plugin_boot$beta),b]    <- t(colSums(boot_data[,rownames(plugin_boot$beta)]) !=0)
+  is_included[is.na(is_included[,b]),b] <- FALSE
+}
+# 30 repetitions 80 sec.
+
+# foreach
+library(foreach)
+library(doParallel)
+
+nr_cores <- detectCores() - 1
+
+myCluster <- makeCluster(nr_cores, # number of cores to use
+                         type = "PSOCK") # type of cluster
+registerDoParallel(myCluster)
+
+tic()
+set.seed(123)
+draws2 <- foreach (i = 1:bootreps, .combine=cbind) %do% {     sort(sample(uniq_clus,replace=TRUE))}
+
+# Run bootstrap repetitions
+output2 <- foreach(i = 1:bootreps) %do% {
+ boot_one(b=i)}
+toc()
+# 68 sec
+stopCluster(myCluster)
+
+boot_one <- function(b){ draw  <- draws2[,b] # Take one draw
+  draw  <- data.table(draw)[,.N,by=draw] # Object containing cluster number and times it drawn
+  colnames(draw)[1] <- "clus" # First column contains cluster IDs
+  boot_data  <- merge(cbind(clus,trade3), draw, "clus", all.x=FALSE, all.y=TRUE) # Merge (cluster, data) and draw, keep only those drawn, i.e. those that appear in draw
+  boot_index <-  rep(row.names(boot_data), boot_data$N) # Repeat row name the times indicated in draw
+  boot_data  <- boot_data[boot_index, ] # Get the row names indicated like this
+  boot_data$rep <- (as.numeric(rownames(boot_data)) %% 1)*10+1 # This creates an ID for 
+  
+  boot_exp  <- factor(boot_data$exp)
+  boot_imp  <- factor(boot_data$imp)
+  boot_time <- factor(boot_data$time)
+
+  boot_rep  <- factor(boot_data$rep)
+  boot_exp_time <- interaction(boot_exp, boot_time)
+  boot_imp_time <- interaction(boot_imp, boot_time)
+  boot_pair     <- interaction(boot_exp, boot_imp)
+
+  #boot_ID = boot_data$id
+  #boot_ID[is.na(WB_TRADE_DATA$alt_id)] <- 0
+  #boot_data$pair <- interaction(boot_exp, boot_imp)
+  #boot_data <- within(boot_data, {alt_id2 = ave(alt_id,pair,FUN=max)} )
+  #boot_data$alt_id2[boot_data$alt_id2==0] <- boot_data$pair[boot_data$alt_id2==0]
+
+  boot_clus    <- boot_data$alt_id2
+  boot_clus    <- interaction(boot_clus, boot_rep)
+  boot_data$clus2 <- boot_clus
+
+  boot_fes      <- list(boot_exp_time,boot_imp_time,boot_pair)
+  boot_trade    <- boot_data$export
+  boot_x        <- boot_data[,8:23]
+
+  #boot_mu       <- boot_data$mu
+  boot_rta      <- ((rowSums(boot_x ))>0)*1
+  boot_data$rta <- boot_rta
+  boot_rta_only <- hdfeppml(dep="export", indep="rta",                  fixed = list(c("exp", "time"), c("imp", "time"), c("exp", "imp")),
+  tol=1e-6,hdfetol=1e-2,cluster="clus2", data=boot_data)
+  boot_mu <- boot_rta_only$mu
+
+  # This runs bootstrap repetition of plugin
+  plugin_boot <- mlfitppml(dep="export",indep=8:23,fixed = list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), tol=1e-6,hdfetol=1e-2,cluster="clus2",method="plugin", colcheck_x=FALSE, mu=boot_mu, data=boot_data) # add option for orig.
+  output3 <- list(plugin_boot$beta, plugin_boot$beta_pre, plugin_boot$phi, t(colSums(boot_data[,rownames(plugin_boot$beta)]) !=0))
+}
+
+save_betas <- matrix(unlist(lapply(output2, `[[`, 1)), ncol=bootreps) 
+rownames(save_betas) <- rownames(output2[[1]][[1]])
+save_betas_pre <- matrix(unlist(lapply(output2, `[[`, 2)), ncol=bootreps) 
+rownames(save_betas_pre) <- rownames(output2[[1]][[2]])
+save_phis <- matrix(unlist(lapply(output2, `[[`, 3)), ncol=bootreps) 
+rownames(save_phis) <- rownames(output2[[1]][[3]])
+is_included <- matrix(unlist(lapply(output2, `[[`, 4)), ncol=bootreps) 
+is_included[is.na(is_included[,b]),b] <- FALSE
+rownames(is_included) <- rownames(output2[[1]][[4]])
+
+toc()
+
+which(rowSums(save_betas!=0)/bootreps>0.01)
+which(reg6$beta!=0)
+
 selected_vars <- NULL
+bs_i = 1
 for(bs_i in 1:3) {
   tryCatch({
-    bs_sample_ind <- sort(sample(1:dim(trade2)[1], bs_sample_size, replace=FALSE))
+    clu_inds <- unique(alt_id2)
+    which()
+    bs_sample_ind <- sort(sample(1:dim(trade2)[1], dim(trade2)[1], replace=TRUE))
     data_bs <- trade2[bs_sample_ind,]
     reg_bs <- mlfitppml(data = data_bs,
                   dep = "export",

@@ -118,11 +118,8 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       pen_beta_pre <- penreg$beta
       #x_select <- x[,as.numeric(penreg$beta)!=0]
       if(length(x_select)!=0){
-        print("post1")
         ppml_temp <- hdfeppml_int(y=y,x=x_select,fes=fes,tol=tol,hdfetol=hdfetol,mu=penreg$mu,
                               colcheck_x=colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post, cluster=cluster)
-        print("post2")
-        print(ppml_temp$coefficients)
 
         pen_beta[which(penreg$beta!=0),1]  <- ppml_temp$coefficients
         pen_bic   <- ppml_temp$bic

@@ -8,9 +8,16 @@ bootstrap(
   data,
   dep,
   indep = NULL,
+  cluster_id = NULL,
+  fixed = NULL,
   selectobs = NULL,
-  bs_sample_size = NULL,
-  bs_reps = 250,
+  bootreps = 250,
+  boot_threshold = 0.01,
+  colcheck_x = FALSE,
+  colcheck_x_fes = FALSE,
+  post = FALSE,
+  gamma_val = NULL,
+  verbose = FALSE,
   ...
 )
 }
@@ -21,6 +28,9 @@ bootstrap(
 
 \item{indep}{A vector with the names or column numbers of the regressors. If left unspecified,
 all remaining variables (excluding fixed effects) are included in the regressor matrix.}
+
+\item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
+or a list with the desired interactions between variables in \code{data}.}
 
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
@@ -42,11 +52,11 @@ selected variables and reports the coefficients from this regression.
 A matrix with coefficient estimates for all dependent variables.
 }
 \description{
-A function performs standard plugin lasso PPML estimation for B subsamples and reports
+This function performs standard plugin lasso PPML estimation for B subsamples and reports
 those regressors selected in at least a certain fraction of the bootstrap repetitions.
 }
 \details{
-This functions enables users to implement the "bootstrap" step in the two-step procedure described in
+This function enables users to implement the "bootstrap" step in the procedure described in
 Breinlich, Corradi, Rocha, Ruta, Santos Silva and Zylkin (2020). To do this, Plugin Lasso is run B times.
 The function can also perform a post-selection estimation.
 }

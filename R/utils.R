@@ -12,7 +12,7 @@
 #' @return A numeric vector containing the variables that pass the collinearity check.
 
 collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALSE, colcheck_x=FALSE) {
-  # Actually collinearity check does not make sense without x
+  # Collinearity check does not make sense without x. Stop if x not provided.
   if(missing(x)){
     stop("Please provide x.")
   }
@@ -47,7 +47,7 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
     }
   }
 
-  if(!missing(x)){
+  if(!missing(x)){ # x is not missing
 
     #Exclude x which have zero variance
     x_var <- var(x)
@@ -64,7 +64,7 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
       rm(res_sds, orig_sds)
       if(!is.null(names(which(frac_sds < 1e-5)))){
       message(
-      paste("The following variables have been dropped, because most of their variation is explained by the fixed effects: ", paste(names(which(frac_sds < 1e-2)), collapse=" ")))
+      paste("The following variables have been dropped, because most of their variation is explained by the fixed effects: ", paste(names(which(frac_sds < 1e-5)), collapse=" ")))
       }
     }
 
@@ -77,11 +77,11 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
   }
 
   if(colcheck_x_fes==TRUE & colcheck_x==TRUE ){
-    include_x <- union(union(include_x_first, which(!is.na(check$coefficients))), include_x_var)
+    include_x <- intersect(intersect(include_x_first, which(!is.na(check$coefficients))), include_x_var)
   } else  if (colcheck_x_fes==FALSE & colcheck_x == TRUE ){
-      include_x <- union(which(!is.na(check$coefficients)), include_x_var)
+      include_x <- intersect(which(!is.na(check$coefficients)), include_x_var)
   } else if(colcheck_x_fes==TRUE & colcheck_x == FALSE){
-        include_x <- union(include_x_first, include_x_var)
+        include_x <- intersect(include_x_first, include_x_var)
   }
  }
 
@@ -305,9 +305,6 @@ genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NUL
   } else {
     stop("Unsupported format for independent variables: x must be a character or numeric vector.")
   }
-
-  print("dim x")
-  print(dim(x))
 
   if (is.null(cluster)) {
     return(list(y = y, x = x, fes = fes))
