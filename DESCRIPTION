@@ -36,6 +36,7 @@ LinkingTo:
     RcppEigen
 Imports: 
     Rcpp,
+    data.table,
     glmnet,
     fixest,
     collapse, 

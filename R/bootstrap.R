@@ -1,6 +1,7 @@
 #' Bootstrap Lasso Implementation (in development)
 #'
-#' This function performs standard plugin lasso PPML estimation for B subsamples and reports
+#' This function performs standard plugin lasso PPML estimation for \code{bootreps} samples drawn again with
+#' replacement and reports
 #' those regressors selected in at least a certain fraction of the bootstrap repetitions.
 #'
 #' This function enables users to implement the "bootstrap" step in the procedure described in
@@ -11,6 +12,8 @@
 #' @param dep A string with the names of the independent variables or their column numbers.
 #' @param indep A vector with the names or column numbers of the regressors. If left unspecified,
 #'              all remaining variables (excluding fixed effects) are included in the regressor matrix.
+#' @param cluster_id A string denoting the cluster-id with which to perform
+#'  cluster bootstrap.
 #' @param selectobs Optional. A vector indicating which observations to use (either a logical vector
 #'     or a numeric vector with row numbers, as usual when subsetting in R).
 #'@inheritParams mlfitppml
@@ -23,7 +26,6 @@
 #' \item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
 #' \item \code{maxiter_hdfe}: Maximum number of iterations in hdfeppml used to get first guess of mu.
 #' \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
-#' \item \code{lambda}: Penalty parameter (a number).
 #' \item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 #'     selected variables and reports the coefficients from this regression.
 #' }
@@ -32,10 +34,14 @@
 #' @export
 #'
 #' @examples
-#' \donttest{iceberg_results <- iceberg(data = trade[, -(1:6)],
-#'                                     dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
-#'                                             "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
-#'                                     selectobs = (trade$time == "2016"))}
+#' \donttest{bs1 <- bootstrap(data=trade3, dep="export",
+#'                  cluster_id="clus",
+#'                  fixed=list(c("exp", "time"),
+#'                  c("imp", "time"), c("exp", "imp")),
+#'                  indep=7:22, bootreps=10, colcheck_x = TRUE,
+#'                  colcheck_x_fes = TRUE,
+#'                  boot_threshold = 0.01,
+#'                  post=TRUE, gamma_val=0.01, verbose=FALSE)}
 #'
 #' @inheritSection hdfeppml_int References
 
@@ -50,7 +56,7 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
 
   # Now we create the result matrices:
   bootstrap_results <- list()
-  uniq_clus <- levels(factor(clus)) # Unique clusters, as characters
+  uniq_clus <- levels(factor(data[,cluster_id])) # Unique clusters, as characters
   save_betas     <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
   save_betas_pre <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
   save_phis      <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
@@ -65,12 +71,19 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
   for (b in 1:bootreps) {
     draw  <- draws[,b] # Take one draw
     draw  <- data.table(draw)[,.N,by=draw] # Object containing cluster number and times it drawn
-    colnames(draw)[1] <- "clus" # First column contains cluster IDs
-    boot_data  <- merge(cbind(clus, data), draw, "clus", all.x=FALSE, all.y=TRUE) # Merge (cluster, data) and draw, keep only those drawn, i.e. those that appear in draw
+    draw <- data.frame(draw)
+    colnames(draw)[1] <- "cluster"
+    draw3 <- data.frame(draw) %>% dplyr::group_by(cluster) %>% dplyr::add_count()
+    print("yo")
+    print(head(as.matrix(draw3)))
+    print(head(as.matrix(draw)))
+    print(colnames(draw))
+    print(cluster_id)
+    colnames(draw)[1] <- cluster_id # First column contains cluster IDs
+    boot_data  <- merge(data, draw, cluster_id, all.x=FALSE, all.y=TRUE) # Merge (cluster, data) and draw, keep only those drawn, i.e. those that appear in draw
     boot_index <-  rep(row.names(boot_data), boot_data$N) # Repeat row name the times indicated in draw
     boot_data  <- boot_data[boot_index, ] # Get the row names indicated like this
     boot_data$rep <- (as.numeric(rownames(boot_data)) %% 1)*10+1 # This creates an ID for
-
     boot_rep  <- factor(boot_data$rep)
 
     #boot_ID = boot_data$id
@@ -92,7 +105,7 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
                               tol=tol,hdfetol=hdfetol,cluster="clus2", colcheck_x=colcheck_x,
                               colcheck_x_fes=colcheck_x_fes, data=boot_data, verbose=verbose, maxiter=maxiter_hdfe)
     boot_mu <- boot_rta_only$mu
-
+print("lo")
     # This runs bootstrap repetition of plugin
     plugin_boot <- mlfitppml(dep=dep,indep=indep_names,fixed = fixed, tol=tol, hdfetol=hdfetol,
                              cluster="clus2",method="plugin", colcheck_x=colcheck_x,

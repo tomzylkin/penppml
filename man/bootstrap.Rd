@@ -18,6 +18,10 @@ bootstrap(
   post = FALSE,
   gamma_val = NULL,
   verbose = FALSE,
+  tol = 1e-06,
+  hdfetol = 0.01,
+  maxiter_hdfe = 1000,
+  penweights = NULL,
   ...
 )
 }
@@ -29,6 +33,9 @@ bootstrap(
 \item{indep}{A vector with the names or column numbers of the regressors. If left unspecified,
 all remaining variables (excluding fixed effects) are included in the regressor matrix.}
 
+\item{cluster_id}{A string denoting the cluster-id with which to perform
+cluster bootstrap.}
+
 \item{fixed}{A vector with the names or column numbers of factor variables identifying the fixed effects,
 or a list with the desired interactions between variables in \code{data}.}
 
@@ -38,13 +45,13 @@ or a numeric vector with row numbers, as usual when subsetting in R).}
 \item{...}{Further arguments, including:
 \itemize{
 \item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
-\item \code{glmnettol}: Tolerance parameter to be passed on to \code{glmnet::glmnet}.
+\item \code{hdfetol}: Tolerance parameter for the within-transformation step, passed on to \code{collapse::fhdwithin}.
 \item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
-\item \code{colcheck}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
-\item \code{K}: Maximum number of iterations.
+\item \code{colcheck_x}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
+\item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
+\item \code{maxiter_hdfe}: Maximum number of iterations in hdfeppml used to get first guess of mu.
 \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
-\item \code{lambda}: Penalty parameter (a number).
-\item \code{phipost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+\item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 selected variables and reports the coefficients from this regression.
 }}
 }
@@ -52,7 +59,8 @@ selected variables and reports the coefficients from this regression.
 A matrix with coefficient estimates for all dependent variables.
 }
 \description{
-This function performs standard plugin lasso PPML estimation for B subsamples and reports
+This function performs standard plugin lasso PPML estimation for \code{bootreps} samples drawn again with
+replacement and reports
 those regressors selected in at least a certain fraction of the bootstrap repetitions.
 }
 \details{
@@ -80,9 +88,13 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
-\donttest{iceberg_results <- iceberg(data = trade[, -(1:6)],
-                                    dep = c("ad_prov_14", "cp_prov_23", "tbt_prov_07",
-                                            "tbt_prov_33", "tf_prov_41", "tf_prov_45"),
-                                    selectobs = (trade$time == "2016"))}
+\donttest{bs1 <- bootstrap(data=trade3, dep="export",
+                 cluster_id="clus",
+                 fixed=list(c("exp", "time"),
+                 c("imp", "time"), c("exp", "imp")),
+                 indep=7:22, bootreps=10, colcheck_x = TRUE,
+                 colcheck_x_fes = TRUE,
+                 boot_threshold = 0.01,
+                 post=TRUE, gamma_val=0.01, verbose=FALSE)}
 
 }
