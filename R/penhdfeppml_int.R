@@ -104,17 +104,33 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
     }
 
     # collinearity check
-    if (colcheck_x == TRUE | colcheck_x_fes == TRUE) {
-      include_x <- collinearity_check(y, x, fes, 1e-6, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes)
-      x <- x[, include_x]
-      if (!is.null(penweights)) {
-        penweights = penweights[include_x]
-      }
-      colcheck_x_post <- FALSE
-      colcheck_x_fes_post <- FALSE
-    } else {
-      colcheck_x_post <- TRUE
-      colcheck_x_fes_post <- TRUE
+    if (colcheck_x==TRUE & colcheck_x_fes==TRUE){
+      include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+      x <- x[,include_x]
+      colnames(x) <- xnames[include_x]
+      xnames <- xnames[include_x]
+      colcheck_x_post = FALSE
+      colcheck_x_fes_post = FALSE
+    }
+    if (colcheck_x==FALSE & colcheck_x_fes==FALSE){
+      colcheck_x_post = TRUE
+      colcheck_x_fes_post = TRUE
+    }
+    if (colcheck_x==TRUE & colcheck_x_fes==FALSE){
+      include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+      x <- x[,include_x]
+      colnames(x) <- xnames[include_x]
+      xnames <- xnames[include_x]
+      colcheck_x_post = TRUE
+      colcheck_x_fes_post = FALSE
+    }
+    if (colcheck_x==FALSE & colcheck_x_fes==TRUE){
+      include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+      x <- x[,include_x]
+      colnames(x) <- xnames[include_x]
+      xnames <- xnames[include_x]
+      colcheck_x_post = FALSE
+      colcheck_x_fes_post = TRUE
     }
 
     # number of obs (needed for deviance)
@@ -259,18 +275,18 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
           warning(penalty, " penalty is not supported. Lasso is used by default.")
         }
         if (debug) {
-          penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
                                 thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"))
           print((penreg$beta))
           print(penweights)
         }
         if (debug) {
-          penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+          penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
                                 thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"))
           print((penreg$beta))
           print(penweights)
         }
-        penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
+        penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda,
                               thresh = glmnettol, penalty.factor = penweights, standardize = standardize, family=gaussian(link = "identity"))
         if (debug) {
           print((penreg$beta))

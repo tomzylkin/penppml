@@ -77,17 +77,36 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
   n      <- length(y)
 
   # collinearity check: if option selected drop x's that are perfectly collinear beforehand
-  if (colcheck_x==TRUE | colcheck_x_fes==TRUE){
+  if (colcheck_x==TRUE & colcheck_x_fes==TRUE){
     include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
     x <- x[,include_x]
     colnames(x) <- xnames[include_x]
     xnames <- xnames[include_x]
     colcheck_x_post = FALSE
     colcheck_x_fes_post = FALSE
-  } else {
+  }
+  if (colcheck_x==FALSE & colcheck_x_fes==FALSE){
     colcheck_x_post = TRUE
     colcheck_x_fes_post = TRUE
   }
+  if (colcheck_x==TRUE & colcheck_x_fes==FALSE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+    x <- x[,include_x]
+    colnames(x) <- xnames[include_x]
+    xnames <- xnames[include_x]
+    colcheck_x_post = TRUE
+    colcheck_x_fes_post = FALSE
+  }
+  if (colcheck_x==FALSE & colcheck_x_fes==TRUE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+    x <- x[,include_x]
+    colnames(x) <- xnames[include_x]
+    xnames <- xnames[include_x]
+    colcheck_x_post = FALSE
+    colcheck_x_fes_post = TRUE
+  }
+
+
   # "xval" = "cross-validation". If this option is selected, set up vectors to store cross-validation results
   if (xval==TRUE) {
     xval_rmse  <- matrix(nrow = 1, ncol = length(lambdas))

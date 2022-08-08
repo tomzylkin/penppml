@@ -71,13 +71,32 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   rownames(b) <- colnames(x)
   include_x <- 1:ncol(x)
 
-  if (colcheck_x == TRUE | colcheck_x_fes == TRUE) {
-    include_x <- collinearity_check(y, x, fes, 1e-6, colcheck_x=colcheck_x, colcheck_x_fes = colcheck_x_fes)
-    x <- x[, include_x]
+  if (colcheck_x==TRUE & colcheck_x_fes==TRUE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+    x <- x[,include_x]
+    colnames(x) <- xnames[include_x]
+    xnames <- xnames[include_x]
     colcheck_x_post = FALSE
     colcheck_x_fes_post = FALSE
-  } else {
+  }
+  if (colcheck_x==FALSE & colcheck_x_fes==FALSE){
     colcheck_x_post = TRUE
+    colcheck_x_fes_post = TRUE
+  }
+  if (colcheck_x==TRUE & colcheck_x_fes==FALSE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+    x <- x[,include_x]
+    colnames(x) <- xnames[include_x]
+    xnames <- xnames[include_x]
+    colcheck_x_post = TRUE
+    colcheck_x_fes_post = FALSE
+  }
+  if (colcheck_x==FALSE & colcheck_x_fes==TRUE){
+    include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
+    x <- x[,include_x]
+    colnames(x) <- xnames[include_x]
+    xnames <- xnames[include_x]
+    colcheck_x_post = FALSE
     colcheck_x_fes_post = TRUE
   }
 
@@ -162,7 +181,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       if (penalty != "lasso" & iter == 1) {
         warning(penalty, " penalty is not supported. Lasso is used by default.")
       }
-      penreg <- glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
+      penreg <- glmnet::glmnet(x = x_resid, y = z_resid, weights = mu / sum(mu), lambda = lambda_glmnet,
                                thresh = glmnettol, penalty.factor = phi, standardize = FALSE, family=gaussian(link = "identity"), warm.g=NULL)
 #    }
 

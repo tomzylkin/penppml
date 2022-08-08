@@ -57,10 +57,10 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
   # Now we create the result matrices:
   bootstrap_results <- list()
   uniq_clus <- levels(factor(data[,cluster_id])) # Unique clusters, as characters
-  save_betas     <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
-  save_betas_pre <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
-  save_phis      <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
-  is_included    <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(trade3[indep]),1:bootreps))
+  save_betas     <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(data[indep]),1:bootreps))
+  save_betas_pre <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(data[indep]),1:bootreps))
+  save_phis      <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(data[indep]),1:bootreps))
+  is_included    <- matrix(nrow = length(indep), ncol = bootreps, dimnames = list(colnames(data[indep]),1:bootreps))
   draws     <- matrix(nrow = length(uniq_clus), ncol = bootreps)
 
   for (b in 1:bootreps) { # draw matrix has resampled cluster IDs in it
@@ -69,16 +69,12 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
 
   # Run bootstrap repetitions
   for (b in 1:bootreps) {
+    tryCatch({
     draw  <- draws[,b] # Take one draw
-    draw  <- data.table(draw)[,.N,by=draw] # Object containing cluster number and times it drawn
-    draw <- data.frame(draw)
-    colnames(draw)[1] <- "cluster"
-    draw3 <- data.frame(draw) %>% dplyr::group_by(cluster) %>% dplyr::add_count()
-    print("yo")
-    print(head(as.matrix(draw3)))
-    print(head(as.matrix(draw)))
-    print(colnames(draw))
-    print(cluster_id)
+    draw <- data.frame(cbind(draw,1))
+    colnames(draw) <- c("cluster","one")
+    draw <- data.frame(draw) %>% dplyr::group_by(cluster) %>% dplyr::mutate(N=cumsum(one))
+    draw <- draw[,-2]
     colnames(draw)[1] <- cluster_id # First column contains cluster IDs
     boot_data  <- merge(data, draw, cluster_id, all.x=FALSE, all.y=TRUE) # Merge (cluster, data) and draw, keep only those drawn, i.e. those that appear in draw
     boot_index <-  rep(row.names(boot_data), boot_data$N) # Repeat row name the times indicated in draw
@@ -105,7 +101,7 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
                               tol=tol,hdfetol=hdfetol,cluster="clus2", colcheck_x=colcheck_x,
                               colcheck_x_fes=colcheck_x_fes, data=boot_data, verbose=verbose, maxiter=maxiter_hdfe)
     boot_mu <- boot_rta_only$mu
-print("lo")
+
     # This runs bootstrap repetition of plugin
     plugin_boot <- mlfitppml(dep=dep,indep=indep_names,fixed = fixed, tol=tol, hdfetol=hdfetol,
                              cluster="clus2",method="plugin", colcheck_x=colcheck_x,
@@ -116,9 +112,10 @@ print("lo")
     save_phis[rownames(plugin_boot$beta),b]      <- plugin_boot$phi
     is_included[rownames(plugin_boot$beta),b]    <- t(colSums(boot_data[,rownames(plugin_boot$beta)]) !=0)
     is_included[is.na(is_included[,b]),b] <- FALSE
+    }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
 
-  selected_vars <- names(which(rowSums(save_betas!=0)/bootreps>boot_threshold))
+  selected_vars <- names(which(rowSums(save_betas!=0, na.rm=T)/bootreps>boot_threshold))
 
   if(post==TRUE){
   if(length(selected_vars)>0){

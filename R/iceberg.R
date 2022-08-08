@@ -44,14 +44,15 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
   # First we do the data handling with genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep, selectobs = selectobs)
 
+  y_mat <- as.matrix(model$y)
+  if(class(dep)=="numeric"){colnames(y_mat) <- colnames(data)[dep]} else {colnames(y_mat) <- dep}
   # Now we create the result matrix:
-  iceberg_results <- matrix(NA, nrow = ncol(model$x), ncol = ncol(model$y))
+  iceberg_results <- matrix(NA, nrow = ncol(model$x), ncol = ncol(y_mat))
   rownames(iceberg_results) <- colnames(model$x)
-  colnames(iceberg_results) <- colnames(model$y)
-
+  colnames(iceberg_results) <- colnames(y_mat)
   # Finally, we call plugin_lasso_int
-  for (v in 1:ncol(model$y)) {
-    temp <- plugin_lasso_int(y = model$y[, v], x = model$x, K = 15)
+  for (v in 1:ncol(y_mat)) {
+    temp <- plugin_lasso_int(y = y_mat[, v], x = model$x, K = 15)
     iceberg_results[, v] <- temp$beta
   }
   return(iceberg_results)

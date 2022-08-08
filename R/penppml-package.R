@@ -36,3 +36,8 @@ NULL
 #' @importFrom Rcpp sourceCpp
 ## usethis namespace: end
 NULL
+
+## usethis namespace: start
+#' @importFrom glmnet glmnet
+## usethis namespace: end
+NULL
