@@ -63,7 +63,7 @@ We will show the capabilities of this package using the filtered `trade2` data f
 
 The package enables users to run unpenalized PPML regressions with HDFE, using the `hdfeppml` function as follows:
 
-```{r try hdfeppml}
+```{r try hdfeppml, eval=FALSE}
 reg1 <- hdfeppml(data = trade2,
                  dep = "export",
                  fixed = list(c("exp", "time"), 
@@ -105,7 +105,7 @@ knitr::kable(list(results[1:8, ], results[9:16, ]),
 
 If we want to specify the independent variable, we can specify indep as pointing to columns 5 to 7 with the following code. 
 
-```{r try hdfeppml}
+```{r try hdfeppml2, eval=FALSE}
 reg1_indep <- hdfeppml(data = trade2, indep=5:7,
                  dep = "export",
                  fixed = list(c("exp", "time"), 
@@ -154,7 +154,7 @@ ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficie
 
 The user can also get a penalized PPML regression without high-dimensional fixed effects. To do so, simply set the option fixed to NULL.
 
-```{r try mlfitpenppml lasso, results = FALSE}
+```{r try mlfitpenppml lasso nofe, results = FALSE}
 lambdas <- c(0.025, 0.01, 0.0075, 0.005, 0.0025, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 0)
 
 reg2_nofe <- mlfitppml(data = trade2,
@@ -237,7 +237,7 @@ Now the function also returns a `rmse` element that includes the cross-validatio
 reg5$rmse
 ```
 
-```{r try cross validation, eval = FALSE}
+```{r try cross validation nofe, eval = FALSE}
 reg5_nofe <- mlfitppml(data = trade2,
                   dep = "export",
                   fixed = NULL,
@@ -299,7 +299,7 @@ We can see that the plugin lasso is very strict: only three provisions have non-
 
 We can also set the gamma value as defined in Belloni et al. to something less strict, e.g. 0.3. 
 
-```{r try plugin lasso, results = FALSE}
+```{r try plugin lasso gamma, results = FALSE}
 reg6_gamma <- mlfitppml(data = trade2,
                   dep = "export",
                   fixed = list(c("exp", "time"), 
@@ -382,7 +382,7 @@ trade3$clus <- alt_id2 #Add the ID to the data
 
 Next, we run Bootstrap Lasso, which means drawing agreement clusters with replacement using the ID just created. In the bootstrap() command, first hdfeppml() is run, using a dummy which is one when any provision was in place and zero otherwise to get initial values of mu. These are then used in plugin Lasso. This is repeated B times (as specified in bootreps) and the command selects those provisions selected by plugin in at least a fraction of cases. This fraction can be specified by the option boot_threshold (Default is 1 pc).
 
-```{r try plugin lasso, results = FALSE}
+```{r try bootstrap lasso, results = FALSE}
 set.seed(123)
 bs1 <- bootstrap(data=trade3, dep="export", cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
 ```
