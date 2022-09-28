@@ -76,6 +76,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                             penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,
                             init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
                             method = "placeholder", cluster = NULL, debug = FALSE, gamma_val=NULL) {
+  xnames <- colnames(x)
   old_x <- x
   old_y <- y
   old_fes <- fes
@@ -94,9 +95,9 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
     rownames(b) <- colnames(x)
     include_x <- 1:ncol(x)
 
-    if (is.null(penweights)) {
-      penweights <- rep(1, length(include_x))   #note this is the default used by glmnet. Using "NULL" actually gives you incorrect weights.
-    }
+   # if (is.null(penweights)) {
+   #    penweights <- rep(1, length(include_x))   #note this is the default used by glmnet. Using "NULL" actually gives you incorrect weights.
+   #  } #N: moved this below colchecks, because include_x gets updated
 
     if (length(penweights) > length(include_x)){
       print("penweights needs to be same length as number of x variables")
@@ -124,13 +125,18 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       colcheck_x_post = TRUE
       colcheck_x_fes_post = FALSE
     }
-    if (colcheck_x==FALSE & colcheck_x_fes==TRUE){
+    if (colcheck_x==FALSE & colcheck_x_fes == TRUE){
       include_x <- collinearity_check(y,x,fes,1e-6, colcheck_x=colcheck_x, colcheck_x_fes=colcheck_x_fes)
       x <- x[,include_x]
       colnames(x) <- xnames[include_x]
+      print(xnames)
       xnames <- xnames[include_x]
       colcheck_x_post = FALSE
       colcheck_x_fes_post = TRUE
+    }
+
+    if (is.null(penweights)) {
+      penweights <- rep(1, length(include_x))   #note this is the default used by glmnet. Using "NULL" actually gives you incorrect weights.
     }
 
     # number of obs (needed for deviance)
@@ -152,7 +158,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
           mu <- only_fes$mu
           #      mu <- mu[mu>0]
-          #  print(length(mu))
+          print(length(mu))
         }
         z   <- (y - mu)/mu + log(mu)
         #     z <- z[mu>0]
@@ -243,13 +249,16 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
       # print(dim(x_resid))
 
       if (is.null(penweights)) {
+        print("null penweights")
         #penreg <- glmnet(x = x_resid, y = z_resid, weights = mu/sum(mu), lambda = lambda, thresh = glmnettol, standardize = standardize, family=gaussian(link = "identity"), warm.g=NULL)
       }
       else{
         if(debug) {
+          print("sum penweights")
           print(sum(penweights))
         }
         if(debug) {
+          print("penweights")
           print(penweights)
         }
         penweights = penweights * length(include_x) / sum(penweights)

@@ -28,7 +28,7 @@ To install and load `penppml`, you can use the following commands:
 install.packages(penppml)
 library(penppml)
 ```
-```{r setup 2}
+```{r setup 2, echo=FALSE}
 #library(data.table)
  library(devtools)
 # library(glmnet)
@@ -63,7 +63,7 @@ We will show the capabilities of this package using the filtered `trade2` data f
 
 The package enables users to run unpenalized PPML regressions with HDFE, using the `hdfeppml` function as follows:
 
-```{r try hdfeppml, eval=FALSE}
+```{r try hdfeppml, eval=TRUE}
 reg1 <- hdfeppml(data = trade2,
                  dep = "export",
                  fixed = list(c("exp", "time"), 
@@ -311,6 +311,21 @@ reg6_gamma <- mlfitppml(data = trade2,
 rownames(reg6$beta)[which(reg6_gamma$beta != 0)]
 ```
 
+```{r plugin results gamma, results = FALSE}
+results_gamma <- data.frame(prov = rownames(reg6_gamma$beta), b_pre = reg6_gamma$beta_pre, b = reg6_gamma$beta, se = 0)
+results_gamma$se[!is.na(reg6_gamma$beta)] <- reg6_gamma$ses
+results_gamma
+```
+
+```{r display plugin results gamma, echo = FALSE}
+knitr::kable(list(results_gamma[1:7,], results_gamma[8:14,]), 
+             format = "pipe",
+             col.names = c("Provision", "Lasso Coefficient", "Post-Lasso Coefficient", "SE"), 
+             caption = "Table 6: Plugin Lasso results, different gamma value",
+             row.names = FALSE,
+             digits = 4)
+```
+
 When doing this, we see that more provisions than before are selected.
 
 ### Iceberg lasso (in development)
@@ -333,7 +348,7 @@ iceberg_results
 ```{r display iceberg results, echo = FALSE}
 knitr::kable(iceberg_results, 
              format = "pipe",
-             caption = "Table 6: Iceberg Lasso coefficients",
+             caption = "Table 7: Iceberg Lasso coefficients",
              row.names = TRUE,
              digits = 4)
 ```
@@ -363,7 +378,7 @@ trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, 
 
 We want to cluster by agreement, that means that we draw observations with the same agreement ID. For this, we need to create a new agreement ID in the following way:
 
-```{r}
+```{r, message=FALSE, warning=FALSE, results=FALSE}
 # Let's cluster by agreement
 trade3$alt_id <- trade3$id # ID refers to agreement ID
 trade3$alt_id[is.na(trade3$alt_id)] <- 0 # We set this to zero when the ID is missing, interpreting this as the country pair not being part of any agreement.
@@ -382,9 +397,17 @@ trade3$clus <- alt_id2 #Add the ID to the data
 
 Next, we run Bootstrap Lasso, which means drawing agreement clusters with replacement using the ID just created. In the bootstrap() command, first hdfeppml() is run, using a dummy which is one when any provision was in place and zero otherwise to get initial values of mu. These are then used in plugin Lasso. This is repeated B times (as specified in bootreps) and the command selects those provisions selected by plugin in at least a fraction of cases. This fraction can be specified by the option boot_threshold (Default is 1 pc).
 
-```{r try bootstrap lasso, results = FALSE}
+```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE}
 set.seed(123)
 bs1 <- bootstrap(data=trade3, dep="export", cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
+```
+
+```{r bss table, echo = FALSE}
+knitr::kable(bs1$betas, 
+             format = "pipe",
+             caption = "Table 8: Coefficients of bootstrap repetitions",
+             row.names = TRUE,
+             digits = 2)
 ```
 
 
