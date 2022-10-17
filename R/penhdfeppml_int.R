@@ -74,6 +74,7 @@
 #' @importFrom stats gaussian
 #' @importFrom stats var
 #' @importFrom utils head
+#' @importFrom devtools load_all
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                             penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,

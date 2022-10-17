@@ -28,8 +28,12 @@ To install and load `penppml`, you can use the following commands:
 install.packages("penppml")
 ```
 
-```{r}
+```{r, eval=FALSE}
 library(penppml)
+```
+
+```{r, hide=TRUE, eval=TRUE}
+devtools::load_all()
 ```
 
 
@@ -372,7 +376,7 @@ To illustrate this, we select the trade data, but now not dropping id and agreem
 
 We want to cluster by agreement, that means that we draw observations with the same agreement ID. For this, we need to create a new agreement ID in the following way:
 
-```{r, message=FALSE, warning=FALSE, results=FALSE, eval=FALSE}
+```{r, message=FALSE, warning=FALSE, results=FALSE, eval=TRUE}
 trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, we need id and agreement variable
 # Let's cluster by agreement
 trade3$alt_id <- trade3$id # ID refers to agreement ID
