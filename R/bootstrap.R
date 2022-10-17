@@ -16,7 +16,16 @@
 #'  cluster bootstrap.
 #' @param selectobs Optional. A vector indicating which observations to use (either a logical vector
 #'     or a numeric vector with row numbers, as usual when subsetting in R).
+#' @param bootreps Number of bootstrap repetitions.
+#' @param boot_threshold Minimal threshold. If a variable is selected in at least this
+#' fraction of times, it is reported at the end of the iterations.
+#' @param colcheck_x Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+#' collinear variables.
+#' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+#' by the fixed effects drops those that are perfectly explained.
 #'@inheritParams mlfitppml
+#'@inheritParams penhdfeppml_int
+#'@inheritParams hdfeppml_int
 #' @param ... Further arguments, including:
 #' \itemize{
 #' \item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
@@ -24,7 +33,7 @@
 #' \item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
 #' \item \code{colcheck_x}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 #' \item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
-#' \item \code{maxiter_hdfe}: Maximum number of iterations in hdfeppml used to get first guess of mu.
+#' \item \code{maxiter}: Maximum number of iterations in hdfeppml used to get first guess of mu.
 #' \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
 #' \item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 #'     selected variables and reports the coefficients from this regression.
@@ -34,7 +43,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{bs1 <- bootstrap(data=trade3, dep="export",
+#' \dontrun{bs1 <- bootstrap(data=trade3, dep="export",
 #'                  cluster_id="clus",
 #'                  fixed=list(c("exp", "time"),
 #'                  c("imp", "time"), c("exp", "imp")),
@@ -47,8 +56,8 @@
 
 bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, selectobs = NULL, bootreps=250, boot_threshold = 0.01, colcheck_x=FALSE,
                       colcheck_x_fes=FALSE, post=FALSE, gamma_val = NULL,
-                      verbose=FALSE, tol=1e-6, hdfetol=1e-2, maxiter_hdfe=1000,
-                      penweights=NULL, ...){
+                      verbose=FALSE, tol=1e-6, hdfetol=1e-2, penweights=NULL, maxiter=1000, ...){
+  cluster <- one <- NULL
   # First we do the data handling with genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep, selectobs = selectobs)
 
@@ -99,14 +108,17 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
     boot_data$rta <- boot_rta
     boot_rta_only <- hdfeppml(dep=dep, indep="rta", fixed = fixed,
                               tol=tol,hdfetol=hdfetol,cluster="clus2", colcheck_x=colcheck_x,
-                              colcheck_x_fes=colcheck_x_fes, data=boot_data, verbose=verbose, maxiter=maxiter_hdfe)
+                              colcheck_x_fes=colcheck_x_fes, data=boot_data, verbose=verbose, maxiter=maxiter)
     boot_mu <- boot_rta_only$mu
 
     # This runs bootstrap repetition of plugin
+    sink(file="NULL")
     plugin_boot <- mlfitppml(dep=dep,indep=indep_names,fixed = fixed, tol=tol, hdfetol=hdfetol,
-                             cluster="clus2",method="plugin", colcheck_x=colcheck_x,
-                             colcheck_x_fes=colcheck_x_fes, mu=boot_mu, data=boot_data,
-                             gamma_val = gamma_val, verbose=verbose, penweights=penweights) # add option for orig.
+                                            cluster="clus2",method="plugin", colcheck_x=colcheck_x,
+                                            colcheck_x_fes=colcheck_x_fes, mu=boot_mu, data=boot_data,
+                                            gamma_val = gamma_val, verbose=verbose, penweights=penweights)
+    sink()
+    # add option for orig.
     save_betas[rownames(plugin_boot$beta),b]     <- plugin_boot$beta
     save_betas_pre[rownames(plugin_boot$beta),b] <- plugin_boot$beta_pre
     save_phis[rownames(plugin_boot$beta),b]      <- plugin_boot$phi

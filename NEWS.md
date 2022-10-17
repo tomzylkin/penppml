@@ -1,3 +1,9 @@
+# penppml 0.2.0.900
+
+* bootstrap function added
+* gamma_val option added for plugin Lasso
+* Two possible collinearity checks introduced
+
 # penppml 0.1.1.900
 
 * When standardize option = TRUE and selected penalty is ridge, there was a mistake in last

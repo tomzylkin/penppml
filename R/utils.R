@@ -8,7 +8,10 @@
 #' @param x Regressor matrix.
 #' @param fes List of fixed effects.
 #' @param hdfetol Tolerance for the centering, passed on to \code{lfe::demeanlist}.
-#'
+#' @param colcheck_x Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+#' collinear variables.
+#' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+#' by the fixed effects drops those that are perfectly explained.
 #' @return A numeric vector containing the variables that pass the collinearity check.
 
 collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALSE, colcheck_x=FALSE) {
@@ -24,9 +27,6 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
   reg_x  <- x
   }
   mu  <- (y + mean(y)) / 2
-  # print("Dimensions")
-  # print(length(mu))
-  # print(dim(reg_x))
 
   if(!missing(fes)){
     if(is.null(fes)){

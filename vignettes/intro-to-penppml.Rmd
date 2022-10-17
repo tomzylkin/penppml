@@ -25,15 +25,13 @@ knitr::opts_chunk$set(
 To install and load `penppml`, you can use the following commands:
 
 ```{r setup 1, eval = FALSE}
-install.packages(penppml)
+install.packages("penppml")
+```
+
+```{r}
 library(penppml)
 ```
-```{r setup 2, echo=FALSE}
-#library(data.table)
- library(devtools)
-# library(glmnet)
-load_all()
-```
+
 
 # Data Sets
 
@@ -51,7 +49,7 @@ knitr::kable(head(countries, 10), format = "pipe", caption = "Table 2: Country D
 
 This enables users to easily filter by region or subregion. For instance, if we want to restrict our analysis to countries in the Americas, we can do the following:
 
-```{r filter trade data}
+```{r filter trade data, eval=TRUE}
 selected <- countries$iso[countries$region %in% c("Americas")]
 trade2 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), -(5:6)] # We remove columns 5 and 
 # 6 because these variables are not needed in our regressions.
@@ -372,13 +370,10 @@ knitr::kable(provcorr,
 
 To illustrate this, we select the trade data, but now not dropping id and agreement variable.
 
-```{r filter for bootstrap}
-trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, we need id and agreement variable
-```
-
 We want to cluster by agreement, that means that we draw observations with the same agreement ID. For this, we need to create a new agreement ID in the following way:
 
-```{r, message=FALSE, warning=FALSE, results=FALSE}
+```{r, message=FALSE, warning=FALSE, results=FALSE, eval=FALSE}
+trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, we need id and agreement variable
 # Let's cluster by agreement
 trade3$alt_id <- trade3$id # ID refers to agreement ID
 trade3$alt_id[is.na(trade3$alt_id)] <- 0 # We set this to zero when the ID is missing, interpreting this as the country pair not being part of any agreement.
@@ -397,12 +392,12 @@ trade3$clus <- alt_id2 #Add the ID to the data
 
 Next, we run Bootstrap Lasso, which means drawing agreement clusters with replacement using the ID just created. In the bootstrap() command, first hdfeppml() is run, using a dummy which is one when any provision was in place and zero otherwise to get initial values of mu. These are then used in plugin Lasso. This is repeated B times (as specified in bootreps) and the command selects those provisions selected by plugin in at least a fraction of cases. This fraction can be specified by the option boot_threshold (Default is 1 pc).
 
-```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE}
+```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE, eval=TRUE}
 set.seed(123)
 bs1 <- bootstrap(data=trade3, dep="export", cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
 ```
 
-```{r bss table, echo = FALSE}
+```{r bss table, echo = FALSE, eval=TRUE}
 knitr::kable(bs1$betas, 
              format = "pipe",
              caption = "Table 8: Coefficients of bootstrap repetitions",

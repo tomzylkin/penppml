@@ -71,6 +71,9 @@
 #' \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
 #'
 #' @inheritSection hdfeppml_int References
+#' @importFrom stats gaussian
+#' @importFrom stats var
+#' @importFrom utils head
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                             penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,
@@ -145,7 +148,6 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
     old_deviance <-0
     iter <-0
     while (crit > tol) {
-      #print(iter)
       iter <- iter + 1
 
       if(iter > 50){message("Lasso exceeded 50 iterations. Break loop and return last model."); break}
@@ -157,7 +159,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                                    init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE)
           mu <- only_fes$mu
           #      mu <- mu[mu>0]
-          print(length(mu))
+          # print(length(mu))
         }
         z   <- (y - mu)/mu + log(mu)
         #     z <- z[mu>0]
@@ -218,22 +220,22 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
         }
       }
 
-      if(sd(z_resid)==Inf){
-        print("z_resid")
-        print(head(z_resid))
-        print(sum(is.na(z_resid)))
-        print(mean(z_resid))
-        print(sd(z_resid))
-      }
-      if(length(reg_z)!=length(z_resid)){
-        mu_t <- mu
-        reg_z_t <- reg_z
-        temp1 <- (collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol))
-        temp2 <- (lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol))
-        print("check")
-        print(all.equal(temp1,temp2))
-        print(sum(is.na(temp2)))
-      }
+      # if(sd(z_resid)==Inf){
+      #   print("z_resid")
+      #   print(head(z_resid))
+      #   print(sum(is.na(z_resid)))
+      #   print(mean(z_resid))
+      #   print(sd(z_resid))
+      # }
+      # if(length(reg_z)!=length(z_resid)){
+      #   mu_t <- mu
+      #   reg_z_t <- reg_z
+      #   temp1 <- (collapse::fhdwithin(reg_z, fes, w = mu, eps = hdfetol))
+      #   temp2 <- (lfe::demeanlist(reg_z, fes, weights = sqrt(mu), eps = hdfetol))
+      #   print("check")
+      #   print(all.equal(temp1,temp2))
+      #   print(sum(is.na(temp2)))
+      # }
 
       #       print(length(z))
       #       print(length(reg_z))

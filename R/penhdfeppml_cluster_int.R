@@ -50,8 +50,8 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
                                 colcheck_x = TRUE, colcheck_x_fes = TRUE, K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL, gamma_val=NULL) {
 
+  xnames <- colnames(x)
   n <- length(y)
-  print(n)
   k <- ncol(x) # BUG? should be defined after colcheck
   nclusters <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
   x <- data.matrix(x)

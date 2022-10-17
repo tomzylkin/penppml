@@ -45,7 +45,7 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
   model <- genmodel(data = data, dep = dep, indep = indep, selectobs = selectobs)
 
   y_mat <- as.matrix(model$y)
-  if(class(dep)=="numeric"){colnames(y_mat) <- colnames(data)[dep]} else {colnames(y_mat) <- dep}
+  if(is.numeric(dep)){colnames(y_mat) <- colnames(data)[dep]} else {colnames(y_mat) <- dep}
   # Now we create the result matrix:
   iceberg_results <- matrix(NA, nrow = ncol(model$x), ncol = ncol(y_mat))
   rownames(iceberg_results) <- colnames(model$x)
@@ -118,7 +118,7 @@ plugin_lasso_int <- function(y, x, tol = 1e-8,
 
   while (crit > tol & iter < K) {
     iter <- iter + 1
-    print(iter)
+#    print(iter)
     if (iter == 1) {
       e <- y - mean(y)
     }
@@ -174,9 +174,6 @@ plugin_lasso_int <- function(y, x, tol = 1e-8,
   k   <- ncol(matrix(x))
   n   <- length(y)
   select_x <- which(b != 0)
-
-  print(k)
-  print(b)
 
   penreg[["beta"]] <- b
   penreg[["deviance"]] <- deviance

@@ -20,8 +20,8 @@ bootstrap(
   verbose = FALSE,
   tol = 1e-06,
   hdfetol = 0.01,
-  maxiter_hdfe = 1000,
   penweights = NULL,
+  maxiter = 1000,
   ...
 )
 }
@@ -42,6 +42,33 @@ or a list with the desired interactions between variables in \code{data}.}
 \item{selectobs}{Optional. A vector indicating which observations to use (either a logical vector
 or a numeric vector with row numbers, as usual when subsetting in R).}
 
+\item{bootreps}{Number of bootstrap repetitions.}
+
+\item{boot_threshold}{Minimal threshold. If a variable is selected in at least this
+fraction of times, it is reported at the end of the iterations.}
+
+\item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+collinear variables.}
+
+\item{colcheck_x_fes}{Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+by the fixed effects drops those that are perfectly explained.}
+
+\item{post}{Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.}
+
+\item{gamma_val}{Numerical value that determines the regularization threshold as defined in Belloni, Chernozhukov, Hansen, and Kozbur (2016). NULL default sets parameter to 0.1/log(n).}
+
+\item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
+
+\item{tol}{Tolerance parameter for convergence of the IRLS algorithm.}
+
+\item{hdfetol}{Tolerance parameter for the within-transformation step,
+passed on to \code{collapse::fhdwithin}.}
+
+\item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
+\code{method == "plugin"}.}
+
+\item{maxiter}{Maximum number of iterations (a number).}
+
 \item{...}{Further arguments, including:
 \itemize{
 \item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
@@ -49,7 +76,7 @@ or a numeric vector with row numbers, as usual when subsetting in R).}
 \item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
 \item \code{colcheck_x}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
 \item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
-\item \code{maxiter_hdfe}: Maximum number of iterations in hdfeppml used to get first guess of mu.
+\item \code{maxiter}: Maximum number of iterations in hdfeppml used to get first guess of mu.
 \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
 \item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 selected variables and reports the coefficients from this regression.
@@ -88,7 +115,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
-\donttest{bs1 <- bootstrap(data=trade3, dep="export",
+\dontrun{bs1 <- bootstrap(data=trade3, dep="export",
                  cluster_id="clus",
                  fixed=list(c("exp", "time"),
                  c("imp", "time"), c("exp", "imp")),

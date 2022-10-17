@@ -130,7 +130,7 @@ nfolds <- 10
 unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), replace = TRUE))
 cross_ids <- merge(trade[, 5, drop = FALSE], unique_ids, by = "id", all.x = TRUE)
 # Finally, we try xvalidate with a lasso penalty (the default) and two lambda values:
-\donttest{reg <- xvalidate(y = y, x = x, fes = fes, lambda = 0.001,
+\dontrun{reg <- xvalidate(y = y, x = x, fes = fes, lambda = 0.001,
                          IDs = cross_ids$fold, verbose = TRUE)}
 
 }

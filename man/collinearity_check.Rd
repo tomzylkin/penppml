@@ -21,6 +21,12 @@ collinearity_check(
 \item{fes}{List of fixed effects.}
 
 \item{hdfetol}{Tolerance for the centering, passed on to \code{lfe::demeanlist}.}
+
+\item{colcheck_x_fes}{Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
+by the fixed effects drops those that are perfectly explained.}
+
+\item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
+collinear variables.}
 }
 \value{
 A numeric vector containing the variables that pass the collinearity check.

@@ -1,6 +1,6 @@
 Package: penppml
 Title: Penalized Poisson Pseudo Maximum Likelihood Regression
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(
     person(given = "Diego",
            family = "Ferreras Garrucho",
@@ -30,7 +30,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: gzip
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 LinkingTo: 
     Rcpp,
     RcppEigen
@@ -40,7 +40,9 @@ Imports:
     fixest,
     collapse, 
     rlang,
-    magrittr
+    magrittr,
+    matrixStats,
+    dplyr
 Depends: 
     R (>= 2.10)
 URL: https://github.com/tomzylkin/penppml
@@ -54,4 +56,4 @@ Suggests:
     ggplot2,
     reshape2
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: knitr, rmarkdown
