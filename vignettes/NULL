@@ -1,0 +1,117 @@
+ERROR : attempt to set 'colnames' on an object with less than two dimensions 
+$betas
+             1          2         3         4  5  6 7  8  9
+ad_prov_14   0 0.08327987 0.0000000 0.0000000 NA NA 0 NA NA
+tbt_prov_07  0 0.48311428 0.7273977 0.6651246  0  0 0  0  0
+lm_prov_10  NA 0.00000000 0.0000000 0.0000000  0  0 0  0  0
+            10
+ad_prov_14  NA
+tbt_prov_07 NA
+lm_prov_10  NA
+
+$betas_pre
+             1        2         3          4  5  6 7  8  9
+ad_prov_14   0 0.125442 0.0000000 0.00000000 NA NA 0 NA NA
+tbt_prov_07  0 0.087968 0.4948759 0.01602661  0  0 0  0  0
+lm_prov_10  NA 0.000000 0.0000000 0.00000000  0  0 0  0  0
+            10
+ad_prov_14  NA
+tbt_prov_07 NA
+lm_prov_10  NA
+
+$phis
+                   1          2          3        4
+ad_prov_14   9853850  8297883.0 8244937.58 20009603
+tbt_prov_07 17260041 12012190.6 9425071.83 29200015
+lm_prov_10        NA   806834.6   94132.41   298650
+                     5         6          7       8
+ad_prov_14          NA        NA 22217793.9      NA
+tbt_prov_07 2671369.84 7069479.9 33903169.6 2848915
+lm_prov_10    72490.71  511097.1   276110.9  151336
+                    9 10
+ad_prov_14         NA NA
+tbt_prov_07 5407037.0 NA
+lm_prov_10   458703.4 NA
+
+$is_included
+                1    2    3    4     5     6    7     8
+ad_prov_14   TRUE TRUE TRUE TRUE FALSE FALSE TRUE FALSE
+tbt_prov_07  TRUE TRUE TRUE TRUE  TRUE  TRUE TRUE  TRUE
+lm_prov_10  FALSE TRUE TRUE TRUE  TRUE  TRUE TRUE  TRUE
+                9 10
+ad_prov_14  FALSE NA
+tbt_prov_07  TRUE NA
+lm_prov_10   TRUE NA
+
+$selected
+[1] "ad_prov_14"  "tbt_prov_07"
+
+$post
+                 [,1]
+ad_prov_14         NA
+tbt_prov_07 0.2326298
+
+                   1          2          3        4
+ad_prov_14   9853850  8297883.0 8244937.58 20009603
+tbt_prov_07 17260041 12012190.6 9425071.83 29200015
+lm_prov_10        NA   806834.6   94132.41   298650
+                     5         6          7       8
+ad_prov_14          NA        NA 22217793.9      NA
+tbt_prov_07 2671369.84 7069479.9 33903169.6 2848915
+lm_prov_10    72490.71  511097.1   276110.9  151336
+                    9 10
+ad_prov_14         NA NA
+tbt_prov_07 5407037.0 NA
+lm_prov_10   458703.4 NA
+$betas
+             1          2         3         4  5  6 7  8  9
+ad_prov_14   0 0.08327987 0.0000000 0.0000000 NA NA 0 NA NA
+tbt_prov_07  0 0.48311428 0.7273977 0.6651246  0  0 0  0  0
+lm_prov_10  NA 0.00000000 0.0000000 0.0000000  0  0 0  0  0
+            10
+ad_prov_14  NA
+tbt_prov_07 NA
+lm_prov_10  NA
+
+$betas_pre
+             1        2         3          4  5  6 7  8  9
+ad_prov_14   0 0.125442 0.0000000 0.00000000 NA NA 0 NA NA
+tbt_prov_07  0 0.087968 0.4948759 0.01602661  0  0 0  0  0
+lm_prov_10  NA 0.000000 0.0000000 0.00000000  0  0 0  0  0
+            10
+ad_prov_14  NA
+tbt_prov_07 NA
+lm_prov_10  NA
+
+$phis
+                   1          2          3        4
+ad_prov_14   9853850  8297883.0 8244937.58 20009603
+tbt_prov_07 17260041 12012190.6 9425071.83 29200015
+lm_prov_10        NA   806834.6   94132.41   298650
+                     5         6          7       8
+ad_prov_14          NA        NA 22217793.9      NA
+tbt_prov_07 2671369.84 7069479.9 33903169.6 2848915
+lm_prov_10    72490.71  511097.1   276110.9  151336
+                    9 10
+ad_prov_14         NA NA
+tbt_prov_07 5407037.0 NA
+lm_prov_10   458703.4 NA
+
+$is_included
+                1    2    3    4     5     6    7     8
+ad_prov_14   TRUE TRUE TRUE TRUE FALSE FALSE TRUE FALSE
+tbt_prov_07  TRUE TRUE TRUE TRUE  TRUE  TRUE TRUE  TRUE
+lm_prov_10  FALSE TRUE TRUE TRUE  TRUE  TRUE TRUE  TRUE
+                9 10
+ad_prov_14  FALSE NA
+tbt_prov_07  TRUE NA
+lm_prov_10   TRUE NA
+
+$selected
+[1] "ad_prov_14"  "tbt_prov_07"
+
+$post
+                 [,1]
+ad_prov_14         NA
+tbt_prov_07 0.2326298
+

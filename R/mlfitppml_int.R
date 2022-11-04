@@ -132,7 +132,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     # if "post", implement post-lasso PPML using selected covariates
     if (post) {
       x_select <- penreg$x_resid[,as.numeric(penreg$beta)!=0]
-
       # "pen_beta_pre" are raw lasso coefficients
       pen_beta_pre <- penreg$beta
       #x_select <- x[,as.numeric(penreg$beta)!=0]
@@ -156,8 +155,10 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
       pen_beta_pre <- t(pen_beta_pre)
       colnames(pen_beta_pre) <- xnames
     }
-    # store results
-    results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "deviance" = penreg$deviance, "bic" = penreg$bic, "lambda" = penreg$lambda, "phi" =penreg$phi, "ses" =t(ses))
+    # store results, conditionally, because post may not be true
+    if(post){results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "deviance" = penreg$deviance, "bic" = penreg$bic, "lambda" = penreg$lambda, "phi" =penreg$phi, "ses" =t(ses))} else {
+      results <- list("beta" = t(pen_beta), "deviance" = penreg$deviance, "bic" = penreg$bic, "lambda" = penreg$lambda, "phi" =penreg$phi, "ses" =t(ses))
+    }
   } else {
 
     # if method != "plugin", do the following:
@@ -202,6 +203,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
           # if selected x's same as for previous value of lambda, carry forward result.
           if (same==1 & v>1) {
+            print("h5")
             pen_beta_pre[,v] <- penreg$beta
             pen_beta[,v] <- pen_beta[,v-1]
             pen_ses[,v]  <- pen_ses[,v-1]
@@ -218,7 +220,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
               pen_bic[,v]   <- ppml_temp$bic
             }
           }
-        } else pen_beta_pre[,v] <- penreg$beta
+        } else  print("h6"); pen_beta_pre[,v] <- penreg$beta
           # I've added the following to solve a bug: when post is TRUE and no variables are selected,
           # the beta_pre object should still be overwritten by 0s. Otherwise, NAs remain.
       } else {
@@ -229,6 +231,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     pen_beta <- t(pen_beta)
     colnames(pen_beta) <- xnames
     if (post) {
+      print("h7")
       pen_beta_pre <- t(pen_beta_pre)
       colnames(pen_beta_pre) <- xnames
     }
@@ -239,6 +242,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     # return results
     if (post) {
       #colnames(pen_beta_pre) <- xnames
+      print("h8")
       results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "bic" =  bic, "lambdas" = lambdas, "ses" = pen_ses)
     }
     else {

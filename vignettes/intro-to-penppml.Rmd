@@ -217,6 +217,8 @@ unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), rep
 
 cross_ids <- merge(trade[(trade$exp %in% selected) & (trade$imp %in% selected), 5, drop = FALSE], 
                    unique_ids, by = "id", all.x = TRUE)
+#trade_ids <- cbind(trade2, cross_ids)
+#write_dta(trade_ids, "trade.dta")
 ```
 
 Now we activate the cross-validation option in `mlfitppml` and input the ID vector:
@@ -381,10 +383,18 @@ trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, 
 # Let's cluster by agreement
 trade3$alt_id <- trade3$id # ID refers to agreement ID
 trade3$alt_id[is.na(trade3$alt_id)] <- 0 # We set this to zero when the ID is missing, interpreting this as the country pair not being part of any agreement.
-exp  <- factor(trade3$exp)
-imp  <- factor(trade3$imp)
-pair     <- interaction(exp, imp)
-trade3$pair <- pair
+
+# Create pair ID
+v1 <- do.call(paste, as.data.frame(t(apply(trade3[1:2], 1, sort))))
+trade3$pair <-  match(v1, unique(v1))
+trade3$pair <- trade3$pair + 500
+
+#exp  <- factor(trade3$exp)
+#imp  <- factor(trade3$imp)
+#pair     <- interaction(exp, imp)
+#trade3$pair <- pair
+
+# Create maximal ID from the preexisting ID-variable inside each pair
 trade3 <- within(trade3, {alt_id2 = ave(alt_id,pair,FUN=max)} ) # This creates the maximum of the ID for each pair. This adjusts for the fact that some pairs might have been part of different agreements and we want to take get a unique agreement ID for each pair. 
 
 trade3$alt_id2[trade3$alt_id2==0] <- trade3$pair[trade3$alt_id2==0]
@@ -398,7 +408,7 @@ Next, we run Bootstrap Lasso, which means drawing agreement clusters with replac
 
 ```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE, eval=TRUE}
 set.seed(123)
-bs1 <- bootstrap(data=trade3, dep="export", cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
+bs1 <- bootstrap(data=trade3, dep="export",  cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=c("ad_prov_14", "tbt_prov_07", "lm_prov_10"), bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
 ```
 
 ```{r bss table, echo = FALSE, eval=TRUE}
