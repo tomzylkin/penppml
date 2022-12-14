@@ -203,7 +203,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
           # if selected x's same as for previous value of lambda, carry forward result.
           if (same==1 & v>1) {
-            print("h5")
             pen_beta_pre[,v] <- penreg$beta
             pen_beta[,v] <- pen_beta[,v-1]
             pen_ses[,v]  <- pen_ses[,v-1]
@@ -220,7 +219,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
               pen_bic[,v]   <- ppml_temp$bic
             }
           }
-        } else  print("h6"); pen_beta_pre[,v] <- penreg$beta
+        } else pen_beta_pre[,v] <- penreg$beta
           # I've added the following to solve a bug: when post is TRUE and no variables are selected,
           # the beta_pre object should still be overwritten by 0s. Otherwise, NAs remain.
       } else {
@@ -231,7 +230,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     pen_beta <- t(pen_beta)
     colnames(pen_beta) <- xnames
     if (post) {
-      print("h7")
       pen_beta_pre <- t(pen_beta_pre)
       colnames(pen_beta_pre) <- xnames
     }
@@ -242,7 +240,6 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
     # return results
     if (post) {
       #colnames(pen_beta_pre) <- xnames
-      print("h8")
       results <- list("beta" = t(pen_beta), "beta_pre" = t(pen_beta_pre), "bic" =  bic, "lambdas" = lambdas, "ses" = pen_ses)
     }
     else {

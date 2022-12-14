@@ -1,3 +1,8 @@
+# penppml 0.2.1.900
+
+* When post = FALSE, there was a mistake in the last version where a non-existent
+* vector of coefficients was being stored. This issue is now corrected.
+
 # penppml 0.2.0.900
 
 * bootstrap function added
