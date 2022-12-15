@@ -44,7 +44,7 @@ A list with 14 elements, including \code{beta}, which is the only one we use in 
 For a full list, see \link[glmnet]{glmnet}.
 }
 \description{
-This is the internal function upon which the \code{ìceberg} wrapper is built. It performs standard
+This is the internal function upon which the \code{iceberg} wrapper is built. It performs standard
 plugin lasso PPML estimation without fixed effects, relying on \code{glmnet::glmnet}. As the other
 internals in the package, it needs a y vector and an x matrix.
 }

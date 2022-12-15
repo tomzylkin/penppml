@@ -60,7 +60,7 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
 
 #' Iceberg Lasso Implementation (in development)
 #'
-#' This is the internal function upon which the `ìceberg` wrapper is built. It performs standard
+#' This is the internal function upon which the `iceberg` wrapper is built. It performs standard
 #' plugin lasso PPML estimation without fixed effects, relying on \code{glmnet::glmnet}. As the other
 #' internals in the package, it needs a y vector and an x matrix.
 #'
