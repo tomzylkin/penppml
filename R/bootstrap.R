@@ -78,6 +78,14 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
 
   # Run bootstrap repetitions
   for (b in 1:bootreps) {
+
+    # Close sink file if it wasn't closed in the last bootstrap repetition
+    if(b>1){
+      if(all(is.na(is_included[,b-1]))){
+        sink()
+      }
+    }
+
     tryCatch({
     draw  <- draws[,b] # Take one draw
     draw <- data.frame(cbind(draw,1))
