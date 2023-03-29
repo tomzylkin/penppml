@@ -25,6 +25,9 @@
 #' @param xval Logical. If \code{TRUE}, it carries out cross-validation.
 #' @param K Maximum number of iterations for the plugin algorithm to converge.
 #' @param vcv Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.
+#' @param phipost Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+#' calculated using estimates from a post-penalty regression when \code{method == "plugin"}. Otherwise,
+#' these are calculated using estimates from a penalty regression.
 #' @param colcheck_x Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
 #' collinear variables.
 #' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
@@ -71,7 +74,7 @@
 
 mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = TRUE,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
-                     standardize = TRUE, vcv = TRUE, penweights = NULL, K = 15, gamma_val=NULL, mu=NULL) {
+                     standardize = TRUE, vcv = TRUE, phipost=TRUE, penweights = NULL, K = 15, gamma_val=NULL, mu=NULL) {
 
   xnames <- colnames(x)
   n      <- length(y)
@@ -125,7 +128,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
 
     # this is the subcommand that implements the iterative plugin estimator
     penreg   <- penhdfeppml_cluster_int(y=y,x=x,fes=fes,tol=tol,hdfetol=hdfetol,penalty=penalty,
-                                    cluster=cluster,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,verbose=verbose,K=K, gamma_val=gamma_val, mu=mu)
+                                    cluster=cluster,colcheck_x=FALSE,colcheck_x_fes=FALSE,post=FALSE,verbose=verbose,phipost=phipost,K=K, gamma_val=gamma_val, mu=mu)
 
     ses <- matrix(NA,nrow = ncol(x), ncol = 1)
 

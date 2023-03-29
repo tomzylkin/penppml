@@ -14,7 +14,7 @@ plugin_lasso_int(
   K = 50,
   verbose = FALSE,
   lambda = NULL,
-  phipost = FALSE
+  icepost = FALSE
 )
 }
 \arguments{
@@ -36,7 +36,7 @@ plugin_lasso_int(
 
 \item{lambda}{Penalty parameter (a number).}
 
-\item{phipost}{Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+\item{icepost}{Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 selected variables and reports the coefficients from this regression.}
 }
 \value{

@@ -25,7 +25,7 @@
 #' \item \code{K}: Maximum number of iterations.
 #' \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
 #' \item \code{lambda}: Penalty parameter (a number).
-#' \item \code{phipost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+#' \item \code{icepost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 #'     selected variables and reports the coefficients from this regression.
 #' }
 #'
@@ -73,7 +73,7 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
 #' @param K Maximum number of iterations.
 #' @param verbose Logical. If \code{TRUE}, prints information to the screen while evaluating.
 #' @param lambda Penalty parameter (a number).
-#' @param phipost Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+#' @param icepost Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 #'     selected variables and reports the coefficients from this regression.
 #'
 #' @return A list with 14 elements, including \code{beta}, which is the only one we use in the wrapper.
@@ -81,7 +81,7 @@ iceberg <- function(data, dep, indep = NULL, selectobs = NULL, ...) {
 
 plugin_lasso_int <- function(y, x, tol = 1e-8,
                          glmnettol = 1e-12, penweights = NULL,
-                         colcheck = FALSE, K = 50, verbose = FALSE, lambda = NULL, phipost = FALSE) {
+                         colcheck = FALSE, K = 50, verbose = FALSE, lambda = NULL, icepost = FALSE) {
 
   x <- data.matrix(x)
   y <- as.matrix(y)
@@ -137,7 +137,7 @@ plugin_lasso_int <- function(y, x, tol = 1e-8,
     penreg <- glmnet::glmnet(x = x, y = y, weights = rep(1/n, n), lambda = lambda_glmnet, thresh = glmnettol,
                      penalty.factor = phi, standardize = FALSE)
 
-    if (phipost == TRUE) {
+    if (icepost == TRUE) {
       x_select <- x[, as.numeric(penreg$beta) != 0]
       if (length(x_select) != 0) {
         b_temp <- rep(0, length(include_x))

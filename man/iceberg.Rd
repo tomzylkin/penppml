@@ -26,7 +26,7 @@ or a numeric vector with row numbers, as usual when subsetting in R).}
 \item \code{K}: Maximum number of iterations.
 \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
 \item \code{lambda}: Penalty parameter (a number).
-\item \code{phipost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
+\item \code{icepost}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
 selected variables and reports the coefficients from this regression.
 }}
 }

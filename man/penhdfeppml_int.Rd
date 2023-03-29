@@ -21,6 +21,7 @@ penhdfeppml_int(
   init_z = NULL,
   post = FALSE,
   verbose = FALSE,
+  phipost = TRUE,
   standardize = TRUE,
   method = "placeholder",
   cluster = NULL,
@@ -66,6 +67,10 @@ first iteration of the algorithm.}
 \item{post}{Logical. If \code{TRUE}, estimates a post-penalty regression with the selected variables.}
 
 \item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
+
+\item{phipost}{Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+calculated using estimates from a post-penalty regression when \code{method == "plugin"}. Otherwise,
+these are calculated using estimates from a penalty regression.}
 
 \item{standardize}{Logical. If \code{TRUE}, x variables are standardized before estimation.}
 

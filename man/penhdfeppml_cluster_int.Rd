@@ -23,6 +23,7 @@ penhdfeppml_cluster_int(
   post = FALSE,
   verbose = FALSE,
   lambda = NULL,
+  phipost = TRUE,
   gamma_val = NULL
 )
 }
@@ -68,6 +69,10 @@ first iteration of the algorithm.}
 \item{verbose}{Logical. If \code{TRUE}, it prints information to the screen while evaluating.}
 
 \item{lambda}{Penalty parameter (a number).}
+
+\item{phipost}{Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+calculated using estimates from a post-penalty regression. Otherwise, these are calculated using
+estimates from a penalty regression.}
 
 \item{gamma_val}{Numerical value that determines the regularization threshold as defined in Belloni, Chernozhukov, Hansen, and Kozbur (2016). NULL default sets parameter to 0.1/log(n).}
 }

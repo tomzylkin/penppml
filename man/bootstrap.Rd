@@ -22,7 +22,7 @@ bootstrap(
   hdfetol = 0.01,
   penweights = NULL,
   maxiter = 1000,
-  ...
+  phipost = TRUE
 )
 }
 \arguments{
@@ -69,18 +69,9 @@ passed on to \code{collapse::fhdwithin}.}
 
 \item{maxiter}{Maximum number of iterations (a number).}
 
-\item{...}{Further arguments, including:
-\itemize{
-\item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
-\item \code{hdfetol}: Tolerance parameter for the within-transformation step, passed on to \code{collapse::fhdwithin}.
-\item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
-\item \code{colcheck_x}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
-\item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
-\item \code{maxiter}: Maximum number of iterations in hdfeppml used to get first guess of mu.
-\item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
-\item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
-selected variables and reports the coefficients from this regression.
-}}
+\item{phipost}{Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+calculated using estimates from a post-penalty regression. Otherwise,
+these are calculated using estimates from a penalty regression.}
 }
 \value{
 A matrix with coefficient estimates for all dependent variables.

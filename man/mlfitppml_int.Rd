@@ -22,6 +22,7 @@ mlfitppml_int(
   xval = FALSE,
   standardize = TRUE,
   vcv = TRUE,
+  phipost = TRUE,
   penweights = NULL,
   K = 15,
   gamma_val = NULL,
@@ -67,6 +68,10 @@ is assigned to a different fold (warning: this is likely to be very resource-int
 \item{standardize}{Logical. If \code{TRUE}, x variables are standardized before estimation.}
 
 \item{vcv}{Logical. If \code{TRUE} (the default), the post-estimation model includes standard errors.}
+
+\item{phipost}{Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+calculated using estimates from a post-penalty regression when \code{method == "plugin"}. Otherwise,
+these are calculated using estimates from a penalty regression.}
 
 \item{penweights}{Optional: a vector of coefficient-specific penalties to use in plugin lasso when
 \code{method == "plugin"}.}

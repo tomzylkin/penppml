@@ -23,21 +23,12 @@
 #' collinear variables.
 #' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
 #' by the fixed effects drops those that are perfectly explained.
+#' @param phipost Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+#' calculated using estimates from a post-penalty regression. Otherwise,
+#' these are calculated using estimates from a penalty regression.
 #'@inheritParams mlfitppml
 #'@inheritParams penhdfeppml_int
 #'@inheritParams hdfeppml_int
-#' @param ... Further arguments, including:
-#' \itemize{
-#' \item \code{tol}: Tolerance parameter for convergence of the IRLS algorithm.
-#' \item \code{hdfetol}: Tolerance parameter for the within-transformation step, passed on to \code{collapse::fhdwithin}.
-#' \item \code{penweights}: Optional: a vector of coefficient-specific penalties to use in plugin lasso.
-#' \item \code{colcheck_x}: Logical. If \code{TRUE}, checks for perfect multicollinearity in \code{x}.
-#' \item \code{colcheck_x_fes}: Logical. If \code{TRUE}, checks whether \code{x} is perfectly explained by \code{fes}.
-#' \item \code{maxiter}: Maximum number of iterations in hdfeppml used to get first guess of mu.
-#' \item \code{verbose}: Logical. If \code{TRUE}, prints information to the screen while evaluating.
-#' \item \code{post}: Logical. If \code{TRUE}, it carries out a post-lasso estimation with just the
-#'     selected variables and reports the coefficients from this regression.
-#' }
 #'
 #' @return A matrix with coefficient estimates for all dependent variables.
 #' @export
@@ -56,7 +47,7 @@
 
 bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, selectobs = NULL, bootreps=250, boot_threshold = 0.01, colcheck_x=FALSE,
                       colcheck_x_fes=FALSE, post=FALSE, gamma_val = NULL,
-                      verbose=FALSE, tol=1e-6, hdfetol=1e-2, penweights=NULL, maxiter=1000, ...){
+                      verbose=FALSE, tol=1e-6, hdfetol=1e-2, penweights=NULL, maxiter=1000, phipost=TRUE){
   cluster <- one <- NULL
   # First we do the data handling with genmodel:
   model <- genmodel(data = data, dep = dep, indep = indep, selectobs = selectobs)
@@ -124,7 +115,7 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
     plugin_boot <- mlfitppml(dep=dep,indep=indep_names,fixed = fixed, tol=tol, hdfetol=hdfetol,
                                             cluster="clus2",method="plugin", colcheck_x=colcheck_x,
                                             colcheck_x_fes=colcheck_x_fes, mu=boot_mu, data=boot_data,
-                                            gamma_val = gamma_val, verbose=verbose, penweights=penweights)
+                                            gamma_val = gamma_val, verbose=verbose, phipost=phipost, penweights=penweights)
     sink()
     # add option for orig.
     save_betas[rownames(plugin_boot$beta),b]     <- plugin_boot$beta

@@ -15,6 +15,9 @@
 #'
 #' @param K Maximum number of iterations.
 #' @param penalty Only "lasso" is supported at the present stage.
+#' @param phipost Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+#' calculated using estimates from a post-penalty regression. Otherwise, these are calculated using
+#' estimates from a penalty regression.
 #' @inheritParams penhdfeppml_int
 #'
 #' @return An object of class \code{elnet} with the elements described in \link[glmnet]{glmnet}, as
@@ -48,7 +51,7 @@
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
                                 colcheck_x = TRUE, colcheck_x_fes = TRUE, K = 15, init_z = NULL, post = FALSE,
-                                verbose = FALSE, lambda = NULL, gamma_val=NULL) {
+                                verbose = FALSE, lambda = NULL, phipost=TRUE, gamma_val=NULL) {
 
   xnames <- colnames(x)
   n <- length(y)
@@ -162,7 +165,29 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
       phi <- sqrt(diag(cluster_matrix(mu * z_resid, cluster, x_resid)) / n)
     }
     else if (iter<=K) {
-      phi <- sqrt(diag(cluster_matrix(mu * residuals, cluster, x_resid)) / n) # alternatively can use y-mu
+      if (phipost == TRUE) {
+
+        x_select <- x_resid[,as.numeric(penreg$beta)!=0]
+
+        if(length(x_select)!=0){
+          ppml_temp <- hdfeppml_int(y = y, x = x_select, fes = fes, tol = tol, hdfetol = hdfetol,
+                       mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post, cluster = cluster)
+
+          mu_post      <- ppml_temp$mu
+          x_resid_post <- collapse::fhdwithin(reg_x, fes, w = mu_post)
+          residuals_post <- y - mu_post
+        }
+        else{ # no covariates selected
+          residuals_post <-  mu*residuals
+          x_resid_post <- x_resid
+          mu_post <- mu
+        }
+
+        phi <- sqrt(diag(cluster_matrix(residuals_post, cluster, x_resid_post))/n)
+      }
+      else {
+        phi <- sqrt(diag(cluster_matrix(mu*residuals,cluster, x_resid))/n)
+      }
     }
     lambda_glmnet <- lambda / sum(y) * sum(phi) / k
 

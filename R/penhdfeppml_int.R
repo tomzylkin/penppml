@@ -31,6 +31,9 @@
 #' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
 #' by the fixed effects drops those that are perfectly explained.
 #' @param gamma_val Numerical value that determines the regularization threshold as defined in Belloni, Chernozhukov, Hansen, and Kozbur (2016). NULL default sets parameter to 0.1/log(n).
+#' @param phipost Logical. If \code{TRUE}, the plugin coefficient-specific penalty weights are iteratively
+#' calculated using estimates from a post-penalty regression when \code{method == "plugin"}. Otherwise,
+#' these are calculated using estimates from a penalty regression.
 #' @inheritParams hdfeppml_int
 #'
 #' @return If \code{method == "lasso"} (the default), an object of class \code{elnet} with the elements
@@ -78,7 +81,7 @@
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                             penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,
-                            init_z = NULL, post = FALSE, verbose = FALSE, standardize = TRUE,
+                            init_z = NULL, post = FALSE, verbose = FALSE, phipost = TRUE, standardize = TRUE,
                             method = "placeholder", cluster = NULL, debug = FALSE, gamma_val=NULL) {
   xnames <- colnames(x)
   old_x <- x
@@ -90,7 +93,7 @@ penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmne
                                       hdfetol = hdfetol, glmnettol = glmnettol, penalty = penalty,
                                       penweights = penweights, saveX = saveX,
                                       mu = mu, colcheck_x = colcheck_x, colcheck_x_fes = colcheck_x_fes, K = 15, init_z = init_z, post = FALSE,
-                                      verbose = verbose, lambda = NULL, gamma_val=gamma_val)
+                                      verbose = verbose, phipost=phipost, lambda = NULL, gamma_val=gamma_val)
   }
   else {
 
