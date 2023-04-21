@@ -284,7 +284,7 @@ reg6 <- mlfitppml(data = trade2,
 
 ```{r plugin results, results = FALSE}
 results <- data.frame(prov = rownames(reg6$beta), b_pre = reg6$beta_pre, b = reg6$beta, se = 0)
-results$se[!is.na(reg6$beta)] <- reg6$ses
+results$se <- reg6$ses[1,]
 results
 ```
 
@@ -297,7 +297,7 @@ knitr::kable(list(results[1:7,], results[8:14,]),
              digits = 4)
 ```
 
-We can see that the plugin lasso is very strict: only three provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
+We can see that the plugin lasso is very strict: only four provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
 
 We can also set the gamma value as defined in Belloni et al. to something less strict, e.g. 0.3. 
 
@@ -315,7 +315,7 @@ rownames(reg6$beta)[which(reg6_gamma$beta != 0)]
 
 ```{r plugin results gamma, results = FALSE}
 results_gamma <- data.frame(prov = rownames(reg6_gamma$beta), b_pre = reg6_gamma$beta_pre, b = reg6_gamma$beta, se = 0)
-results_gamma$se[!is.na(reg6_gamma$beta)] <- reg6_gamma$ses
+results_gamma$se <- reg6_gamma$ses[1,]
 results_gamma
 ```
 
@@ -328,7 +328,7 @@ knitr::kable(list(results_gamma[1:7,], results_gamma[8:14,]),
              digits = 4)
 ```
 
-When doing this, we see that more provisions than before are selected.
+When doing this, we see that one more provision than before is selected.
 
 ### Iceberg lasso (in development)
 

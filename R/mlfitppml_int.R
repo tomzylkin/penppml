@@ -145,7 +145,7 @@ mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfe
         pen_beta[which(penreg$beta!=0),1]  <- ppml_temp$coefficients
         pen_bic   <- ppml_temp$bic
         if(verbose==TRUE){print(ppml_temp$se)}
-        ses[which(penreg$beta!=0),1] <- ppml_temp$se
+        ses[which(!is.na(pen_beta)&penreg$beta!=0),1] <- ppml_temp$se
       }
     } else {
       pen_beta <- penreg$beta

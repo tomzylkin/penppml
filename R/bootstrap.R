@@ -125,6 +125,11 @@ bootstrap <- function(data, dep, indep = NULL, cluster_id=NULL, fixed=NULL, sele
     is_included[is.na(is_included[,b]),b] <- FALSE
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
+  
+  # Close sink file if it wasn't closed in the last bootstrap repetition
+    if(all(is.na(is_included[,bootreps]))){
+      sink()
+    }
 
   selected_vars <- names(which(rowSums(save_betas!=0, na.rm=T)/bootreps>boot_threshold))
 

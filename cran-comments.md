@@ -1,11 +1,11 @@
 ## Resubmission
 This is a resubmission.
 
-* I fixed an issue in mlfitppml_int() that occurred when post=FALSE, where a non-existent vector was being stored.
-* I replaced the package maintainer.
+* I added an option to plugin Lasso (phipost) which allows the coefficient-specific penalty weights 
+* to be iteratively calculated using estimates from a post-penalty regression.
 
 ## Test environments
-* Windows 11, 64 bit, R 4.2.2
+* Windows 11, 64 bit, R 4.2.3
 * macOS 10.13.6 High Sierra, R-release, CRAN's setup
 
 ## R CMD check results

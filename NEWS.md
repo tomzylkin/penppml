@@ -1,3 +1,8 @@
+# penppml 0.2.2.900
+
+* phipost option added for plugin Lasso, allowing the coefficient-specific penalty weights 
+* to be iteratively calculated using estimates from a post-penalty regression.
+
 # penppml 0.2.1.900
 
 * When post = FALSE, there was a mistake in the last version where a non-existent
