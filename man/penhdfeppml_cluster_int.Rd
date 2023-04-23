@@ -123,9 +123,9 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
-# To reduce run time, we keep only countries in the Americas:
-americas <- countries$iso[countries$region == "Americas"]
-trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
+# To reduce run time, we keep only countries in Latin America and the Caribbean:
+LatAmericaCar <- countries$iso[countries$sub.region == "Latin America and the Caribbean"]
+trade <- trade[(trade$imp \%in\% LatAmericaCar) & (trade$exp \%in\% LatAmericaCar), ]
 # Now generate the needed x, y and fes objects:
 y <- trade$export
 x <- data.matrix(trade[, -1:-6])
