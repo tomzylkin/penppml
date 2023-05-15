@@ -27,7 +27,8 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
   reg_x  <- x
   }
   mu  <- (y + mean(y)) / 2
-
+  
+  # Step 1: If there are fixed effects, residualize with respect to the fixed effects
   if(!missing(fes)){
     if(is.null(fes)){
       z_resid <- collapse::fwithin(x=reg_z, g=factor(rep(1,length(reg_z))), w = mu)
@@ -47,33 +48,33 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
     }
   }
 
-  if(!missing(x)){ # x is not missing
-
-    #Exclude x which have zero variance
-    x_var <- var(x)
-    include_x_var <- which(diag(x_var)!=0)
-    if (length(which(diag(x_var)==0)) != 0){
-      message(paste("The following variables are dropped because their variation is equal zero:", paste(names(which(diag(x_var)==0)), collapse=" ")))
-    }
-
-    if(colcheck_x_fes==TRUE){
-      orig_sds <- matrixStats::colSds(x)
-      res_sds <- matrixStats::colSds(x_resid)
-      frac_sds <- res_sds/orig_sds
-      include_x_first <- union(which(!is.na(frac_sds)), which(frac_sds >= 1e-5))
-      rm(res_sds, orig_sds)
-      if(!is.null(names(which(frac_sds < 1e-5)))){
+  # Step 2: Exclude x which have zero variance
+  orig_sds <- matrixStats::colSds(x)
+  names(orig_sds) <- colnames(x)
+  include_x_var <- which(orig_sds!=0)
+  if (length(which(orig_sds==0)) != 0){
+    message(paste("The following variables are dropped because their variation is equal to zero:", paste(names(which(orig_sds==0)), collapse=" ")))
+  }
+  
+  # Step 3: Exclude x that are explained by the FEs
+  if(colcheck_x_fes==TRUE){
+    res_sds <- matrixStats::colSds(x_resid)
+    frac_sds <- res_sds/orig_sds
+    names(frac_sds) <- colnames(x)
+    include_x_first <- union(which(!is.na(frac_sds)), which(frac_sds >= 1e-5))
+    rm(res_sds, orig_sds)
+    if(length(which(frac_sds < 1e-5)) !=  0){
       message(
-      paste("The following variables have been dropped, because most of their variation is explained by the fixed effects: ", paste(names(which(frac_sds < 1e-5)), collapse=" ")))
-      }
+      paste("The following variables have been dropped because most of their variation is explained by the fixed effects: ", paste(names(which(frac_sds < 1e-5)), collapse=" ")))
     }
-
+  }
+  
+  # Step 4: check for collinearity among residualized x's
   if(colcheck_x==TRUE){
     check <- stats::lm.wfit(x_resid, z_resid, mu)
     if(length(names(which(is.na(check$coefficients)))) != 0){
-    message(paste("The following variables have been dropped, due to collinearity: ", paste(names(which(is.na(check$coefficients))), collapse=" ")))
+    message(paste("The following variables have been dropped due to collinearity: ", paste(names(which(is.na(check$coefficients))), collapse=" ")))
     }
-  }
   }
 
   if(colcheck_x_fes==TRUE & colcheck_x==TRUE ){
@@ -83,7 +84,7 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALS
   } else if(colcheck_x_fes==TRUE & colcheck_x == FALSE){
         include_x <- intersect(include_x_first, include_x_var)
   }
- }
+}
 
 
 #' Cluster-robust Standard Error Estimation
