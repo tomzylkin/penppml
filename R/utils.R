@@ -236,6 +236,14 @@ genfes <- function(data, inter) {
 genmodel <- function(data, dep = NULL, indep = NULL, fixed = NULL, cluster = NULL, selectobs = NULL) {
   # First, we filter using selectobs:
   if (!is.null(selectobs)) data <- data[selectobs, ]
+  
+  # drop any NA values
+  NA.remove = na.omit(data)
+  if (nrow(NA.remove) != nrow(data) ) {
+    message(paste("Observations with NAs dropped:", paste(nrow(data)-nrow(NA.remove), collapse=" ")))
+    data = NA.remove
+  }
+  
   # Now the fes:
   if (is.numeric(fixed) | is.character(fixed)) {
     fes <- as.list(data[, fixed])
