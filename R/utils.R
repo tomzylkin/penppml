@@ -14,7 +14,7 @@
 #' by the fixed effects drops those that are perfectly explained.
 #' @return A numeric vector containing the variables that pass the collinearity check.
 
-collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=FALSE, colcheck_x=FALSE) {
+collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=TRUE, colcheck_x=TRUE) {
   # Collinearity check does not make sense without x. Stop if x not provided.
   if(missing(x)){
     stop("Please provide x.")
