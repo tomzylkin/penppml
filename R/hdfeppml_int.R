@@ -80,6 +80,7 @@
 
 hdfeppml_int <- function(y, x=NULL, fes=NULL, tol = 1e-8, hdfetol = 1e-4, colcheck_x = TRUE,
                              colcheck_x_fes = TRUE, mu = NULL, saveX = TRUE,
+                             colcheck = TRUE, colcheck_x = colcheck, colcheck_x_fes = colcheck,
                              init_z = NULL, verbose = FALSE, maxiter = 1000, cluster = NULL, vcv = TRUE) {
   if(missing(x) & missing(fes)){
     stop("Please provide at least one of the arguments x or fes.")
