@@ -50,7 +50,8 @@
 
 penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
                                 penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
-                                colcheck_x = TRUE, colcheck_x_fes = TRUE, K = 15, init_z = NULL, post = FALSE,
+                                colcheck = TRUE, colcheck_x = colcheck, colcheck_x_fes = colcheck, 
+                                K = 15, init_z = NULL, post = FALSE,
                                 verbose = FALSE, lambda = NULL, phipost=TRUE, gamma_val=NULL) {
 
   xnames <- colnames(x)
