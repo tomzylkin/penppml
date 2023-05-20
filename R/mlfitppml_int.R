@@ -72,7 +72,8 @@
 #'
 #' @inheritSection hdfeppml_int References
 
-mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, colcheck_x = FALSE, colcheck_x_fes = TRUE,
+mlfitppml_int = function(y, x, fes, lambdas, penalty = "lasso", tol = 1e-8, hdfetol = 1e-4, 
+                     colcheck = TRUE, colcheck_x = colcheck, colcheck_x_fes = colcheck,
                      post = TRUE, cluster = NULL, method = "bic", IDs = 1:n, verbose = FALSE, xval = FALSE,
                      standardize = TRUE, vcv = TRUE, phipost=TRUE, penweights = NULL, K = 15, gamma_val=NULL, mu=NULL) {
 
