@@ -80,7 +80,8 @@
 #' @importFrom devtools load_all
 
 penhdfeppml_int <- function(y, x, fes, lambda, tol = 1e-8, hdfetol = 1e-4, glmnettol = 1e-12,
-                            penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL, colcheck_x = FALSE, colcheck_x_fes = TRUE,
+                            penalty = "lasso", penweights = NULL, saveX = TRUE, mu = NULL,
+                            colcheck = TRUE, colcheck_x = colcheck, colcheck_x_fes = colcheck,
                             init_z = NULL, post = FALSE, verbose = FALSE, phipost = TRUE, standardize = TRUE,
                             method = "placeholder", cluster = NULL, debug = FALSE, gamma_val=NULL) {
   xnames <- colnames(x)
