@@ -85,6 +85,7 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=TRUE
         include_x <- intersect(include_x_first, include_x_var)
   } else {
     include_x = include_x_first
+  }
 }
 
 
