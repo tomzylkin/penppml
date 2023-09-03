@@ -32,6 +32,8 @@
 #' collinear variables.
 #' @param colcheck_x_fes Logical. If \code{TRUE}, this checks whether the independent variables are perfectly explained
 #' by the fixed effects drops those that are perfectly explained.
+#' @param colcheck Logical. If \code{TRUE}, performs both checks in \code{colcheck_x} and \code{colcheck_x_fes}. 
+#' If the user specifies \code{colcheck_x} and \code{colcheck_x_fes} individually, this option is overwritten.
 #' @inheritParams penhdfeppml_int
 #'
 #' @return A list with the following elements:

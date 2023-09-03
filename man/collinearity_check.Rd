@@ -9,8 +9,8 @@ collinearity_check(
   x = NULL,
   fes = NULL,
   hdfetol,
-  colcheck_x_fes = FALSE,
-  colcheck_x = FALSE
+  colcheck_x_fes = TRUE,
+  colcheck_x = TRUE
 )
 }
 \arguments{

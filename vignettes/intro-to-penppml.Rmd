@@ -149,7 +149,7 @@ ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficie
   ggplot2::scale_x_reverse(expand = ggplot2::expansion(add = c(0, 0.015))) +
   ggplot2::theme_classic() +
   directlabels::geom_dl(ggplot2::aes(label = provision), 
-                        method = list(directlabels::dl.trans(x = x + 0.5), "last.bumpup")) +
+                        method = list(directlabels::dl.trans(x = x + 0.5), "last.qp")) +
   ggplot2::labs(x = "Penalty parameter (lambda)", y = "Coefficient", 
                 title = "Figure 1: Regularization path for lasso")
 ```

@@ -16,8 +16,9 @@ penhdfeppml_cluster_int(
   penweights = NULL,
   saveX = TRUE,
   mu = NULL,
-  colcheck_x = TRUE,
-  colcheck_x_fes = TRUE,
+  colcheck = TRUE,
+  colcheck_x = colcheck,
+  colcheck_x_fes = colcheck,
   K = 15,
   init_z = NULL,
   post = FALSE,
@@ -52,6 +53,9 @@ passed on to \code{collapse::fhdwithin}.}
 fixed effects.}
 
 \item{mu}{A vector of initial values for mu that can be passed to the command.}
+
+\item{colcheck}{Logical. If \code{TRUE}, performs both checks in \code{colcheck_x} and \code{colcheck_x_fes}.
+If the user specifies \code{colcheck_x} and \code{colcheck_x_fes} individually, this option is overwritten.}
 
 \item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
 collinear variables.}

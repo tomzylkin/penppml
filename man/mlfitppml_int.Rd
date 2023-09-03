@@ -12,8 +12,9 @@ mlfitppml_int(
   penalty = "lasso",
   tol = 1e-08,
   hdfetol = 1e-04,
-  colcheck_x = FALSE,
-  colcheck_x_fes = TRUE,
+  colcheck = TRUE,
+  colcheck_x = colcheck,
+  colcheck_x_fes = colcheck,
   post = TRUE,
   cluster = NULL,
   method = "bic",
@@ -44,6 +45,9 @@ mlfitppml_int(
 
 \item{hdfetol}{Tolerance parameter for the within-transformation step,
 passed on to \code{collapse::fhdwithin}.}
+
+\item{colcheck}{Logical. If \code{TRUE}, performs both checks in \code{colcheck_x} and \code{colcheck_x_fes}.
+If the user specifies \code{colcheck_x} and \code{colcheck_x_fes} individually, this option is overwritten.}
 
 \item{colcheck_x}{Logical. If \code{TRUE}, this checks collinearity between the independent variables and drops the
 collinear variables.}
