@@ -1,3 +1,9 @@
+# penppml 0.2.3.900
+
+* Correction of small error that was appearing in the CRAN checks.
+* colcheck option added, allowing to simultaneously check whether the independent variables are 
+* collinear or are perfectly explained by the fixed effects.
+
 # penppml 0.2.2.900
 
 * phipost option added for plugin Lasso, allowing the coefficient-specific penalty weights 

@@ -1,17 +1,18 @@
 ## Resubmission
 This is a resubmission.
 
-* I added an option to plugin Lasso (phipost) which allows the coefficient-specific penalty weights 
-* to be iteratively calculated using estimates from a post-penalty regression.
+* I corrected a small bug that was causing an error in the CRAN checks.
+* I added an option (colcheck) which allows to simultaneously check whether the independent variables are 
+* collinear or are perfectly explained by the fixed effects.
 
 ## Test environments
-* Windows 11, 64 bit, R 4.2.3
-* macOS 10.13.6 High Sierra, R-release, CRAN's setup
+* Windows 11, 64 bit, R 4.3.1
+* Debian Linux, R-devel, clang, CRAN's setup
 
 ## R CMD check results
 
 * Windows:
 0 errors | 0 warnings | 1 notes
 
-* macOS:
+* Debian Linux:
 0 errors | 0 warnings | 1 notes

@@ -65,5 +65,10 @@ Authors:
   \item Tom Zylkin \email{tzylkin@richmond.edu}
 }
 
+Other contributors:
+\itemize{
+  \item Nicolas Apfel \email{n.apfel@soton.ac.uk} [contributor]
+}
+
 }
 \keyword{internal}
