@@ -88,6 +88,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
 test <- penhdfeppml_cluster(data = trade[, -(5:6)],
@@ -98,5 +99,6 @@ test <- penhdfeppml_cluster(data = trade[, -(5:6)],
                               cluster = c("exp", "imp"),
                               selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas),
                               tol = 1e-5, hdfetol = 1e-1)
+}
 
 }

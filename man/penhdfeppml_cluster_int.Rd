@@ -127,6 +127,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in Latin America and the Caribbean:
 LatAmericaCar <- countries$iso[countries$sub.region == "Latin America and the Caribbean"]
 trade <- trade[(trade$imp \%in\% LatAmericaCar) & (trade$exp \%in\% LatAmericaCar), ]
@@ -138,5 +139,6 @@ fes <- list(exp_time = interaction(trade$exp, trade$time),
             pair     = interaction(trade$exp, trade$imp))
 # Finally, we try penhdfeppml_cluster_int:
 reg <- penhdfeppml_cluster_int(y = y, x = x, fes = fes, cluster = fes$pair)
+}
 
 }

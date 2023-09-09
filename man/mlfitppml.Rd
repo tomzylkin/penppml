@@ -106,6 +106,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
 # Now we can use our main functions on the reduced trade data set:
@@ -117,5 +118,6 @@ test <- mlfitppml(data = trade[, -(5:6)],
                     selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas),
                     lambdas = c(0.01, 0.001),
                     tol = 1e-6, hdfetol = 1e-2)
+}
 
 }

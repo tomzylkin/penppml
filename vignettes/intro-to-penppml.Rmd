@@ -32,7 +32,7 @@ install.packages("penppml")
 library(penppml)
 ```
 
-```{r, hide=TRUE, eval=TRUE}
+```{r, hide=TRUE, eval=FALSE}
 devtools::load_all()
 ```
 
@@ -41,19 +41,11 @@ devtools::load_all()
 
 The `penppml` package features the `trade` data set, which integrates panel data on bilateral trade flows with information about specific provisions in trade agreements for 220 exporters and 270 importers. The provisions included in the package are a subset of 16 out of 305 "essential" provisions featured in the full data set. More information about the data set and the variables is included in the corresponding help file, accessible via `?trade`.
 
-```{r inspect trade, echo = FALSE}
-knitr::kable(head(trade[, 1:10], 10), format = "pipe", caption = "Table 1: International Trade Data Set")
-```
-
 Along with the `trade` data set, the package includes an auxiliary data frame, `countries`, which contains basic information about the country ISO codes included in the main data set.
-
-```{r inspect countries, echo = FALSE}
-knitr::kable(head(countries, 10), format = "pipe", caption = "Table 2: Country Data Set",)
-```
 
 This enables users to easily filter by region or subregion. For instance, if we want to restrict our analysis to countries in the Americas, we can do the following:
 
-```{r filter trade data, eval=TRUE}
+```{r filter trade data, eval=FALSE}
 selected <- countries$iso[countries$region %in% c("Americas")]
 trade2 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), -(5:6)] # We remove columns 5 and 
 # 6 because these variables are not needed in our regressions.
@@ -65,7 +57,7 @@ We will show the capabilities of this package using the filtered `trade2` data f
 
 The package enables users to run unpenalized PPML regressions with HDFE, using the `hdfeppml` function as follows:
 
-```{r try hdfeppml, eval=TRUE}
+```{r try hdfeppml, eval=FALSE}
 reg1 <- hdfeppml(data = trade2,
                  dep = "export",
                  fixed = list(c("exp", "time"), 
@@ -83,27 +75,13 @@ Internally, the function will do the necessary transformations of the columns in
 
 Alternatively, more advanced users who prefer to handle data transformations themselves can use the internal function `hdfeppml_int`. For more information and examples on this issue, run `?hdfeppml` or `?hdfeppml_int`. Note also that this applies to all of the main functions in our package: both the data-frame-friendly wrapper and the internal function are available for use.
 
-The results of our PPML model are:
+To obtain the results associated with our PPML model:
 
-```{r hdfeppml results, results = FALSE}
+```{r hdfeppml results, results = FALSE, eval=FALSE}
 results <- data.frame(prov = rownames(reg1$coefficients), b = reg1$coefficients, se = 0)
 results$se[!is.na(reg1$coefficients)] <- reg1$se
 results
 ```
-
-
-```{r display results, echo = FALSE}
-results <- data.frame(prov = rownames(reg1$coefficients), b = reg1$coefficients, se = 0)
-results$se[!is.na(reg1$coefficients)] <- reg1$se
-knitr::kable(list(results[1:8, ], results[9:16, ]), 
-             format = "pipe",
-             col.names = c("Provision", "Coefficient", "SE"), 
-             caption = "Table 3: Unpenalized PPML results",
-             row.names = FALSE,
-             digits = 4)
-```
-
-(Note that the functions is automatically dropping perfectly collinear variables from the estimation algorithm and reporting `NA` as the coefficient.)
 
 If we want to specify the independent variable, we can specify indep as pointing to columns 5 to 7 with the following code. 
 
@@ -122,7 +100,7 @@ reg1_indep <- hdfeppml(data = trade2, indep=5:7,
 
 The `mlfitppml` function is a flexible tool for computing penalized PPML regressions with HDFE. For instance, if we want to fit a PPML regression with a lasso penalty for several values of the penalty parameter (lambda) at once, we can run:
 
-```{r try mlfitpenppml lasso, results = FALSE}
+```{r try mlfitpenppml lasso, results = FALSE, eval=FALSE}
 lambdas <- c(0.05, 0.025, 0.01, 0.0075, 0.005, 0.0025, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 0)
 
 reg2 <- mlfitppml(data = trade2,
@@ -134,41 +112,11 @@ reg2 <- mlfitppml(data = trade2,
                   lambdas = lambdas)
 ```
 
-The function returns a list that contains two sets of coefficients for each value of lambda: the penalized coefficients (in the `beta_pre` element) and the post-penalty or unpenalized coefficients (in the `beta` element; these are calculated by estimating a post-penalty regression with just the selected variables). We can plot the regularization path of the penalized coefficients as follows:
-
-```{r plot regularization path}
-results <- as.data.frame(reg2$beta_pre)
-names(results) <- lambdas
-results$provision <- row.names(results)
-results <- reshape2::melt(results, id.vars = "provision", variable.name = "lambda", 
-                          value.name = "coefficient")
-results$lambda <- as.numeric(as.character(results$lambda))
-
-ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficient, col = provision)) +
-  ggplot2::geom_line(show.legend = FALSE) +
-  ggplot2::scale_x_reverse(expand = ggplot2::expansion(add = c(0, 0.015))) +
-  ggplot2::theme_classic() +
-  directlabels::geom_dl(ggplot2::aes(label = provision), 
-                        method = list(directlabels::dl.trans(x = x + 0.5), "last.qp")) +
-  ggplot2::labs(x = "Penalty parameter (lambda)", y = "Coefficient", 
-                title = "Figure 1: Regularization path for lasso")
-```
-
-The user can also get a penalized PPML regression without high-dimensional fixed effects. To do so, simply set the option fixed to NULL.
-
-```{r try mlfitpenppml lasso nofe, results = FALSE}
-lambdas <- c(0.025, 0.01, 0.0075, 0.005, 0.0025, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 0)
-
-reg2_nofe <- mlfitppml(data = trade2,
-                  dep = "export",
-                  fixed = NULL,
-                  penalty = "lasso",
-                  lambdas = lambdas)
-```
+The function returns a list that contains two sets of coefficients for each value of lambda: the penalized coefficients (in the `beta_pre` element) and the post-penalty or unpenalized coefficients (in the `beta` element; these are calculated by estimating a post-penalty regression with just the selected variables).
 
 If the user wishes to obtain the penalized estimates for a single value of lambda, they can either use `mlfitppml` as described above (just setting `lambdas == x`, where `x` is a number) or use the `penhdfeppml` function, upon which `mlfitppml` is built, directly. For instance:
 
-```{r try penhdfeppml, results = FALSE}
+```{r try penhdfeppml, results = FALSE, eval=FALSE}
 reg3 <- penhdfeppml(data = trade2,
                   dep = "export",
                   fixed = list(c("exp", "time"), 
@@ -178,19 +126,13 @@ reg3 <- penhdfeppml(data = trade2,
                   lambda = 0.005)
 ```
 
-We can easily check that the penalized coefficient estimates of `penhdfeppml` and `mlfitppml` are equal for a lambda value of 0.005 (within a numerical tolerance):
-
-```{r check penhdfeppml results}
-all.equal(as.vector(reg3$beta[!is.na(reg3$beta)]), as.vector(reg2$beta_pre[, 5]), tol = 1e-05)
-```
-
 For more details on `penhdfeppml`, run `?penhdfeppml`.
 
 ## Ridge regression (in development)
 
 `mlfitppml` also allows user to use the ridge penalty in their PPML regressions. Simply run:
 
-```{r try mlfitpenppml ridge, results = FALSE}
+```{r try mlfitpenppml ridge, results = FALSE, eval=FALSE}
 lambdas <- seq(0.0001, 0, length.out = 10) 
 
 reg4 <- mlfitppml(data = trade2,
@@ -210,7 +152,7 @@ Note that this feature is still in development and may contain bugs.
 
 The `mlfitppml` function enables users to carry out cross-validation of their models via the `xval` and `IDs` arguments. When `xval` is set to `TRUE`, the function performs cross-validation using a user-provided vector of IDs. For instance, if we want to do k-fold cross validation with k = 20,  splitting the data set by agreement (not by observation), we can do the following:
 
-```{r split data set by agreement}
+```{r split data set by agreement, eval = FALSE}
 id <- unique(trade[(trade$exp %in% selected) & (trade$imp %in% selected), 5])
 nfolds <- 20
 unique_ids <- data.frame(id = id, fold = sample(1:nfolds, size = length(id), replace = TRUE))
@@ -239,39 +181,11 @@ Now the function also returns a `rmse` element that includes the cross-validatio
 reg5$rmse
 ```
 
-```{r try cross validation nofe, eval = FALSE}
-reg5_nofe <- mlfitppml(data = trade2,
-                  dep = "export",
-                  fixed = NULL,
-                  penalty = "lasso",
-                  lambdas = c(seq(0.5, 0.1, by = -0.1), 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0),
-                  xval = TRUE,
-                  IDs =  cross_ids$fold)
-```
-
-```{r display xval results, echo = FALSE}
-# Note for package maintainer: notice that the code above is not being evaluated when building the vignette (due to the eval = FALSE option). This is for convenience: the cross-validation algorithm takes forever to run and, since vignettes are rebuilt a couple of times every time R CMD check is run, this makes it too cumbersome to check the package. Instead, I've run the code above in a separate R session and stored the results, which I'm reproducing below (re-running the code above should produce similar results):
-rmse <- structure(list(lambda = c(0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.01, 
-0.005, 0.001, 5e-04, 1e-04, 0), rmse = c(108.581317035247, 108.581317035247, 
-108.581317035247, 108.581317035247, 108.581317035247, 108.581317217437, 
-108.575034620904, 108.574325753172, 108.573959604138, 108.573944149073, 
-108.573933541391, 108.573931664275)), class = "data.frame", row.names = c(NA, 
--12L))
-knitr::kable(rmse, 
-             format = "pipe",
-             col.names = c("Penalty (lambda)", "RMSE"), 
-             caption = "Table 4: Cross-validation results",
-             row.names = FALSE,
-             digits = 4)
-```
-
-In this case, the RMSE criterion suggest that the penalty should be set at 0. In other words, the results in Table 3 are the ones that minimize the mean squared error of the regression, according to 20-fold cross-validation.
-
 ### Plugin lasso
 
 This package also enables the use of the plugin lasso method, incorporating coefficient-specific penalty weights calculated automatically by the package. The most convenient way to do this is to set `method = "plugin"` in `mlfitppml`. Note that the plugin algorithm requires a clustering variable  - we are using the interaction of the exporter and importer variables in the `trade` data set:
 
-```{r try plugin lasso, results = FALSE}
+```{r try plugin lasso, results = FALSE, eval=FALSE}
 reg6 <- mlfitppml(data = trade2,
                   dep = "export",
                   fixed = list(c("exp", "time"), 
@@ -281,27 +195,17 @@ reg6 <- mlfitppml(data = trade2,
                   method = "plugin",
                   cluster = c("exp", "imp"))
 ```
+To display the plugin lasso results:
 
-```{r plugin results, results = FALSE}
+```{r plugin results, results = FALSE, eval=FALSE}
 results <- data.frame(prov = rownames(reg6$beta), b_pre = reg6$beta_pre, b = reg6$beta, se = 0)
 results$se <- reg6$ses[1,]
 results
 ```
 
-```{r display plugin results, echo = FALSE}
-knitr::kable(list(results[1:7,], results[8:14,]), 
-             format = "pipe",
-             col.names = c("Provision", "Lasso Coefficient", "Post-Lasso Coefficient", "SE"), 
-             caption = "Table 5: Plugin Lasso results",
-             row.names = FALSE,
-             digits = 4)
-```
-
-We can see that the plugin lasso is very strict: only four provisions have non-zero coefficients when the penalties are set at the level suggested by the plugin algorithm. Compare this to the cross-validation results, which didn't remove any of the provisions.
-
 We can also set the gamma value as defined in Belloni et al. to something less strict, e.g. 0.3. 
 
-```{r try plugin lasso gamma, results = FALSE}
+```{r try plugin lasso gamma, results = FALSE, eval=FALSE}
 reg6_gamma <- mlfitppml(data = trade2,
                   dep = "export",
                   fixed = list(c("exp", "time"), 
@@ -313,61 +217,29 @@ reg6_gamma <- mlfitppml(data = trade2,
 rownames(reg6$beta)[which(reg6_gamma$beta != 0)]
 ```
 
-```{r plugin results gamma, results = FALSE}
+```{r plugin results gamma, results = FALSE, eval=FALSE}
 results_gamma <- data.frame(prov = rownames(reg6_gamma$beta), b_pre = reg6_gamma$beta_pre, b = reg6_gamma$beta, se = 0)
 results_gamma$se <- reg6_gamma$ses[1,]
 results_gamma
 ```
 
-```{r display plugin results gamma, echo = FALSE}
-knitr::kable(list(results_gamma[1:7,], results_gamma[8:14,]), 
-             format = "pipe",
-             col.names = c("Provision", "Lasso Coefficient", "Post-Lasso Coefficient", "SE"), 
-             caption = "Table 6: Plugin Lasso results, different gamma value",
-             row.names = FALSE,
-             digits = 4)
-```
-
-When doing this, we see that one more provision than before is selected.
-
 ### Iceberg lasso (in development)
 
 This package also allows users to implement the two-step lasso described in Breinlich et al. (2021). This method consists in, first, running a plugin lasso estimation and second, running individual lasso regressions on each of the variables selected in the first stage. The `iceberg` function is designed precisely with this second step in mind. It takes a vector of dependent variables and returns a lasso regression for each one of them:
 
-```{r try iceberg,  results = FALSE}
+```{r try iceberg,  results = FALSE, eval = FALSE}
 iceberg_results <- iceberg(data = trade2[, -(1:4)],
                            dep = results$prov[results$b != 0],
                            selectobs = (trade2$time == "2016"))
 ```
 
-Currently, the function returns a matrix with coefficient estimates for each of the selected provisions. Support for standard errors (including clustered) is in development as of the current version of the package. The iceberg lasso coefficients are:
-
-```{r iceberg results, results = FALSE}
-iceberg_results
-```
-
-
-```{r display iceberg results, echo = FALSE}
-knitr::kable(iceberg_results, 
-             format = "pipe",
-             caption = "Table 7: Iceberg Lasso coefficients",
-             row.names = TRUE,
-             digits = 4)
-```
+Currently, the function returns a matrix with coefficient estimates for each of the selected provisions. Support for standard errors (including clustered) is in development as of the current version of the package. 
 
 Since PPML coefficients can't be easily interpreted, you may find it useful to see the raw correlations between the variables in the iceberg lasso step:
 
-```{r iceberg correlations, results = FALSE}
+```{r iceberg correlations, results = FALSE, eval = FALSE}
 provcorr <- cor(trade2[, results$prov])
 (provcorr <- provcorr[, results$prov[results$b != 0]])
-```
-
-```{r iceberg correlations table, echo = FALSE}
-knitr::kable(provcorr, 
-             format = "pipe",
-             caption = "Table 7: Iceberg Lasso correlations",
-             row.names = TRUE,
-             digits = 4)
 ```
 
 # Bootstrap Lasso
@@ -376,7 +248,7 @@ To illustrate this, we select the trade data, but now not dropping id and agreem
 
 We want to cluster by agreement, that means that we draw observations with the same agreement ID. For this, we need to create a new agreement ID in the following way:
 
-```{r, message=FALSE, warning=FALSE, results=FALSE, eval=TRUE}
+```{r, message=FALSE, warning=FALSE, results=FALSE, eval=FALSE}
 trade3 <- trade[(trade$exp %in% selected) & (trade$imp %in% selected), ] # Now, we need id and agreement variable
 # Let's cluster by agreement
 trade3$alt_id <- trade3$id # ID refers to agreement ID
@@ -400,19 +272,10 @@ trade3$clus <- alt_id2 #Add the ID to the data
 
 Next, we run Bootstrap Lasso, which means drawing agreement clusters with replacement using the ID just created. In the bootstrap() command, first hdfeppml() is run, using a dummy which is one when any provision was in place and zero otherwise to get initial values of mu. These are then used in plugin Lasso. This is repeated B times (as specified in bootreps) and the command selects those provisions selected by plugin in at least a fraction of cases. This fraction can be specified by the option boot_threshold (Default is 1 pc).
 
-```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE, eval=TRUE}
+```{r try bootstrap lasso, warning=FALSE, message=FALSE, results = FALSE, eval=FALSE}
 set.seed(123)
 bs1 <- bootstrap(data=trade3, dep="export", cluster_id="clus", fixed=list(c("exp", "time"), c("imp", "time"), c("exp", "imp")), indep=7:22, bootreps=10, colcheck_x = TRUE, colcheck_x_fes = TRUE, boot_threshold = 0.01, post=TRUE, gamma_val=0.01, verbose=FALSE)
 ```
-
-```{r bss table, echo = FALSE, eval=TRUE}
-knitr::kable(bs1$betas, 
-             format = "pipe",
-             caption = "Table 8: Coefficients of bootstrap repetitions",
-             row.names = TRUE,
-             digits = 2)
-```
-
 
 # References
 

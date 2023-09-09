@@ -57,26 +57,6 @@ reg <- mlfitppml(data = trade2,
                  lambdas = lambdas)
 ```
 
-We can plot the resulting regularization path as follows:
-
-```{r regularization_path, echo = FALSE}
-results <- as.data.frame(reg$beta)
-names(results) <- lambdas
-results$provision <- row.names(results)
-results <- reshape2::melt(results, id.vars = "provision", variable.name = "lambda", 
-                          value.name = "coefficient")
-results$lambda <- as.numeric(as.character(results$lambda))
-
-ggplot2::ggplot(data = results, mapping = ggplot2::aes(x = lambda, y = coefficient, col = provision)) +
-  ggplot2::geom_line(show.legend = FALSE) +
-  ggplot2::scale_x_reverse(expand = ggplot2::expansion(add = c(0, 0.015))) +
-  ggplot2::theme_classic() +
-  directlabels::geom_dl(ggplot2::aes(label = provision), 
-                        method = list(directlabels::dl.trans(x = x + 0.5), "last.qp")) +
-  ggplot2::labs(x = "Penalty parameter (lambda)", y = "Coefficient", 
-                title = "Figure 1: Regularization path for lasso")
-```
-
 For more examples and details on how to use the package, see the vignette.
 
 ## References

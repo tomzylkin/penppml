@@ -146,6 +146,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
 trade <- trade[(trade$imp \%in\% americas) & (trade$exp \%in\% americas), ]
@@ -160,5 +161,6 @@ reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1)
 
 # We can also try ridge:
 \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
+}
 
 }

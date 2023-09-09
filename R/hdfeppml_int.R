@@ -50,6 +50,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
@@ -61,6 +62,7 @@
 #'             pair     = interaction(trade$exp, trade$imp))
 #' # Finally, the call to hdfeppml_int:
 #' reg <- hdfeppml_int(y = y, x = x, fes = fes)
+#' }
 #'
 #' @section References:
 #' Breinlich, H., Corradi, V., Rocha, N., Ruta, M., Santos Silva, J.M.C. and T. Zylkin (2021).

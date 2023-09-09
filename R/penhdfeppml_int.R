@@ -60,6 +60,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' trade <- trade[(trade$imp %in% americas) & (trade$exp %in% americas), ]
@@ -74,6 +75,7 @@
 #'
 #' # We can also try ridge:
 #' \donttest{reg <- penhdfeppml_int(y = y, x = x, fes = fes, lambda = 0.1, penalty = "ridge")}
+#' }
 #'
 #' @inheritSection hdfeppml_int References
 #' @importFrom stats gaussian

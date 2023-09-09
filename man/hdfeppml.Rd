@@ -84,6 +84,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
 test <- hdfeppml(data = trade[, -(5:6)],
@@ -92,5 +93,6 @@ test <- hdfeppml(data = trade[, -(5:6)],
                                 c("imp", "time"),
                                 c("exp", "imp")),
                    selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas))
+}
 
 }

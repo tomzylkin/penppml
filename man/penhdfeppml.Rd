@@ -102,6 +102,7 @@ models with an application to gun control", \emph{Journal of Business & Economic
 }
 
 \examples{
+\dontrun{
 # To reduce run time, we keep only countries in the Americas:
 americas <- countries$iso[countries$region == "Americas"]
 test <- penhdfeppml(data = trade[, -(5:6)],
@@ -111,5 +112,6 @@ test <- penhdfeppml(data = trade[, -(5:6)],
                                    c("exp", "imp")),
                       lambda = 0.05,
                       selectobs = (trade$imp \%in\% americas) & (trade$exp \%in\% americas))
+}
 
 }

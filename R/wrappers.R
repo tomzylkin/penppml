@@ -50,6 +50,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' # Now we can use our main functions on the reduced trade data set:
@@ -61,6 +62,7 @@
 #'                     selectobs = (trade$imp %in% americas) & (trade$exp %in% americas),
 #'                     lambdas = c(0.01, 0.001),
 #'                     tol = 1e-6, hdfetol = 1e-2)
+#'}
 #'
 #' @inheritSection hdfeppml_int References
 
@@ -97,6 +99,7 @@ mlfitppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' test <- hdfeppml(data = trade[, -(5:6)],
@@ -105,6 +108,7 @@ mlfitppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL,
 #'                                 c("imp", "time"),
 #'                                 c("exp", "imp")),
 #'                    selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
+#'}
 #'
 #' @inheritSection hdfeppml_int References
 
@@ -151,6 +155,7 @@ hdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' test <- penhdfeppml(data = trade[, -(5:6)],
@@ -160,6 +165,7 @@ hdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NULL, 
 #'                                    c("exp", "imp")),
 #'                       lambda = 0.05,
 #'                       selectobs = (trade$imp %in% americas) & (trade$exp %in% americas))
+#'}
 #'
 #' @inheritSection hdfeppml_int References
 
@@ -204,6 +210,7 @@ penhdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NUL
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # To reduce run time, we keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
 #' test <- penhdfeppml_cluster(data = trade[, -(5:6)],
@@ -214,6 +221,7 @@ penhdfeppml <- function(data, dep = 1, indep = NULL, fixed = NULL, cluster = NUL
 #'                               cluster = c("exp", "imp"),
 #'                               selectobs = (trade$imp %in% americas) & (trade$exp %in% americas),
 #'                               tol = 1e-5, hdfetol = 1e-1)
+#'}
 #'
 #' @inheritSection hdfeppml_int References
 

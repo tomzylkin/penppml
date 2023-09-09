@@ -54,6 +54,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # First, we need to transform the data (this is what mlfitppml handles internally). Start by
 #' # filtering the data set to keep only countries in the Americas:
 #' americas <- countries$iso[countries$region == "Americas"]
@@ -71,6 +72,7 @@
 #' \donttest{reg <- mlfitppml_int(y = y, x = x, fes = fes, cluster = fes$pair, method = "plugin")}
 #'
 #' # For an example with cross-validation, please see the vignette.
+#' }
 #'
 #' @inheritSection hdfeppml_int References
 
