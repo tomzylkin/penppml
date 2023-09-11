@@ -101,6 +101,9 @@ collinearity_check <- function(y, x=NULL, fes=NULL, hdfetol, colcheck_x_fes=TRUE
 #' @importFrom rlang .data
 
 cluster_matrix <- function(e, cluster, x) {
+  if(is.null(cluster)) {
+    cluster=rep(1, length(e))
+  }
   K <- ncol(x)
   vars      <- data.frame(e = e, cluster = factor(cluster, exclude = TRUE), x = x)
   vars      <- vars[order(vars$cluster), ] #5780 is missing...

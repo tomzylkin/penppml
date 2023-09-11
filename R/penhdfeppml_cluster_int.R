@@ -59,7 +59,7 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
   xnames <- colnames(x)
   n <- length(y)
   k <- ncol(x) # BUG? should be defined after colcheck
-  nclusters <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
+  #nclusters <- nlevels(droplevels(cluster, exclude = if(anyNA(levels(cluster))) NULL else NA))
   x <- data.matrix(x)
 
   if(is.null(lambda)){
@@ -177,7 +177,11 @@ penhdfeppml_cluster_int <- function(y, x, fes, cluster, tol = 1e-8, hdfetol = 1e
                        mu = penreg$mu, colcheck_x = colcheck_x_post, colcheck_x_fes = colcheck_x_fes_post, cluster = cluster)
 
           mu_post      <- ppml_temp$mu
+          if(is.null(fes)){
+          x_resid_post <- collapse::fwithin(x=reg_x, g=factor(rep(1,length(reg_z))), w = mu_post)
+          }else{
           x_resid_post <- collapse::fhdwithin(reg_x, fes, w = mu_post)
+          }
           residuals_post <- y - mu_post
         }
         else{ # no covariates selected
