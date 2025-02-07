@@ -1,6 +1,6 @@
 Package: penppml
 Title: Penalized Poisson Pseudo Maximum Likelihood Regression
-Version: 0.2.3
+Version: 0.2.4
 Authors@R: c(
     person(given = "Diego",
            family = "Ferreras Garrucho",
@@ -12,8 +12,8 @@ Authors@R: c(
            email = "tzylkin@richmond.edu"),
     person(given = "Joao",
            family = "Cruz",
-           role = "cre",
-           email = "jm01780@surrey.ac.uk"),
+           role = c("cre","ctb"),
+           email = "joaocruz@iseg.ulisboa.pt"),
     person(given = "Nicolas",
            family = "Apfel",
            role = "ctb",
@@ -34,7 +34,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: gzip
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 LinkingTo: 
     Rcpp,
     RcppEigen

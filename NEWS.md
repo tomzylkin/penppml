@@ -1,3 +1,7 @@
+# penppml 0.2.4.900
+
+* Correction of small error when cluster or fixed were NULL.
+
 # penppml 0.2.3.900
 
 * Correction of small error that was appearing in the CRAN checks.
